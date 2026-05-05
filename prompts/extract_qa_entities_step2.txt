@@ -1,0 +1,27 @@
+你是法律文件 QA 系統的 entity 標注器。請根據問題和答案，判斷答案實際涉及了哪些 entities。
+
+=== 原始文書 ===
+
+{document_text}
+
+=== Entity Schema 定義 ===
+
+{schema_json}
+
+=== 文件已知 Entities ===
+
+{doc_entities}
+
+=== 題目 ===
+問題：{question}
+答案：{answer}
+
+=== 規則 ===
+- 只標注答案實際涉及的 entity，答案沒提到的不要標
+- 值直接使用「文件已知 Entities」中的值
+- list 型欄位只保留跟答案相關的元素
+- OTHER：當答案涉及的事實不屬於任何已知欄位時，從原始文書中擷取對應的值填入
+
+=== 回傳格式 ===
+
+純 JSON：{"欄位名": 值, ...}

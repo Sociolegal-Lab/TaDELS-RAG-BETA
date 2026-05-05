@@ -1,0 +1,441 @@
+{
+  "basic_info": {
+    "desc": "案件基本資訊 — 所有文書共通的基本事實與裁判資訊",
+    "fields": {
+      "DOC_TYPE": {
+        "name": "文書類型",
+        "type": "str",
+        "desc": "該份法律文書的類型",
+        "values": ["裁定", "刑事判決", "刑事簡易判決", "起訴書", "聲請簡易判決處刑書", "刑事裁定", "刑事裁定（抗告審）", "裁定（抗告審）", "刑事判決（二審）", "刑事宣示判決筆錄", "刑事宣示判決筆錄（協商程序判決）", "小額民事判決"],
+        "eval": "B"
+      },
+      "COURT": {
+        "name": "裁判機關",
+        "type": "str",
+        "desc": "作出裁定/判決的法院（含庭別與審級）",
+        "example": "臺灣臺中地方法院、臺灣士林地方法院簡易庭",
+        "eval": "B"
+      },
+      "TRANSFER_AGENCY": {
+        "name": "移送機關",
+        "type": "str",
+        "desc": "移送案件的警察機關（社維法案件適用，刑事案件為null）",
+        "example": "臺中市政府警察局霧峰分局",
+        "eval": "B"
+      },
+      "PROSECUTION": {
+        "name": "檢察機關",
+        "type": "str",
+        "desc": "起訴或聲請處刑的檢察署（刑事案件適用，社維法為null）",
+        "example": "臺灣臺中地方檢察署",
+        "eval": "B"
+      },
+      "CASE_NO": {
+        "name": "案號",
+        "type": "list[str]",
+        "desc": "案件編號（年度＋字別＋號），多案號以list表示",
+        "example": "109年度中秩字第94號",
+        "eval": "B"
+      },
+      "RELATED_CASE_NO": {
+        "name": "關聯案號",
+        "type": "list[str] | null",
+        "desc": "前審/起訴/偵查/上訴/併辦案號（null表示無關聯案號）",
+        "example": "109年度偵字第3272號",
+        "eval": "B"
+      },
+      "DEFENDANT": {
+        "name": "被移送人/被告",
+        "type": "list[str]",
+        "desc": "被移送或被起訴之行為人姓名（多被告以list表示）",
+        "example": ["廖顯文", "陳奇昌"],
+        "eval": "B"
+      },
+      "VICTIM": {
+        "name": "被害人/告訴人",
+        "type": "list[str] | null",
+        "desc": "因行為受害或提出告訴之自然人",
+        "example": ["許寬裕", "曾雅珠"],
+        "eval": "B"
+      },
+      "VICTIM_ORG": {
+        "name": "被害機構",
+        "type": "list[str] | null",
+        "desc": "因行為受害之法人或機構",
+        "example": ["羅東博愛醫院", "童綜合醫院"],
+        "eval": "B"
+      },
+      "APPELLANT": {
+        "name": "抗告人/上訴人",
+        "type": "str | null",
+        "desc": "對裁定提起抗告或對判決提起上訴之一方",
+        "example": "魏志軒、臺灣桃園地方檢察署檢察官",
+        "eval": "B"
+      },
+      "JUDGE": {
+        "name": "法官",
+        "type": "list[str] | null",
+        "desc": "承審法官（合議庭含審判長及陪席法官）",
+        "example": ["曹宗鼎", "顏珮珊（審判長）"],
+        "eval": "B"
+      },
+      "PROSECUTOR": {
+        "name": "檢察官",
+        "type": "str | null",
+        "desc": "偵辦/到庭/提起上訴之檢察官",
+        "example": "張永政（檢察官）、洪榮甫（提起公訴）",
+        "eval": "B"
+      },
+      "DEFENSE_LAWYER": {
+        "name": "辯護人",
+        "type": "str | null",
+        "desc": "被告之選任或指定辯護人",
+        "example": "吳光群律師",
+        "eval": "B"
+      },
+      "LEGAL_GUARDIAN": {
+        "name": "法定代理人",
+        "type": "str | null",
+        "desc": "未成年被移送人之法定代理人",
+        "example": "歐祖明",
+        "eval": "B"
+      },
+      "LAW": {
+        "name": "適用法條（原始）",
+        "type": "list[str]",
+        "desc": "法院適用或論及的所有法律條文（每條獨立一個元素）",
+        "example": "社會秩序維護法第63條第1項第5款",
+        "eval": "B"
+      },
+      "LAW_CLASSIFIED": {
+        "name": "適用法條（分類）",
+        "type": "list[dict]",
+        "desc": "每條法條標註功能角色",
+        "structure": {"article": "str — 法條名稱", "role": "str — 功能角色"},
+        "role_values": ["構成要件", "競合罪名", "競合處理", "量刑", "法律適用", "程序", "請求權基礎"],
+        "example": [{"article": "特別條例第14條", "role": "構成要件"}],
+        "eval": "B"
+      },
+      "ACT_TIME": {
+        "name": "行為時間",
+        "type": "str | null",
+        "desc": "行為人實施違法行為的時間（民國年月日，原文無具體日期時按照原文描述）",
+        "example": "109年4月2日",
+        "eval": "B"
+      },
+      "RULING_TIME": {
+        "name": "裁判時間",
+        "type": "str",
+        "desc": "法院作成裁定/判決的日期",
+        "example": "109年5月12日",
+        "eval": "B"
+      },
+      "ACT_PLACE": {
+        "name": "行為地點",
+        "type": "str | null",
+        "desc": "違法行為發生的地理位置",
+        "example": "臺中市○○區○○街○○號1樓",
+        "eval": "B"
+      },
+      "PLATFORM": {
+        "name": "傳播平台/管道",
+        "type": "list[str] | null",
+        "desc": "行為人實際散佈訊息所使用的平台或管道（僅指散佈平台，不含接收來源平台）",
+        "values": ["Facebook", "LINE", "Instagram", "PTT", "Dcard", "口頭", "電話"],
+        "eval": "B"
+      },
+      "GROUP_NAME": {
+        "name": "群組/頁面名稱",
+        "type": "str | null",
+        "desc": "散佈訊息的具體群組、社團或粉專名稱",
+        "example": "馬岡俱樂部、沙鹿之美",
+        "eval": "B"
+      },
+      "ACT_TYPE": {
+        "name": "行為態樣",
+        "type": "str",
+        "desc": "行為人具體做了什麼違法行為",
+        "example": "散佈不實謠言、轉傳不實訊息、口頭當眾宣稱自武漢返國",
+        "eval": "C"
+      },
+      "RUMOR_CONTENT": {
+        "name": "不實訊息內容",
+        "type": "str | null",
+        "desc": "被散佈的具體訊息內容",
+        "example": "武漢病毒博愛醫院送去一個確診的到了",
+        "eval": "C"
+      },
+      "SPREAD_TYPE": {
+        "name": "散佈類型",
+        "type": "str | null",
+        "desc": "行為人散佈的方式分類",
+        "values": ["原創", "轉傳", "轉傳加工", "原創／轉傳", "口頭傳述", "未載"],
+        "eval": "A"
+      },
+      "SPREAD_DETAIL": {
+        "name": "散佈方式細節",
+        "type": "str | null",
+        "desc": "原始的散佈方式描述（僅當原始資料為長描述時保留）",
+        "example": "臉書帳號「邱祥巴」轉貼",
+        "eval": "C"
+      },
+      "VERDICT_CATEGORY": {
+        "name": "裁判結果分類",
+        "type": "str | null",
+        "desc": "標準化的裁判結果分類",
+        "values": ["不罰", "罰鍰", "有罪", "有罪（協商判決）", "無罪", "起訴", "駁回", "部分罰鍰部分不罰", "抗告駁回", "民事賠償"],
+        "eval": "A"
+      },
+      "SANCTION": {
+        "name": "處罰內容",
+        "type": "str | null",
+        "desc": "法院宣告的處罰金額或刑度（不罰/無罪/起訴書為null）",
+        "example": "新臺幣貳仟元、拘役伍拾日、有期徒刑伍月",
+        "eval": "B"
+      },
+      "RATIONALE": {
+        "name": "裁判理由",
+        "type": "str | null",
+        "desc": "法院作出該裁判的理由（起訴書/聲請書為null）",
+        "example": "審酌動機、目的、手段、智識程度、所生危害及犯後態度等",
+        "eval": "C"
+      },
+      "OTHER": {
+        "name": "其他事實",
+        "type": "str | null",
+        "desc": "答案涉及的事實資訊但不屬於其他 entity 欄位",
+        "example": "50分鐘、68人、VOLK11、114.27.29.131",
+        "eval": "C"
+      }
+    }
+  },
+  "elements": {
+    "desc": "構成要件分析 — 法院對客觀要件（不實性、公共危害）與主觀要件（故意）的認定",
+    "fields": {
+      "FALSITY": {
+        "name": "訊息不實性認定",
+        "type": "str | null",
+        "desc": "法院/檢察官對訊息是否構成謠言或不實訊息的認定",
+        "values": ["肯定", "否定", "未認定"],
+        "example": "肯定",
+        "eval": "A"
+      },
+      "FALSITY_DESC": {
+        "name": "訊息不實性說明",
+        "type": "str | null",
+        "desc": "法院認定訊息不實性的具體理由",
+        "example": "經中央流行疫情指揮中心函覆確認該訊息為不實訊息，且被移送人於警詢時已供承所傳送訊息為謠言",
+        "eval": "C"
+      },
+      "PUBLIC_HARM": {
+        "name": "公共危害認定",
+        "type": "str | null",
+        "desc": "法院對公共安寧影響或足生損害的認定",
+        "values": ["肯定", "否定", "未認定"],
+        "example": "肯定",
+        "eval": "A"
+      },
+      "PUBLIC_HARM_DESC": {
+        "name": "公共危害說明",
+        "type": "str | null",
+        "desc": "法院認定公共危害的具體理由",
+        "example": "致民眾擔憂疫情而心生畏懼與恐慌，足以影響公共安寧",
+        "eval": "C"
+      },
+      "INTENT_BINARY": {
+        "name": "故意認定",
+        "type": "str | null",
+        "desc": "故意之有無（傳染病的直接故意與未必故意均映射為肯定）",
+        "values": ["肯定", "否定", "未認定"],
+        "example": "否定",
+        "eval": "A"
+      },
+      "INTENT_DETAIL": {
+        "name": "故意類型",
+        "type": "str | null",
+        "desc": "故意之類型（僅傳染病案件區分，社維法案件為null）",
+        "values": ["直接故意", "未必故意", null],
+        "example": "未必故意",
+        "eval": "A"
+      },
+      "INTENT_DESC": {
+        "name": "故意說明",
+        "type": "str | null",
+        "desc": "法院認定主觀故意的具體理由",
+        "example": "未詳加查證即轉貼於LINE群組，足見有不論訊息是否為真實亦將予散布之不確定故意",
+        "eval": "C"
+      },
+      "LAW_COMPARISON": {
+        "name": "新舊法比較",
+        "type": "str | null",
+        "desc": "行為時法vs裁判時法的適用結果（僅傳染病案件，社維法為null）",
+        "example": "適用行為時法、適用特別條例14條",
+        "eval": "A"
+      }
+    }
+  },
+  "concurrence": {
+    "desc": "競合罪名分析 — 同一行為觸犯多罪名時的競合關係與各罪認定",
+    "fields": {
+      "CONCURRENCE_TYPE": {
+        "name": "競合類型",
+        "type": "str",
+        "desc": "本案罪名間的競合關係",
+        "values": ["想像競合", "數罪併罰", "接續犯", "法規競合"],
+        "eval": "A"
+      },
+      "DEFAME_FINDING": {
+        "name": "誹謗名譽損害認定",
+        "type": "str | null",
+        "desc": "法院對「足以毀損他人名譽」的認定",
+        "values": ["肯定", "否定", "告訴人撤回告訴"],
+        "eval": "A"
+      },
+      "DEFAME_DEFENSE": {
+        "name": "誹謗真實性/公益抗辯",
+        "type": "str | null",
+        "desc": "被告主張真實性抗辯或公共利益抗辯的結果",
+        "values": ["抗辯成立", "抗辯不成立", "未主張"],
+        "eval": "A"
+      },
+      "THREAT_FINDING": {
+        "name": "恐嚇公眾加害意涵認定",
+        "type": "str | null",
+        "desc": "法院對「以加害生命身體之事恐嚇公眾」的認定",
+        "values": ["肯定", "否定"],
+        "eval": "A"
+      },
+      "PRIVACY_FINDING": {
+        "name": "個資法非法利用認定",
+        "type": "str | null",
+        "desc": "法院對「非法利用個人資料」的認定",
+        "values": ["肯定", "否定"],
+        "eval": "A"
+      }
+    }
+  },
+  "prior_record": {
+    "desc": "程序與前案資訊 — 被告前科紀錄與累犯加重",
+    "fields": {
+      "PRIOR_RECORD": {
+        "name": "前科/累犯",
+        "type": "str | null",
+        "desc": "被告之前案紀錄及是否構成累犯",
+        "values": ["無前科", "構成累犯"],
+        "eval": "C"
+      },
+      "RECIDIVIST_ENHANCE": {
+        "name": "累犯加重與否",
+        "type": "str | null",
+        "desc": "法院是否依累犯規定加重其刑",
+        "values": ["加重", "不加重", "不適用"],
+        "eval": "A"
+      }
+    }
+  },
+  "civil_tort": {
+    "desc": "民事侵權分析 — 民事損害賠償案件的侵權認定與賠償",
+    "fields": {
+      "TORT_TYPE": {
+        "name": "侵權行為類型",
+        "type": "str",
+        "desc": "侵權行為的法律分類",
+        "example": "民法第184條第1項前段（故意不法侵害名譽權）及後段（故意以背於善良風俗之方法加損害於他人）",
+        "eval": "C"
+      },
+      "REPUTATION_FINDING": {
+        "name": "名譽損害認定",
+        "type": "str",
+        "desc": "法院對名譽損害的認定",
+        "example": "肯定",
+        "eval": "A"
+      },
+      "DEFENDANT_DEFENSE": {
+        "name": "被告抗辯",
+        "type": "str",
+        "desc": "被告的抗辯理由",
+        "example": "辯稱僅係照樣造句、認同原告看書可有武漢肺炎抗體之意，法院認與客觀證據不符不予採信",
+        "eval": "C"
+      },
+      "COVID_RELATION": {
+        "name": "與疫情之關聯",
+        "type": "str",
+        "desc": "案件與疫情的關聯性",
+        "example": "被告留言將原告著作與武漢肺炎連結，但本案性質為民事名譽侵權，非刑事散播不實疫情訊息",
+        "eval": "C"
+      },
+      "DAMAGES": {
+        "name": "損害賠償",
+        "type": "str",
+        "desc": "法院判定的賠償金額",
+        "example": "精神慰撫金1萬元",
+        "eval": "B"
+      },
+      "LITIGATION_COST": {
+        "name": "訴訟費用",
+        "type": "str",
+        "desc": "訴訟費用的分擔",
+        "example": "1,000元，被告負擔100元，原告負擔900元",
+        "eval": "B"
+      }
+    }
+  },
+  "procedure": {
+    "desc": "程序歷程 — 文書在訴訟流程中的位置與關聯文書",
+    "fields": {
+      "PROC_STAGE": {
+        "name": "程序階段",
+        "type": "str",
+        "desc": "該文書在訴訟流程中的位置",
+        "values": ["偵查書類", "一審裁判", "上級審"],
+        "eval": "A"
+      },
+      "PREV_DOC": {
+        "name": "前階段文書",
+        "type": "list[str] | null",
+        "desc": "本案前一階段文書的案號（如起訴書之於判決）",
+        "example": "109年度嘉秩字第9號",
+        "eval": "B"
+      },
+      "NEXT_DOC": {
+        "name": "後階段文書",
+        "type": "list[str] | null",
+        "desc": "本案後一階段文書的案號（如判決之於起訴書）",
+        "example": "109年度秩抗字第1號",
+        "eval": "B"
+      }
+    }
+  },
+  "cited_authority": {
+    "desc": "援引法源 — 文書中引用的法條以外之上層司法權威來源",
+    "fields": {
+      "CITED_AUTHORITY": {
+        "name": "援引法源",
+        "type": "list[dict] | null",
+        "desc": "法院/檢察官引用的大法官解釋、最高法院判決或判例、上級判決",
+        "structure": {
+          "type": "str — 大法官解釋 / 最高法院判決或判例 / 上級判決",
+          "content": "str — 被引用的具體法源名稱（如釋字第775號）",
+          "precedent": "str | null — 被引用的最高法院判決或判例"
+        },
+        "example": [
+          {"type": "大法官解釋", "content": "釋字第509號", "precedent": null},
+          {"type": "最高法院判決或判例", "content": "最高法院40年台上字第86號", "precedent": "最高法院40年台上字第86號"}
+        ],
+        "eval": "B"
+      }
+    }
+  },
+  "law_role": {
+    "desc": "法條角色分類 — LAW_CLASSIFIED 欄位中 role 的值域定義",
+    "roles": {
+      "構成要件": {"desc": "被告被論罪/裁罰的實體法依據", "example": "社維法§63①⑤、傳染病§63、特別條例§14"},
+      "競合罪名": {"desc": "同一行為另觸犯的罪名", "example": "刑法§310誹謗、§151恐嚇公眾、§305恐嚇、個資法§41"},
+      "競合處理": {"desc": "罪名間競合關係的處理依據", "example": "刑法§55想像競合、§51數罪併罰"},
+      "量刑": {"desc": "法院裁量刑度的依據", "example": "易科罰金§41、易服勞役§42、緩刑§74、累犯加重§47"},
+      "法律適用": {"desc": "法律適用的一般規定", "example": "新舊法比較§2、刑法總則適用§11、從新從輕§7"},
+      "程序": {"desc": "訴訟程序進行的依據", "example": "抗告§92、移送時效§31、刑訴§412/§413"},
+      "請求權基礎": {"desc": "民事案件的請求權基礎", "example": "民法§184侵權、§195非財產損害"}
+    }
+  }
+}

@@ -1,0 +1,2721 @@
+{
+  "summary": {
+    "total_questions": 101,
+    "unanswerable_count": 33,
+    "answerable_count": 68,
+    "avg_unanswerable_em": 0.9090909090909091,
+    "avg_entity_matching_score": 0.9352767302006821,
+    "avg_entity_score": 0.9058649654947998,
+    "avg_answer_fallback_score": 0.722052275058209,
+    "avg_hallucination_penalty": 0.016176470588235296,
+    "avg_hallucination_rate": 0.029356856378915202,
+    "avg_ndcg@5": 0.9656932147509906
+  },
+  "details": [
+    {
+      "question_id": "A_0001_0008_0196_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "OTHER": 1.0
+      },
+      "answer_detail": {
+        "OTHER": 0.6387619972229004
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "GROUP_NAME": {
+          "value": "我是大○人",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0196_L_1",
+      "type": "long",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 0.17529036104679108,
+      "entity_detail": {
+        "SPREAD_TYPE": 1.0,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DETAIL": 1.0,
+        "INTENT_DESC": 1.0
+      },
+      "answer_detail": {
+        "SPREAD_TYPE": 0.0,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DETAIL": 0.0,
+        "INTENT_DESC": 0.7011614441871643
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "DEFENDANT": {
+          "value": [
+            "古宗玄"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "SPREAD_DETAIL": {
+          "value": "以暱稱「Gao Hao Yu」之帳號登入臉書，在臉書社團「我是大○人」轉貼上開訊息，並在貼文上加註「這個人被通報，請大家留意」等語",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "FALSITY_DESC": {
+          "value": "被告自承並沒有查證過即逕行在網路上分享，訊息來源為不詳友人，內容認定為不實訊息",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0043_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "VERDICT_CATEGORY": 1.0
+      },
+      "answer_detail": {
+        "VERDICT_CATEGORY": 1.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0043_L_1",
+      "type": "long",
+      "entity_matching_score": 0.9858628660440445,
+      "entity_score": 0.9858628660440445,
+      "answer_fallback_score": 0.4914282038807869,
+      "entity_detail": {
+        "VERDICT_CATEGORY": 1.0,
+        "RATIONALE": 0.8869026899337769,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 1.0000001192092896,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 1.0,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DESC": 1.0000001192092896
+      },
+      "answer_detail": {
+        "VERDICT_CATEGORY": 1.0,
+        "RATIONALE": 0.8217401504516602,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.7265868782997131,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.601158857345581,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DESC": 0.7819397449493408
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "LAW_CLASSIFIED": {
+          "value": [
+            {
+              "article": "社會秩序維護法第63條第1項第5款",
+              "role": "構成要件"
+            }
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "ACT_TYPE": {
+          "value": "於LINE通訊軟體群組內以署名「德妮培安幼兒園」散布關於新冠肺炎南部女性確診案例之訊息",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "SPREAD_DETAIL": {
+          "value": "將網路新聞內容口語化轉換成文字訊息後張貼至LINE群組",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "PLATFORM": {
+          "value": [
+            "LINE"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "SPREAD_TYPE": {
+          "value": "轉傳加工",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "LAW": {
+          "value": [
+            "社會秩序維護法第63條第1項第5款"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0043_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 0.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0067_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "VERDICT_CATEGORY": 1.0
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "VERDICT_CATEGORY": 1.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0067_L_1",
+      "type": "long",
+      "entity_matching_score": 0.7306111982890539,
+      "entity_score": 0.7306111982890539,
+      "answer_fallback_score": 0.20665621544633592,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "VERDICT_CATEGORY": 1.0,
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 0.4,
+        "PLATFORM": 1.0,
+        "SPREAD_TYPE": 0.0,
+        "SPREAD_DETAIL": 0.0,
+        "RATIONALE": 0.8285566568374634,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 0.0,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 1.0,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DESC": 1.0000001192092896
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "VERDICT_CATEGORY": 0.0,
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "PLATFORM": 0.0,
+        "SPREAD_TYPE": 0.0,
+        "SPREAD_DETAIL": 0.4518248736858368,
+        "RATIONALE": 0.7960159778594971,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.5262064337730408,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.5643033385276794,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DESC": 0.5548363924026489
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0067_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0211_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0
+      },
+      "answer_detail": {
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "DEFENDANT": {
+          "value": [
+            "許琦琦"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0211_L_1",
+      "type": "long",
+      "entity_matching_score": 0.8911656269005367,
+      "entity_score": 0.8911656269005367,
+      "answer_fallback_score": 0.28197899035045076,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "ACT_TIME": 1.0,
+        "PLATFORM": 1.0,
+        "GROUP_NAME": 1.0,
+        "ACT_TYPE": 0.9115838408470154,
+        "RUMOR_CONTENT": 0.9817893505096436,
+        "SPREAD_TYPE": 0.0,
+        "SPREAD_DETAIL": 0.825353741645813,
+        "FALSITY": 1.0,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 0.7804600596427917,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DETAIL": 1.0,
+        "INTENT_DESC": 0.9771317839622498
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "ACT_TIME": 1.0,
+        "PLATFORM": 0.0,
+        "GROUP_NAME": 0.0,
+        "ACT_TYPE": 0.6384822130203247,
+        "RUMOR_CONTENT": 0.5459945797920227,
+        "SPREAD_TYPE": 0.0,
+        "SPREAD_DETAIL": 0.6869350075721741,
+        "FALSITY": 0.0,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.46301424503326416,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DETAIL": 0.0,
+        "INTENT_DESC": 0.6132798194885254
+      },
+      "hallucination_penalty": 0.15,
+      "hallucination_rate": 0.07142857142857142,
+      "hallucination_detail": {
+        "OTHER": {
+          "value": "被告員工潘俐璇（不知情）；被告所營隆易生活實業有限公司（登記地：桃園市○○區○○路0巷00號，實際營業地：桃園市○○區○○○○街000巷00號），許琦琦為負責人；案經法務部調查局高雄市調查處移送偵辦",
+          "type": "contradictory",
+          "penalty": 0.15
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0211_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0044_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "VERDICT_CATEGORY": 1.0
+      },
+      "answer_detail": {
+        "VERDICT_CATEGORY": 1.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "DEFENDANT": {
+          "value": [
+            "李中岑",
+            "王家貞",
+            "勞德正",
+            "李昱潔"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0044_L_1",
+      "type": "long",
+      "entity_matching_score": 0.7616795281569163,
+      "entity_score": 0.7616795281569163,
+      "answer_fallback_score": 0.3163830578327179,
+      "entity_detail": {
+        "CASE_NO": 0.0,
+        "DEFENDANT": 0.0,
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 0.6666666666666666,
+        "VERDICT_CATEGORY": 1.0,
+        "RATIONALE": 0.9501286149024963,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DESC": 1.0,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 1.0
+      },
+      "answer_detail": {
+        "CASE_NO": 0.0,
+        "DEFENDANT": 0.0,
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "VERDICT_CATEGORY": 1.0,
+        "RATIONALE": 0.8775910139083862,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DESC": 0.6571347713470459,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.6291047930717468
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "FALSITY": {
+          "value": "未認定",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "ACT_TYPE": {
+          "value": "散布振興三倍券偽券謠言：勞德正變造訊息後於LINE群組發佈；李昱潔轉傳訊息口頭告知王家貞議員；王家貞、李中岑於記者會公開發表相關言論",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "PLATFORM": {
+          "value": [
+            "LINE",
+            "口頭"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "FALSITY_DESC": {
+          "value": "法院未就訊息客觀真偽作明確認定，而係以被移送人對振興三倍券之時事提出針砭屬可受公評之公共政策，難認有捏造不實謠言之故意",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0044_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0129_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "SANCTION": 1.0
+      },
+      "answer_detail": {
+        "SANCTION": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0129_L_1",
+      "type": "long",
+      "entity_matching_score": 0.9851559661328793,
+      "entity_score": 0.9851559661328793,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "ACT_TIME": 1.0,
+        "ACT_PLACE": 1.0,
+        "VICTIM_ORG": 1.0,
+        "PLATFORM": 1.0,
+        "ACT_TYPE": 0.7624951004981995,
+        "RUMOR_CONTENT": 1.0000001192092896,
+        "SPREAD_TYPE": 1.0,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 1.0,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 1.0000001192092896,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DETAIL": 1.0,
+        "INTENT_DESC": 1.0000001192092896,
+        "VICTIM": 1.0
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "ACT_TIME": 1.0,
+        "ACT_PLACE": 0.0,
+        "VICTIM_ORG": 0.0,
+        "PLATFORM": 0.0,
+        "ACT_TYPE": 0.5549315810203552,
+        "RUMOR_CONTENT": 0.3205054700374603,
+        "SPREAD_TYPE": 0.0,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.5546673536300659,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.6704773306846619,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DETAIL": 0.0,
+        "INTENT_DESC": 0.7370696067810059,
+        "VICTIM": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0129_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0006_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "PLATFORM": 1.0
+      },
+      "answer_detail": {
+        "PLATFORM": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0006_L_1",
+      "type": "long",
+      "entity_matching_score": 0.879118659098943,
+      "entity_score": 0.879118659098943,
+      "answer_fallback_score": 0.3300393025080363,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "VERDICT_CATEGORY": 1.0,
+        "LAW": 0.8,
+        "LAW_CLASSIFIED": 0.8,
+        "RATIONALE": 0.9494239091873169,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 1.0,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 1.0,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DESC": 1.0,
+        "PLATFORM": 0.0
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "VERDICT_CATEGORY": 1.0,
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "RATIONALE": 0.8747308850288391,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.7533610463142395,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.648781955242157,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DESC": 0.6835977435112,
+        "PLATFORM": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "PROC_STAGE": {
+          "value": "一審裁判",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0006_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0171_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0
+      },
+      "answer_detail": {
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0171_L_1",
+      "type": "long",
+      "entity_matching_score": 1.000000011920929,
+      "entity_score": 1.000000011920929,
+      "answer_fallback_score": 0.35208130478858946,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "ACT_TIME": 1.0,
+        "ACT_PLACE": 1.0,
+        "PLATFORM": 1.0,
+        "ACT_TYPE": 1.0000001192092896,
+        "RUMOR_CONTENT": 1.0,
+        "SPREAD_TYPE": 1.0,
+        "SPREAD_DETAIL": 1.0,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 1.0
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "ACT_TIME": 1.0,
+        "ACT_PLACE": 0.0,
+        "PLATFORM": 0.0,
+        "ACT_TYPE": 0.6160715222358704,
+        "RUMOR_CONTENT": 0.6313861608505249,
+        "SPREAD_TYPE": 0.0,
+        "SPREAD_DETAIL": 0.6283453702926636,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.6450099945068359
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "INTENT_DESC": {
+          "value": "被告明知自身未患有武漢肺炎亦未住院，仍基於散播有關武漢肺炎流行疫情不實訊息之犯意，及縱引起公眾恐慌亦不違背其本意之恐嚇公眾不確定故意，在臉書留言散播不實內容",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "INTENT_BINARY": {
+          "value": "肯定",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "OTHER": {
+          "value": "同案被告梁寶庭所涉散播不實訊息等罪嫌部分另為不起訴處分；梁寶庭嗣後於鍋台銘時尚湯鍋桃園春日店Google評論下轉述被告留言，並通知員工陳淑芬，再由陳淑芬轉告店長王翰麟",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "INTENT_DETAIL": {
+          "value": "直接故意",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0171_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0137_S_2",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "SANCTION": 1.0
+      },
+      "answer_detail": {
+        "SANCTION": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "DEFENDANT": {
+          "value": [
+            "張岳旻"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0137_L_1",
+      "type": "long",
+      "entity_matching_score": 0.8571428571428571,
+      "entity_score": 0.8571428571428571,
+      "answer_fallback_score": 0.14285714285714285,
+      "entity_detail": {
+        "CASE_NO": 1.0,
+        "DEFENDANT": 1.0,
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 0.0,
+        "ACT_TYPE": 1.0,
+        "SANCTION": 1.0,
+        "VERDICT_CATEGORY": 1.0
+      },
+      "answer_detail": {
+        "CASE_NO": 0.0,
+        "DEFENDANT": 0.0,
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "ACT_TYPE": 1.0,
+        "SANCTION": 0.0,
+        "VERDICT_CATEGORY": 0.0
+      },
+      "hallucination_penalty": 0.05,
+      "hallucination_rate": 0.08333333333333333,
+      "hallucination_detail": {
+        "RELATED_CASE_NO": {
+          "value": [
+            "109年度撤緩偵字第492號"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "RUMOR_CONTENT": {
+          "value": "死亡病例的姪女婿住在豐原水源路，目前在署豐，負壓病房隔離治療！今天水源路整條消毒。不要靠近立淇湯包附近...保護自身安全",
+          "type": "unsupported",
+          "penalty": 0.05
+        },
+        "DOC_TYPE": {
+          "value": "刑事簡易判決",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "FALSITY": {
+          "value": "肯定",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "PROC_STAGE": {
+          "value": "一審裁判",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "PREV_DOC": {
+          "value": [
+            "109年度撤緩偵字第492號"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0137_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0004_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "ACT_TIME": 1.0
+      },
+      "answer_detail": {
+        "ACT_TIME": 1.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0004_L_1",
+      "type": "long",
+      "entity_matching_score": 0.997076565027237,
+      "entity_score": 0.997076565027237,
+      "answer_fallback_score": 0.3593246042728424,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "ACT_TIME": 1.0,
+        "VERDICT_CATEGORY": 1.0,
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0,
+        "RATIONALE": 0.9707654118537903,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 1.0000001192092896,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DESC": 1.0000001192092896
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "ACT_TIME": 1.0,
+        "VERDICT_CATEGORY": 0.0,
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "RATIONALE": 1.0,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.7550379037857056,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DESC": 0.8382081389427185
+      },
+      "hallucination_penalty": 0.15,
+      "hallucination_rate": 0.09090909090909091,
+      "hallucination_detail": {
+        "OTHER": {
+          "value": "被移送人係看到雅虎知識家上「肛交是否容易比較容易得到ADSL？」之網路笑話後發文回應；被移送人經警方通知後旋即將系爭貼文刪除；截至109年4月7日，國內已確診之COVID-19案例計376例；移送書文...",
+          "type": "contradictory",
+          "penalty": 0.15
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0004_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0163_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "SANCTION": 1.0
+      },
+      "answer_detail": {
+        "SANCTION": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "DEFENDANT": {
+          "value": [
+            "王元獅"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0163_L_1",
+      "type": "long",
+      "entity_matching_score": 0.9465898871421814,
+      "entity_score": 0.9465898871421814,
+      "answer_fallback_score": 0.8737190365791321,
+      "entity_detail": {
+        "RATIONALE": 0.9465898871421814
+      },
+      "answer_detail": {
+        "RATIONALE": 0.8737190365791321
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "DEFENDANT": {
+          "value": [
+            "王元獅"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "CASE_NO": {
+          "value": [
+            "109年度嘉簡字第609號"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 0.6131471927654584
+    },
+    {
+      "question_id": "A_0001_0008_0163_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 0.6131471927654584
+    },
+    {
+      "question_id": "A_0001_0008_0116_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "SANCTION": 1.0
+      },
+      "answer_detail": {
+        "SANCTION": 1.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0116_L_1",
+      "type": "long",
+      "entity_matching_score": 1.0000000198682149,
+      "entity_score": 1.0000000198682149,
+      "answer_fallback_score": 0.4066679775714874,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "LAW": 1.0,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DETAIL": 1.0,
+        "INTENT_DESC": 1.0,
+        "FALSITY_DESC": 1.0000001192092896
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "LAW": 0.0,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DETAIL": 1.0,
+        "INTENT_DESC": 0.8547366261482239,
+        "FALSITY_DESC": 0.5852712392807007
+      },
+      "hallucination_penalty": 0.15,
+      "hallucination_rate": 0.08333333333333333,
+      "hallucination_detail": {
+        "LAW_CLASSIFIED": {
+          "value": [
+            {
+              "article": "傳染病防治法第63條",
+              "role": "構成要件"
+            }
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "PUBLIC_HARM_DESC": {
+          "value": "不認識被告之一般大眾無從辨別貼文為不實訊息，可能誤認被告確自武漢返臺，產生疫情蔓延之疑慮；帳號「洪珮瑄」詢問是否真的飛過去，帳號「紀尼釦」轉發至行政院長臉書請求協助，顯示閱覽者並非全數知悉為不實；不僅...",
+          "type": "contradictory",
+          "penalty": 0.15
+        },
+        "ACT_TYPE": {
+          "value": "在臉書以公開設定（開地球）發表貼文，虛假將位置標註為武漢地區，附上相關照片及文字，散播有關傳染病流行疫情之不實訊息",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "FALSITY": {
+          "value": "肯定",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "PLATFORM": {
+          "value": [
+            "Facebook"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "PUBLIC_HARM": {
+          "value": "肯定",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0116_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0145_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "SANCTION": 1.0
+      },
+      "answer_detail": {
+        "SANCTION": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "DEFENDANT": {
+          "value": [
+            "陳沂駿",
+            "楊智涵"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0145_L_1",
+      "type": "long",
+      "entity_matching_score": 0.9521360238393147,
+      "entity_score": 0.9521360238393147,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "ACT_TIME": 1.0,
+        "ACT_PLACE": 1.0,
+        "PLATFORM": 1.0,
+        "ACT_TYPE": 0.6971750855445862,
+        "RUMOR_CONTENT": 0.9486960768699646,
+        "SPREAD_TYPE": 1.0,
+        "SPREAD_DETAIL": 1.0,
+        "VICTIM_ORG": 1.0,
+        "FALSITY": 1.0,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 0.796409547328949,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DETAIL": 1.0,
+        "INTENT_DESC": 0.8397596478462219
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "ACT_TIME": 1.0,
+        "ACT_PLACE": 0.0,
+        "PLATFORM": 0.0,
+        "ACT_TYPE": 0.41462597250938416,
+        "RUMOR_CONTENT": 0.7774112224578857,
+        "SPREAD_TYPE": 0.0,
+        "SPREAD_DETAIL": 0.6973764896392822,
+        "VICTIM_ORG": 0.0,
+        "FALSITY": 0.0,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.47767379879951477,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DETAIL": 0.0,
+        "INTENT_DESC": 0.691759467124939
+      },
+      "hallucination_penalty": 0.15,
+      "hallucination_rate": 0.0625,
+      "hallucination_detail": {
+        "FALSITY_DESC": {
+          "value": "台新國際商業銀行羅東分行並無員工確診，僅起動異地備援；證人莊焙然（羅東分行經理）具結證稱公司無人確診，被告等所傳訊息純屬謠言，銀行公告亦證明並非確診公告",
+          "type": "contradictory",
+          "penalty": 0.15
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0145_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 0.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0179_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 0.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "SPREAD_DETAIL": 0.0
+      },
+      "answer_detail": {
+        "SPREAD_DETAIL": 0.41160714626312256
+      },
+      "hallucination_penalty": 0.05,
+      "hallucination_rate": 0.3333333333333333,
+      "hallucination_detail": {
+        "DEFENDANT": {
+          "value": [
+            "謝和弦"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "OTHER": {
+          "value": "被移送人使用暱稱「chord0415」之帳號",
+          "type": "unsupported",
+          "penalty": 0.05
+        },
+        "PLATFORM": {
+          "value": [
+            "Instagram"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0179_L_1",
+      "type": "long",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 0.25,
+      "entity_detail": {
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0,
+        "ACT_TIME": 1.0,
+        "LAW_COMPARISON": 1.0
+      },
+      "answer_detail": {
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "ACT_TIME": 1.0,
+        "LAW_COMPARISON": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 0.46927872602275644
+    },
+    {
+      "question_id": "A_0001_0008_0179_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0007_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "SANCTION": 1.0
+      },
+      "answer_detail": {
+        "SANCTION": 1.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "VERDICT_CATEGORY": {
+          "value": "罰鍰",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "DEFENDANT": {
+          "value": [
+            "何智瑋"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0007_L_1",
+      "type": "long",
+      "entity_matching_score": 0.9935076713562012,
+      "entity_score": 0.9935076713562012,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "ACT_TIME": 1.0,
+        "PLATFORM": 1.0,
+        "ACT_TYPE": 1.0000001192092896,
+        "RUMOR_CONTENT": 0.992406964302063,
+        "SPREAD_DETAIL": 1.0,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 1.0,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 0.9426696300506592
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "ACT_TIME": 1.0,
+        "PLATFORM": 0.0,
+        "ACT_TYPE": 0.7151943445205688,
+        "RUMOR_CONTENT": 0.552668035030365,
+        "SPREAD_DETAIL": 0.6058729290962219,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.6143460869789124,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.651466429233551
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "ACT_PLACE": {
+          "value": "臺中市○區○○里○○○路○○○號5樓之2",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0007_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0084_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0
+      },
+      "answer_detail": {
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "DEFENDANT": {
+          "value": [
+            "蔡庭瑜"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "CASE_NO": {
+          "value": [
+            "109年度鳳秩字第16號"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0084_L_1",
+      "type": "long",
+      "entity_matching_score": 0.9949608445167542,
+      "entity_score": 0.9949608445167542,
+      "answer_fallback_score": 0.3955398499965668,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0,
+        "RUMOR_CONTENT": 1.0000001192092896,
+        "VERDICT_CATEGORY": 1.0,
+        "RATIONALE": 0.9395300149917603,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 1.0,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 1.0,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DESC": 1.0
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "RUMOR_CONTENT": 0.6306013464927673,
+        "VERDICT_CATEGORY": 1.0,
+        "RATIONALE": 0.9151846170425415,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.7354702353477478,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.6647208333015442,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DESC": 0.8005011677742004
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0084_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0013_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0
+      },
+      "answer_detail": {
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "DEFENDANT": {
+          "value": [
+            "何之瀚"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0013_L_1",
+      "type": "long",
+      "entity_matching_score": 0.8259688417116801,
+      "entity_score": 0.8259688417116801,
+      "answer_fallback_score": 0.32454223930835724,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "VERDICT_CATEGORY": 1.0,
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0,
+        "ACT_TIME": 0.0,
+        "RUMOR_CONTENT": 1.0,
+        "RATIONALE": 0.9116259813308716,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 1.0,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 1.0000001192092896,
+        "cited_authority": 0.0
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "VERDICT_CATEGORY": 1.0,
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "ACT_TIME": 0.0,
+        "RUMOR_CONTENT": 0.5686270594596863,
+        "RATIONALE": 0.8848598599433899,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.8150545954704285,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.6259653568267822,
+        "cited_authority": 0.0
+      },
+      "hallucination_penalty": 0.15,
+      "hallucination_rate": 0.07142857142857142,
+      "hallucination_detail": {
+        "COURT": {
+          "value": "臺灣臺北地方法院臺北簡易庭",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "OTHER": {
+          "value": "案19（62歲白牌車司機）於109年1月25日發病，109年2月15日確診，感染源推測浙江台商；案27（80多歲長者）於109年2月6日發病，109年2月23日確診，感染源迄今不明；二例發病日均在被移送人發言之前",
+          "type": "contradictory",
+          "penalty": 0.15
+        },
+        "PLATFORM": {
+          "value": [
+            "Facebook"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "GROUP_NAME": {
+          "value": "東森新聞臉書",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0013_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0046_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "SANCTION": 1.0
+      },
+      "answer_detail": {
+        "SANCTION": 1.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "VERDICT_CATEGORY": {
+          "value": "罰鍰",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "DEFENDANT": {
+          "value": [
+            "黃嘉豪"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0046_L_1",
+      "type": "long",
+      "entity_matching_score": 0.9375000074505806,
+      "entity_score": 0.9375000074505806,
+      "answer_fallback_score": 0.29821869917213917,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0,
+        "ACT_TIME": 1.0,
+        "PLATFORM": 1.0,
+        "ACT_TYPE": 1.0,
+        "RUMOR_CONTENT": 1.0,
+        "VERDICT_CATEGORY": 1.0,
+        "SANCTION": 1.0,
+        "RATIONALE": 0.0,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 1.0,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 1.0000001192092896,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DESC": 1.0
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "ACT_TIME": 1.0,
+        "PLATFORM": 0.0,
+        "ACT_TYPE": 0.769014298915863,
+        "RUMOR_CONTENT": 0.5882588624954224,
+        "VERDICT_CATEGORY": 0.0,
+        "SANCTION": 0.0,
+        "RATIONALE": 0.4300486743450165,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.828559398651123,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.541002094745636,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DESC": 0.6146158576011658
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "SPREAD_TYPE": {
+          "value": "原創",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0046_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0104_S_2",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "RUMOR_CONTENT": 1.0
+      },
+      "answer_detail": {
+        "RUMOR_CONTENT": 0.5001036524772644
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0104_L_1",
+      "type": "long",
+      "entity_matching_score": 0.8317638499396188,
+      "entity_score": 0.8317638499396188,
+      "answer_fallback_score": 0.3079290900911604,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "LAW": 0.4,
+        "LAW_CLASSIFIED": 0.4,
+        "SPREAD_TYPE": 1.0,
+        "VERDICT_CATEGORY": 1.0,
+        "RATIONALE": 0.8446937799453735,
+        "RUMOR_CONTENT": 1.0,
+        "PLATFORM": 1.0,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DESC": 1.0000001192092896,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 1.0,
+        "GROUP_NAME": 0.0,
+        "ACT_TYPE": 1.0
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "SPREAD_TYPE": 0.0,
+        "VERDICT_CATEGORY": 1.0,
+        "RATIONALE": 0.9550015926361084,
+        "RUMOR_CONTENT": 0.36507242918014526,
+        "PLATFORM": 0.0,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DESC": 0.70224928855896,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.6589863300323486,
+        "GROUP_NAME": 0.0,
+        "ACT_TYPE": 0.6296976208686829
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "FALSITY": {
+          "value": "未認定",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "PROC_STAGE": {
+          "value": "一審裁判",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "FALSITY_DESC": {
+          "value": "法院未明確認定訊息是否構成謠言，主要著重於被移送人轉發當下是否明知內容不實，未就訊息本身真偽作出獨立認定。",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0104_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0072_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 0.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "OTHER": 0.0
+      },
+      "answer_detail": {
+        "OTHER": 0.568152904510498
+      },
+      "hallucination_penalty": 0.05,
+      "hallucination_rate": 1.0,
+      "hallucination_detail": {
+        "SANCTION": {
+          "value": "新臺幣貳仟元",
+          "type": "unsupported",
+          "penalty": 0.05
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0072_L_1",
+      "type": "long",
+      "entity_matching_score": 0.9115659090188833,
+      "entity_score": 0.9115659090188833,
+      "answer_fallback_score": 0.3083869172976567,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "APPELLANT": 1.0,
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0,
+        "VERDICT_CATEGORY": 1.0,
+        "RATIONALE": 0.8875377178192139,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 0.96281898021698,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DESC": 1.0000001192092896,
+        "PROC_STAGE": 1.0,
+        "PREV_DOC": 1.0,
+        "RUMOR_CONTENT": 0.0
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "APPELLANT": 0.0,
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "VERDICT_CATEGORY": 1.0,
+        "RATIONALE": 0.9127036333084106,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.82198166847229,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DESC": 0.8284700512886047,
+        "PROC_STAGE": 0.0,
+        "PREV_DOC": 0.0,
+        "RUMOR_CONTENT": 0.44587457180023193
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "OTHER": {
+          "value": "抗告人為佑銓生技有限公司（醫療器材批發零售）代表人；原裁定裁處罰鍰新臺幣2,000元",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "CASE_NO": {
+          "value": [
+            "109年度秩抗字第1號"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "DOC_TYPE": {
+          "value": "裁定（抗告審）",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0072_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0132_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "SANCTION": 1.0
+      },
+      "answer_detail": {
+        "SANCTION": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0132_L_1",
+      "type": "long",
+      "entity_matching_score": 1.000000007947286,
+      "entity_score": 1.000000007947286,
+      "answer_fallback_score": 0.3130919337272644,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "ACT_TIME": 1.0,
+        "ACT_PLACE": 1.0,
+        "PLATFORM": 1.0,
+        "ACT_TYPE": 1.0,
+        "RUMOR_CONTENT": 1.0,
+        "SPREAD_TYPE": 1.0,
+        "SPREAD_DETAIL": 1.0,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 1.0000001192092896,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 1.0,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DETAIL": 1.0,
+        "INTENT_DESC": 1.0
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "ACT_TIME": 1.0,
+        "ACT_PLACE": 0.0,
+        "PLATFORM": 0.0,
+        "ACT_TYPE": 0.7065972685813904,
+        "RUMOR_CONTENT": 0.394636332988739,
+        "SPREAD_TYPE": 0.0,
+        "SPREAD_DETAIL": 0.5729637145996094,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.6748244762420654,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.631214439868927,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DETAIL": 0.0,
+        "INTENT_DESC": 0.7161427736282349
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0132_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0066_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "VERDICT_CATEGORY": 1.0
+      },
+      "answer_detail": {
+        "VERDICT_CATEGORY": 1.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0066_L_1",
+      "type": "long",
+      "entity_matching_score": 0.8963891565799713,
+      "entity_score": 0.8963891565799713,
+      "answer_fallback_score": 0.4240901291370392,
+      "entity_detail": {
+        "DEFENDANT": 0.0,
+        "RUMOR_CONTENT": 1.0000001192092896,
+        "VERDICT_CATEGORY": 1.0,
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0,
+        "RATIONALE": 0.9638914465904236,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 1.0,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 1.0
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "RUMOR_CONTENT": 1.0,
+        "VERDICT_CATEGORY": 1.0,
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "RATIONALE": 0.8461710214614868,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.7849213480949402,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.6098089218139648
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "ACT_TYPE": {
+          "value": "以「東華大學」暱稱於Dcard社群網站文章留言區留言，散佈謠言稱肺炎係臺灣傳出",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "PLATFORM": {
+          "value": [
+            "Dcard"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0066_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0016_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "OTHER": 1.0
+      },
+      "answer_detail": {
+        "OTHER": 0.6757192611694336
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0016_L_1",
+      "type": "long",
+      "entity_matching_score": 0.8791959683100382,
+      "entity_score": 0.8791959683100382,
+      "answer_fallback_score": 0.35086220502853394,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "VERDICT_CATEGORY": 1.0,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 0.0,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DESC": 1.0000001192092896,
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0,
+        "RATIONALE": 0.9127635955810547
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "VERDICT_CATEGORY": 1.0,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.5567063093185425,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DESC": 0.7648001909255981,
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "RATIONALE": 0.8362533450126648
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "OTHER": {
+          "value": "留言在網路上停留時間約50分鐘",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0016_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0181_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0
+      },
+      "answer_detail": {
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0181_L_1",
+      "type": "long",
+      "entity_matching_score": 0.9390425331452313,
+      "entity_score": 0.9390425331452313,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "ACT_TIME": 1.0,
+        "ACT_PLACE": 1.0,
+        "PLATFORM": 1.0,
+        "GROUP_NAME": 1.0,
+        "RUMOR_CONTENT": 1.0,
+        "SPREAD_TYPE": 1.0,
+        "ACT_TYPE": 1.0000001192092896,
+        "VICTIM_ORG": 1.0,
+        "VERDICT_CATEGORY": 0.0,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 0.963722825050354,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 1.0,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DETAIL": 1.0,
+        "INTENT_DESC": 1.0000001192092896
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "ACT_TIME": 1.0,
+        "ACT_PLACE": 0.0,
+        "PLATFORM": 0.0,
+        "GROUP_NAME": 0.0,
+        "RUMOR_CONTENT": 0.5774081349372864,
+        "SPREAD_TYPE": 0.0,
+        "ACT_TYPE": 0.5391809940338135,
+        "VICTIM_ORG": 0.0,
+        "VERDICT_CATEGORY": 0.0,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.6548714637756348,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.5815364122390747,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DETAIL": 0.0,
+        "INTENT_DESC": 0.6582946181297302
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "OTHER": {
+          "value": "世界衛生組織（WHO）於民國109年3月11日已將武漢肺炎疫情定性為「全球大流行」；案經法務部調查局新竹縣調查站移送偵辦",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0181_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0071_S_1",
+      "type": "short",
+      "entity_matching_score": 0.0,
+      "entity_score": 0.0,
+      "answer_fallback_score": 0.0,
+      "entity_detail": {
+        "SANCTION": 0.0
+      },
+      "answer_detail": {
+        "SANCTION": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 0.0
+    },
+    {
+      "question_id": "A_0001_0008_0071_L_1",
+      "type": "long",
+      "entity_matching_score": 0.6134685828135564,
+      "entity_score": 0.6134685828135564,
+      "answer_fallback_score": 0.16679227810639602,
+      "entity_detail": {
+        "CASE_NO": 0.0,
+        "DEFENDANT": 0.0,
+        "APPELLANT": 1.0,
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0,
+        "ACT_TIME": 0.0,
+        "PLATFORM": 1.0,
+        "VERDICT_CATEGORY": 1.0,
+        "RATIONALE": 0.9750914573669434,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.0,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DESC": 1.0000001192092896
+      },
+      "answer_detail": {
+        "CASE_NO": 0.0,
+        "DEFENDANT": 0.0,
+        "APPELLANT": 0.0,
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "ACT_TIME": 0.0,
+        "PLATFORM": 0.0,
+        "VERDICT_CATEGORY": 0.0,
+        "RATIONALE": 0.7900918126106262,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.704845666885376,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DESC": 0.673362135887146
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "PROC_STAGE": {
+          "value": "上級審",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "PUBLIC_HARM_DESC": {
+          "value": "於疫情緊要關頭，抗告人以文字散佈謠言，足以影響公共之安寧",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "ACT_TYPE": {
+          "value": "於臉書社群網站以本名張貼未經證實消息，散佈謠言足以影響公共之安寧",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "PUBLIC_HARM": {
+          "value": "肯定",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 0.6131471927654584
+    },
+    {
+      "question_id": "A_0001_0008_0071_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0155_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "SANCTION": 1.0
+      },
+      "answer_detail": {
+        "SANCTION": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "DEFENDANT": {
+          "value": [
+            "蔡嘉祥"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0155_L_1",
+      "type": "long",
+      "entity_matching_score": 0.967268922499248,
+      "entity_score": 0.967268922499248,
+      "answer_fallback_score": 0.2588279502732413,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "VICTIM": 1.0,
+        "ACT_TIME": 1.0,
+        "ACT_PLACE": 1.0,
+        "PLATFORM": 1.0,
+        "ACT_TYPE": 0.9766160249710083,
+        "RUMOR_CONTENT": 1.0,
+        "SPREAD_TYPE": 1.0,
+        "FALSITY": 1.0,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 0.7545984387397766,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DETAIL": 1.0,
+        "INTENT_DESC": 0.8105504512786865
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "VICTIM": 0.0,
+        "ACT_TIME": 1.0,
+        "ACT_PLACE": 0.0,
+        "PLATFORM": 0.0,
+        "ACT_TYPE": 0.7686649560928345,
+        "RUMOR_CONTENT": 0.6605349779129028,
+        "SPREAD_TYPE": 0.0,
+        "FALSITY": 0.0,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.5283581018447876,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DETAIL": 0.0,
+        "INTENT_DESC": 0.6660332679748535
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0155_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0115_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "SANCTION": 1.0
+      },
+      "answer_detail": {
+        "SANCTION": 1.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "VERDICT_CATEGORY": {
+          "value": "有罪",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "DEFENDANT": {
+          "value": [
+            "曹玉梅"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "CASE_NO": {
+          "value": [
+            "109年度中簡字第1162號"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0115_L_1",
+      "type": "long",
+      "entity_matching_score": 0.9936712185541788,
+      "entity_score": 0.9936712185541788,
+      "answer_fallback_score": 0.3566477861669328,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "ACT_TIME": 1.0,
+        "PLATFORM": 1.0,
+        "GROUP_NAME": 1.0,
+        "RUMOR_CONTENT": 1.0000001192092896,
+        "SPREAD_TYPE": 1.0,
+        "SPREAD_DETAIL": 1.0000001192092896,
+        "ACT_TYPE": 1.0000001192092896,
+        "RATIONALE": 0.9430406093597412
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "ACT_TIME": 1.0,
+        "PLATFORM": 0.0,
+        "GROUP_NAME": 0.0,
+        "RUMOR_CONTENT": 0.500714123249054,
+        "SPREAD_TYPE": 0.0,
+        "SPREAD_DETAIL": 0.6596887111663818,
+        "ACT_TYPE": 0.3394725024700165,
+        "RATIONALE": 0.7099547386169434
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "PUBLIC_HARM_DESC": {
+          "value": "足生損害於多數民眾接受新冠肺炎流行疫情訊息之正確性",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "PUBLIC_HARM": {
+          "value": "肯定",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "SANCTION": {
+          "value": "拘役貳拾日，如易科罰金，以新臺幣壹仟元折算壹日",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "PRIOR_RECORD": {
+          "value": "構成累犯",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "VERDICT_CATEGORY": {
+          "value": "有罪",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0115_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0121_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "SANCTION": 1.0
+      },
+      "answer_detail": {
+        "SANCTION": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "DEFENDANT": {
+          "value": [
+            "邱永祥"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "CASE_NO": {
+          "value": [
+            "109年度易字第739號"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0121_L_1",
+      "type": "long",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 0.25,
+      "entity_detail": {
+        "ACT_TIME": 1.0,
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0,
+        "LAW_COMPARISON": 1.0
+      },
+      "answer_detail": {
+        "ACT_TIME": 1.0,
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "LAW_COMPARISON": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 0.6131471927654584
+    },
+    {
+      "question_id": "A_0001_0008_0121_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0083_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "VERDICT_CATEGORY": 1.0
+      },
+      "answer_detail": {
+        "VERDICT_CATEGORY": 1.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "DEFENDANT": {
+          "value": [
+            "鄭傑丞"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0083_L_1",
+      "type": "long",
+      "entity_matching_score": 0.793567419052124,
+      "entity_score": 0.793567419052124,
+      "answer_fallback_score": 0.40456178188323977,
+      "entity_detail": {
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "VERDICT_CATEGORY": 1.0,
+        "RATIONALE": 0.9356739521026611,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 1.0,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 1.0000001192092896,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DESC": 1.0000001192092896
+      },
+      "answer_detail": {
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0,
+        "VERDICT_CATEGORY": 1.0,
+        "RATIONALE": 0.887376070022583,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.6907351016998291,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.6327006816864014,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DESC": 0.834805965423584
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "SPREAD_DETAIL": {
+          "value": "轉貼對話截圖張貼於臉書「內門. 旗山. 大小事」社團",
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "SPREAD_TYPE": {
+          "value": "轉傳",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0083_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 0.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0018_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0
+      },
+      "answer_detail": {
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "DEFENDANT": {
+          "value": [
+            "周榮輝"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "TRANSFER_AGENCY": {
+          "value": "臺北市政府警察局信義分局",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0018_L_1",
+      "type": "long",
+      "entity_matching_score": 0.983261227607727,
+      "entity_score": 0.983261227607727,
+      "answer_fallback_score": 0.5359523445367813,
+      "entity_detail": {
+        "VERDICT_CATEGORY": 1.0,
+        "RATIONALE": 0.8880941271781921,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 0.9779955744743347,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 1.0,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DESC": 1.0000001192092896
+      },
+      "answer_detail": {
+        "VERDICT_CATEGORY": 1.0,
+        "RATIONALE": 0.8935502171516418,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.8136593699455261,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.7727192640304565,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DESC": 0.807689905166626
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "LAW_CLASSIFIED": {
+          "value": [
+            {
+              "article": "社會秩序維護法第63條第1項第5款",
+              "role": "構成要件"
+            }
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "DEFENDANT": {
+          "value": [
+            "周榮輝"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "LAW": {
+          "value": [
+            "社會秩序維護法第63條第1項第5款"
+          ],
+          "type": "supported",
+          "penalty": 0.0
+        },
+        "RUMOR_CONTENT": {
+          "value": "菜婆子防疫，打算要花1兆500億紓困救經濟，每人預計發1千元酷碰券，這樣也才230億而已，剩下的1兆多，這群綠魔惡狼們，又要開始實施五鬼搬運法了嗎？",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0018_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0203_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "OTHER": 1.0
+      },
+      "answer_detail": {
+        "OTHER": 0.5327026844024658
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0203_L_1",
+      "type": "long",
+      "entity_matching_score": 0.9333333412806193,
+      "entity_score": 0.9333333412806193,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "VICTIM_ORG": 1.0,
+        "ACT_TIME": 1.0,
+        "ACT_PLACE": 1.0,
+        "PLATFORM": 1.0,
+        "ACT_TYPE": 1.0,
+        "RUMOR_CONTENT": 1.0,
+        "SPREAD_TYPE": 1.0,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 1.0000001192092896,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 0.0,
+        "INTENT_BINARY": 1.0,
+        "INTENT_DETAIL": 1.0,
+        "INTENT_DESC": 1.0
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "VICTIM_ORG": 0.0,
+        "ACT_TIME": 0.0,
+        "ACT_PLACE": 0.0,
+        "PLATFORM": 0.0,
+        "ACT_TYPE": 0.6580506563186646,
+        "RUMOR_CONTENT": 0.4971493184566498,
+        "SPREAD_TYPE": 0.0,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.6120740175247192,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.4963497221469879,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DETAIL": 0.0,
+        "INTENT_DESC": 0.5421561002731323
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "OTHER": {
+          "value": "被告Facebook暱稱「Archer Her」；Facebook好友共1156人得見聞上開訊息；被告於109年3月6日晚間接收案外人江東樊口頭告知之不實訊息後，翌日發文",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0203_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0208_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "LAW": 1.0,
+        "LAW_CLASSIFIED": 1.0
+      },
+      "answer_detail": {
+        "LAW": 0.0,
+        "LAW_CLASSIFIED": 0.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0208_L_1",
+      "type": "long",
+      "entity_matching_score": 0.9570078030228615,
+      "entity_score": 0.9570078030228615,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "VICTIM": 1.0,
+        "ACT_TIME": 1.0,
+        "PLATFORM": 1.0,
+        "ACT_TYPE": 0.962882936000824,
+        "RUMOR_CONTENT": 0.6931794881820679,
+        "SPREAD_TYPE": 1.0,
+        "FALSITY": 1.0
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "VICTIM": 0.0,
+        "ACT_TIME": 1.0,
+        "PLATFORM": 0.0,
+        "ACT_TYPE": 0.6705428957939148,
+        "RUMOR_CONTENT": 0.2803858518600464,
+        "SPREAD_TYPE": 0.0,
+        "FALSITY": 0.0
+      },
+      "hallucination_penalty": 0.2,
+      "hallucination_rate": 0.2,
+      "hallucination_detail": {
+        "SPREAD_DETAIL": {
+          "value": "以個人臉書帳號（名稱為Mei Mei），將鄭意純之個人臉書頭像照片加註「此人有武漢肺炎」之不實內容後，上傳於鄭意純臉書留言內容後方",
+          "type": "unsupported",
+          "penalty": 0.05
+        },
+        "OTHER": {
+          "value": "被告臉書帳號名稱：Mei Mei；被害人臉書帳號名稱：Yi Chun Cheng；散布地點為臉書名稱「The Wengs」之人個人臉書貼文留言區；臺南市政府衛生局109年4...",
+          "type": "contradictory",
+          "penalty": 0.15
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0208_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0174_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "ACT_TIME": 1.0
+      },
+      "answer_detail": {
+        "ACT_TIME": 1.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0174_L_1",
+      "type": "long",
+      "entity_matching_score": 0.43430659506056046,
+      "entity_score": 0.43430659506056046,
+      "answer_fallback_score": 0.21768530209859213,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "ACT_TIME": 0.0,
+        "PLATFORM": 1.0,
+        "GROUP_NAME": 1.0,
+        "ACT_TYPE": 0.0,
+        "RUMOR_CONTENT": 0.908759355545044,
+        "SPREAD_TYPE": 0.0,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.0
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "ACT_TIME": 0.0,
+        "PLATFORM": 0.0,
+        "GROUP_NAME": 0.0,
+        "ACT_TYPE": 0.45400482416152954,
+        "RUMOR_CONTENT": 0.9878547787666321,
+        "SPREAD_TYPE": 0.0,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.5173081159591675
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0174_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0167_S_1",
+      "type": "short",
+      "entity_matching_score": 1.0,
+      "entity_score": 1.0,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "GROUP_NAME": 1.0
+      },
+      "answer_detail": {
+        "GROUP_NAME": 1.0
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {},
+      "ndcg@5": 0.6131471927654584
+    },
+    {
+      "question_id": "A_0001_0008_0167_L_1",
+      "type": "long",
+      "entity_matching_score": 0.726498544216156,
+      "entity_score": 0.726498544216156,
+      "answer_fallback_score": 1.0,
+      "entity_detail": {
+        "DEFENDANT": 1.0,
+        "ACT_TIME": 1.0,
+        "PLATFORM": 1.0,
+        "GROUP_NAME": 1.0,
+        "ACT_TYPE": 1.0,
+        "RUMOR_CONTENT": 0.8974781632423401,
+        "SPREAD_TYPE": 1.0,
+        "VICTIM_ORG": 1.0,
+        "FALSITY": 1.0,
+        "FALSITY_DESC": 0.0,
+        "PUBLIC_HARM": 1.0,
+        "PUBLIC_HARM_DESC": 1.0,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DETAIL": 0.0,
+        "INTENT_DESC": 0.0
+      },
+      "answer_detail": {
+        "DEFENDANT": 0.0,
+        "ACT_TIME": 0.0,
+        "PLATFORM": 0.0,
+        "GROUP_NAME": 0.0,
+        "ACT_TYPE": 0.4797021150588989,
+        "RUMOR_CONTENT": 0.45721352100372314,
+        "SPREAD_TYPE": 0.0,
+        "VICTIM_ORG": 0.0,
+        "FALSITY": 0.0,
+        "FALSITY_DESC": 0.5732666254043579,
+        "PUBLIC_HARM": 0.0,
+        "PUBLIC_HARM_DESC": 0.43408963084220886,
+        "INTENT_BINARY": 0.0,
+        "INTENT_DETAIL": 0.0,
+        "INTENT_DESC": 0.6957921981811523
+      },
+      "hallucination_penalty": 0.0,
+      "hallucination_rate": 0.0,
+      "hallucination_detail": {
+        "OTHER": {
+          "value": "LINE群組「桓遊世界」好友93人",
+          "type": "supported",
+          "penalty": 0.0
+        }
+      },
+      "ndcg@5": 1.0
+    },
+    {
+      "question_id": "A_0001_0008_0167_U_1",
+      "type": "unanswerable",
+      "unanswerable_em": 1.0,
+      "entity_matching_score": null,
+      "hallucination_penalty": null,
+      "ndcg@5": 1.0
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+你是法律文件結構化實體的審查員。以下是同一篇法律文書的兩組抽取結果（Regex 版和 LLM 版），請判斷每個欄位哪個正確，產出最終版本。
+
+=== 原始文書（節錄前 3000 字） ===
+
+{document_text_truncated}
+
+=== Entity Schema 定義 ===
+
+{schema_json}
+
+=== Regex 版 ===
+{regex_entities}
+
+=== LLM 版 ===
+{llm_entities}
+
+=== 判斷依據 ===
+1. 以原始文書為準，哪個版本的值更正確就選哪個
+2. 兩版都對的欄位直接保留
+3. 兩版都錯或都缺的欄位，根據原文自行填寫正確值
+4. 以 LLM 版的結構（模組分類）為主，Regex 版可補充 LLM 版遺漏的欄位
+5. 分類標籤型欄位（FALSITY、PUBLIC_HARM、INTENT_BINARY 等）只填標籤，不加說明
+6. LAW_CLASSIFIED 的 key 用 article / role
+7. CITED_AUTHORITY 的 key 用 type / content / precedent
+
+回傳格式與 LLM 版相同的 JSON 結構。只回傳純 JSON。

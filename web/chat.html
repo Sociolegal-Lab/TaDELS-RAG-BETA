@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaDELS RAG Chat</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #242836;
+    --border: #2e3345;
+    --text: #e1e4ed;
+    --text2: #8b90a0;
+    --accent: #6c8cff;
+    --green: #4ade80;
+    --user-bg: #1e3a5f;
+    --bot-bg: #1a1d27;
+  }
+  html { scrollbar-gutter: stable; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  .header {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    background: var(--surface);
+  }
+  .header h1 { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .beta-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(108,140,255,.15);
+    color: var(--accent);
+    border: 1px solid rgba(108,140,255,.3);
+    letter-spacing: .5px;
+  }
+  .header nav { display: flex; align-items: center; gap: 20px; }
+  .header nav a {
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color .2s;
+  }
+  .header nav a:hover, .header nav a.active { color: var(--accent); }
+
+  /* ── Options (inline in header) ── */
+  .options {
+    display: flex;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--text2);
+    align-items: center;
+    margin-right: 16px;
+  }
+  .options label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    transition: color .2s;
+    position: relative;
+  }
+  .options label:hover { color: var(--text); }
+  .options label .tip {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text);
+    white-space: pre-line;
+    width: 320px;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,.4);
+    pointer-events: none;
+  }
+  .options label:hover .tip { display: block; }
+  .options input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 13px;
+    height: 13px;
+  }
+
+  /* ── Main Content (chat + side panel) ── */
+  .main-content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* ── Chat Area ── */
+  .chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 24px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  /* ── Side Panel (Reference Viewer) ── */
+  .side-panel {
+    width: 0;
+    overflow: hidden;
+    border-left: 1px solid var(--border);
+    background: var(--surface);
+    transition: width .3s ease;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .side-panel.open {
+    width: 480px;
+  }
+  .side-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .side-panel-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    margin-right: 8px;
+  }
+  .side-panel-close {
+    background: none;
+    border: none;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: background .2s, color .2s;
+    flex-shrink: 0;
+  }
+  .side-panel-close:hover { background: var(--surface2); color: var(--text); }
+  .side-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+  }
+  .side-panel-body::-webkit-scrollbar { width: 6px; }
+  .side-panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .side-panel-section {
+    margin-bottom: 16px;
+  }
+  .side-panel-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 6px;
+  }
+  .side-panel-meta {
+    font-size: 12px;
+    color: var(--text2);
+    padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    white-space: pre-wrap;
+    line-height: 1.6;
+  }
+  .side-panel-fulltext {
+    font-size: 13px;
+    color: var(--text);
+    padding: 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    white-space: pre-wrap;
+    line-height: 1.7;
+    max-height: none;
+  }
+  .side-panel-id {
+    font-size: 11px;
+    color: var(--text2);
+    font-family: 'SF Mono', 'Consolas', monospace;
+  }
+  .side-panel-nav {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .side-panel-nav button {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    transition: background .2s, color .2s;
+  }
+  .side-panel-nav button:hover { background: var(--border); color: var(--text); }
+  @media (max-width: 900px) {
+    .side-panel.open { width: 100%; position: absolute; right: 0; top: 0; bottom: 0; z-index: 50; }
+  }
+
+  .msg {
+    animation: fadeIn .3s;
+    word-break: break-word;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .msg-user {
+    align-self: flex-end;
+    max-width: 75%;
+  }
+  .msg-user .msg-bubble {
+    background: var(--user-bg);
+    padding: 12px 16px;
+    border-radius: 14px;
+    border-bottom-right-radius: 4px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #dbeafe;
+  }
+
+  .msg-bot {
+    align-self: stretch;
+    width: 100%;
+  }
+  .msg-bot .msg-bubble {
+    padding: 16px 20px;
+    font-size: 14px;
+    line-height: 1.8;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .answer-text { margin-bottom: 8px; }
+
+  /* ── Debug ── */
+  .debug-toggle {
+    font-size: 11px;
+    color: var(--text2);
+    cursor: pointer;
+    margin-top: 8px;
+    user-select: none;
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: background .2s;
+  }
+  .debug-toggle:hover { background: var(--surface2); color: var(--accent); }
+  .debug-content {
+    display: none;
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 11px;
+    color: var(--text2);
+    white-space: pre-wrap;
+    line-height: 1.5;
+  }
+  .debug-content.open { display: block; }
+
+  /* ── Refs ── */
+  .refs-container {
+    margin-top: 10px;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+  }
+  .refs-label {
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .ref-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  .ref-card:hover { border-color: var(--accent); background: rgba(108,140,255,.05); }
+  .ref-card-header {
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .ref-card-title { font-size: 13px; font-weight: 500; color: #c8ccd6; }
+  .ref-card-id { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .ref-chevron {
+    color: var(--text2);
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  /* ── Step progress ── */
+  .steps-log {
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.8;
+  }
+  .step-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text2);
+  }
+  .step-line.active { color: var(--accent); }
+  .step-line .step-icon {
+    width: 14px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .step-line.active .step-icon { animation: spin .8s linear infinite; }
+  .step-line.done .step-icon { color: var(--green); }
+  .step-label { overflow: hidden; white-space: nowrap; }
+  .step-cursor {
+    display: inline-block;
+    width: 1px;
+    height: 1em;
+    background: var(--accent);
+    margin-left: 1px;
+    vertical-align: text-bottom;
+    animation: blink .5s step-end infinite;
+  }
+  .step-line.done .step-cursor { display: none; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .step-time {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--text2);
+    font-family: 'SF Mono', 'Consolas', monospace;
+    opacity: .7;
+  }
+
+  /* ── Typing ── */
+  .typing {
+    display: flex;
+    gap: 5px;
+    padding: 6px 0;
+  }
+  .typing span {
+    width: 7px;
+    height: 7px;
+    background: var(--text2);
+    border-radius: 50%;
+    animation: bounce .6s infinite alternate;
+  }
+  .typing span:nth-child(2) { animation-delay: .2s; }
+  .typing span:nth-child(3) { animation-delay: .4s; }
+  @keyframes bounce { to { transform: translateY(-5px); opacity: .3; } }
+
+  /* ── Input Bar ── */
+  .input-bar {
+    padding: 12px 24px 8px;
+    flex-shrink: 0;
+    background: var(--bg);
+  }
+  .disclaimer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text2);
+    padding: 4px 24px 12px;
+    opacity: .7;
+  }
+  .input-wrap {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 8px 8px 8px 18px;
+    transition: border-color .2s;
+    margin: 0 auto;
+  }
+  .input-wrap:focus-within { border-color: var(--accent); }
+  .input-wrap textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    resize: none;
+    outline: none;
+    min-height: 24px;
+    max-height: 120px;
+    line-height: 2;
+    padding: 4px 0;
+  }
+  .input-wrap textarea::placeholder { color: var(--text2); }
+  .send-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    width: 40px;
+    height: 36px;
+    cursor: pointer;
+    transition: opacity .2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .send-btn:hover { opacity: .85; }
+  .send-btn:disabled { opacity: .3; cursor: not-allowed; }
+  .send-btn svg { width: 18px; height: 18px; }
+
+  /* ── Welcome ── */
+  .welcome {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text2);
+    text-align: center;
+    gap: 12px;
+  }
+  .welcome h2 { font-size: 22px; color: var(--text); font-weight: 600; }
+  .welcome p { font-size: 14px; max-width: 440px; line-height: 1.7; }
+  .examples {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+    max-width: 640px;
+    width: 100%;
+  }
+  .example-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 13px;
+    text-align: left;
+    transition: border-color .2s, background .2s;
+    line-height: 1.5;
+  }
+  .example-btn:hover { border-color: var(--accent); background: var(--surface2); }
+
+  @media (max-width: 640px) {
+    .examples { grid-template-columns: 1fr; }
+    .options { display: none; }
+    .filter-panel { max-height: 50vh !important; }
+  }
+
+  /* ── Data Source Filter ── */
+  .filter-bar {
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  .filter-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 24px;
+    cursor: pointer;
+    user-select: none;
+    transition: background .2s;
+  }
+  .filter-toggle:hover { background: var(--surface2); }
+  .filter-toggle-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+  }
+  .filter-toggle-left .ft-icon {
+    font-size: 11px;
+    transition: transform .25s;
+    color: var(--text2);
+  }
+  .filter-bar.open .filter-toggle-left .ft-icon { transform: rotate(90deg); }
+  .filter-stats {
+    font-size: 11px;
+    color: var(--text2);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .filter-stats .fs-enabled {
+    color: var(--green);
+    font-weight: 600;
+  }
+  .filter-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .3s ease;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+  }
+  .filter-bar.open .filter-panel {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  .filter-panel::-webkit-scrollbar { width: 6px; }
+  .filter-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .ftree { padding: 8px 16px 12px; }
+  .ftree ul { list-style: none; padding: 0; margin: 0; }
+  .ftree li { position: relative; }
+  .ftree .fnode {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 0;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .ftree .fnode .farrow {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 10px;
+    transition: transform .2s;
+    flex-shrink: 0;
+    border-radius: 4px;
+  }
+  .ftree .fnode .farrow:hover { background: var(--surface2); }
+  .ftree .fnode .farrow.expanded { transform: rotate(90deg); }
+  .ftree .fnode .farrow.leaf { visibility: hidden; }
+  .ftree .fnode input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .ftree .fnode input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+    opacity: .35;
+  }
+  .ftree .fnode .fname {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text);
+  }
+  .ftree .fnode.disabled .fname {
+    color: var(--text2);
+    opacity: .5;
+  }
+  .ftree .fnode .fcount {
+    font-size: 11px;
+    color: var(--text2);
+    flex-shrink: 0;
+    margin-left: 4px;
+    font-family: 'SF Mono', 'Consolas', monospace;
+  }
+  .ftree .fnode.disabled .fcount { opacity: .4; }
+  .ftree .fchildren {
+    display: none;
+    padding-left: 22px;
+  }
+  .ftree .fchildren.open { display: block; }
+
+  /* depth-based indent colors */
+  .ftree > ul > li > .fnode .fname { font-weight: 600; font-size: 13px; }
+  .ftree > ul > li > .fchildren > li > .fnode .fname { font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>TaDELS RAG Chat <span class="beta-badge">Beta</span></h1>
+  <nav>
+    <div class="options">
+      <label><input type="checkbox" id="opt-rewrite" checked> Rewrite
+        <span class="tip">用 LLM 改寫問題，以更符合法律文件用語。
+例：「猩猩比中指被罰多少？」→「被移送人於社群媒體散布猩猩比中指貼圖，違反社會秩序維護法第63條，裁處罰鍰金額為何？」</span>
+      </label>
+      <label><input type="checkbox" id="opt-hyde"> HyDE
+        <span class="tip">Hypothetical Document Embeddings — LLM 先生成一段假設性回答，再用該段落的 embedding 做語意檢索，提升召回率。
+Ref: Gao et al. (2023) Precise Zero-Shot Dense Retrieval without Relevance Labels, ACL 2023.</span>
+      </label>
+      <label><input type="checkbox" id="opt-rerank" checked> Re-rank
+        <span class="tip">用 LLM 對初步檢索到的文件重新排序，挑出與問題最相關的前 3 篇送去生成答案。
+例：初步撈回 10 篇 → LLM 判斷相關性 → 只保留最相關的 3 篇。</span>
+      </label>
+      <label><input type="checkbox" id="opt-entities"> Entities
+        <span class="tip">從回答中抽取結構化欄位（被告、法條、罰鍰金額等），用於評估準確度。</span>
+      </label>
+    </div>
+    <a href="/intro">Intro</a>
+    <a href="/results">Results</a>
+    <a href="/chat" class="active">Chat</a>
+    <a href="/entities">Entities</a>
+    <a href="/qa">QA</a>
+  </nav>
+</div>
+
+<div class="filter-bar" id="filterBar">
+  <div class="filter-toggle" onclick="document.getElementById('filterBar').classList.toggle('open')">
+    <div class="filter-toggle-left">
+      <span class="ft-icon">&#9654;</span>
+      <span>資料來源篩選</span>
+    </div>
+    <div class="filter-stats">
+      <span id="filterStats"></span>
+    </div>
+  </div>
+  <div class="filter-panel">
+    <div class="ftree" id="filterTree"></div>
+  </div>
+</div>
+
+<div class="main-content">
+<div class="chat-area" id="chatArea">
+  <div class="welcome" id="welcome">
+    <h2>TaDELS RAG</h2>
+    <p>挑戰一：針對 211 篇 COVID-19 相關法律判決文件進行問答<br>支援案號、被告姓名、法條等檢索</p>
+    <div class="examples">
+      <button class="example-btn" onclick="askExample(this)">109年度士秩字第59號裁定中，對被移送人蔡宗龍裁處的罰鍰金額為何？</button>
+      <button class="example-btn" onclick="askExample(this)">109年度中秩字第99號裁定中，證人王慧貞的身份為何？</button>
+      <button class="example-btn" onclick="askExample(this)">109年度店秩字第78號裁定中，法院裁定駁回本件移送的原因為何？請說明事實經過與法律依據。</button>
+      <button class="example-btn" onclick="askExample(this)">109年度店秩字第45號裁定中，被移送人汪庭維不罰的理由為何？</button>
+    </div>
+  </div>
+</div>
+<div class="side-panel" id="sidePanel">
+  <div class="side-panel-header">
+    <div class="side-panel-title" id="sidePanelTitle"></div>
+    <div class="side-panel-nav" id="sidePanelNav"></div>
+    <button class="side-panel-close" onclick="closeSidePanel()">&times;</button>
+  </div>
+  <div class="side-panel-body" id="sidePanelBody"></div>
+</div>
+</div>
+
+<div class="input-bar">
+  <div class="input-wrap">
+    <textarea id="input" placeholder="輸入問題... (Enter 送出)" rows="1"></textarea>
+    <button class="send-btn" id="sendBtn" onclick="send()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+<div class="disclaimer">AI 生成內容僅供參考，可能存在錯誤或不完整之處，請務必自行查證。</div>
+
+<script>
+/* ── Filter Tree ── */
+const CATEGORY_TREE = [{"name":"人權案件檔案","count":4612,"children":[{"name":"勞動人權","count":1438,"children":[{"name":"RCA工殤案","count":26},{"name":"台灣國際勞工協會（TIWA）","count":346},{"name":"國道收費員案","count":41},{"name":"曾茂興-苗栗客運工會罷工案","count":3},{"name":"花博派遣工","count":11},{"name":"華光社區","count":4},{"name":"華隆案","count":13},{"name":"道交條例第六十七條第一項(終身不得考照)","count":9},{"name":"關廠工人案","count":985}]},{"name":"原住民人權","count":87,"children":[{"name":"原住民女性之子女身分訴訟","count":4},{"name":"原住民湯英伸殺害雇主案","count":7},{"name":"司馬庫斯風倒櫸木案","count":53},{"name":"身分證單列族語拼音行政訴訟案","count":23}]},{"name":"居住人權","count":34,"children":[{"name":"華光社區","count":34}]},{"name":"性別人權","count":460,"children":[{"name":"原住民女性之子女身分訴訟","count":4},{"name":"同志人權","count":294},{"name":"趙岩冰家暴殺夫案","count":6},{"name":"鄧如雯家暴殺夫案","count":6},{"name":"釋字410號（夫妻財產制）","count":97},{"name":"釋字457號（退輔會配耕土地出嫁女繼承權利）","count":53}]},{"name":"政治人權","count":932,"children":[{"name":"318學運","count":14},{"name":"COVID-19 疫情言論","count":211,"children":[{"name":"南投地方檢察署檢察官聲請簡易判決處刑書（109年度撤緩偵字第85號）","count":1},{"name":"南投地方法院刑事簡易判決（110年度投原簡字第4號）","count":1},{"name":"南投地方法院裁定（109年度埔秩字第12號）","count":1},{"name":"南投地方法院裁定（109年度投秩字第14號）","count":1},{"name":"南投地方法院裁定（109年度投秩字第15號）","count":1},{"name":"嘉義地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第2066號）","count":1},{"name":"嘉義地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第2667號）","count":1},{"name":"嘉義地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第2676號）","count":1},{"name":"嘉義地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第4510號）","count":1},{"name":"嘉義地方法院刑事簡易判決（109年度嘉簡字第609號）","count":1},{"name":"嘉義地方法院刑事簡易判決（109年度嘉簡字第692號）","count":1},{"name":"嘉義地方法院刑事簡易判決（109年度嘉簡字第747號）","count":1},{"name":"嘉義地方法院刑事簡易判決（109年度嘉簡字第915號）","count":1},{"name":"嘉義地方法院刑事裁定（109年度秩抗字第1號）","count":1},{"name":"嘉義地方法院裁定（109年度嘉秩字第23號）","count":1},{"name":"嘉義地方法院裁定（109年度嘉秩字第9號）","count":1},{"name":"基隆地方檢察署檢察官聲請簡易判決處刑書（109年度撤緩偵字第44號）","count":1},{"name":"基隆地方法院刑事簡易判決 （109年度基簡字第1267號）","count":1},{"name":"基隆地方法院基隆簡易庭裁定（109年度基秩字第42號）","count":1},{"name":"士林地方法院普通庭裁定（109年度秩抗字第6號）","count":1},{"name":"士林地方法院裁定（109年度士秩字第100號）","count":1},{"name":"士林地方法院裁定（109年度士秩字第122號）","count":1},{"name":"士林地方法院裁定（109年度士秩字第53號）","count":1},{"name":"士林地方法院裁定（109年度士秩字第57號）","count":1},{"name":"士林地方法院裁定（109年度士秩字第59號）","count":1},{"name":"士林地方法院裁定（109年度士秩字第69號）","count":1},{"name":"士林地方法院裁定（109年度湖秩字第39號）","count":1},{"name":"宜蘭地方檢察署檢察官起訴書（109年度偵字第2347號）","count":1},{"name":"宜蘭地方檢察署檢察官起訴書（109年度偵字第3173號）","count":1},{"name":"宜蘭地方檢察署檢察官起訴書（109年度偵字第979號）","count":1},{"name":"宜蘭地方法院刑事判決（109年度易字第446號）","count":1},{"name":"宜蘭地方法院刑事判決（109年度簡上字第63號）","count":1},{"name":"宜蘭地方法院刑事宣示判決筆錄（109年度易字第466號）","count":1},{"name":"宜蘭地方法院刑事簡易判決（109年度簡字第420號）","count":1},{"name":"宜蘭地方法院刑事簡易庭裁定（109年度秩字第19號）","count":1},{"name":"宜蘭地方法院刑事簡易庭裁定（109年度秩字第22號）","count":1},{"name":"宜蘭地方法院刑事簡易庭裁定（109年度秩字第28號）","count":1},{"name":"宜蘭地方法院刑事裁定（109年度易字第264號）","count":1},{"name":"宜蘭地方法院簡易庭裁定（109年度秩字第17號）","count":1},{"name":"宜蘭地方法院簡易庭裁定（109年度秩字第25號）","count":1},{"name":"屏東地方法院裁定（109年度屏秩字第19號）","count":1},{"name":"彰化地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第2108號）","count":1},{"name":"彰化地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第3363號）","count":1},{"name":"彰化地方檢察署檢察官起訴書（109年度偵字第2107號）","count":1},{"name":"彰化地方法院刑事判決（109年度易字第344號）","count":1},{"name":"彰化地方法院刑事簡易判決（109年度簡字第350號）","count":1},{"name":"彰化地方法院刑事簡易判決（109年度簡字第694號）","count":1},{"name":"彰化地方法院刑事簡易庭裁定（109年度秩字第125號）","count":1},{"name":"彰化地方法院刑事簡易庭裁定（109年度秩字第60號）","count":1},{"name":"彰化地方法院刑事裁定（109年度秩字第52號）","count":1},{"name":"彰化地方法院簡易庭裁定（109年度秩字第51號）","count":1},{"name":"新北地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第5324號）","count":1},{"name":"新北地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第5638號）","count":1},{"name":"新北地方法院三重簡易庭裁定（109年度重秩字第110號）","count":1},{"name":"新北地方法院三重簡易庭裁定（109年度重秩字第114號）","count":1},{"name":"新北地方法院三重簡易庭裁定（109年度重秩字第84號）","count":1},{"name":"新北地方法院三重簡易庭裁定（110年度重秩字第80號）","count":1},{"name":"新北地方法院刑事簡易判決（109年度簡字1393號）","count":1},{"name":"新北地方法院刑事簡易判決（109年度簡字3302號）","count":1},{"name":"新北地方法院板橋簡易庭裁定（109年度板秩字第128號）","count":1},{"name":"新北地方法院板橋簡易庭裁定（109年度板秩字第137號）","count":1},{"name":"新北地方法院板橋簡易庭裁定（109年度板秩字第138號）","count":1},{"name":"新北地方法院板橋簡易庭裁定（109年度板秩字第141號）","count":1},{"name":"新北地方法院板橋簡易庭裁定（109年度板秩字第161號）","count":1},{"name":"新北地方法院板橋簡易庭裁定（109年度板秩字第167號）","count":1},{"name":"新北地方法院板橋簡易庭裁定（109年度板秩字第176號）","count":1},{"name":"新北地方法院板橋簡易庭裁定（109年度板秩字第185號）","count":1},{"name":"新北地方法院板橋簡易庭裁定（110年度板秩字第101號）","count":1},{"name":"新北地方法院板橋簡易庭裁定（110年度板秩字第159號）","count":1},{"name":"新竹地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第3294號）","count":1},{"name":"新竹地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第4581號）","count":1},{"name":"新竹地方法院刑事宣示判決筆錄（109年度竹簡字第703號）","count":1},{"name":"新竹地方法院刑事簡易判決（109年度竹簡字第154號）","count":1},{"name":"新竹地方法院刑事簡易判決（109年度竹簡字第444號）","count":1},{"name":"新竹地方法院簡易庭裁定（109年度竹北秩字第14號）","count":1},{"name":"新竹地方法院簡易庭裁定（110年度竹秩字第22號）","count":1},{"name":"桃園地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第16018號）","count":1},{"name":"桃園地方檢察署檢察官聲請簡易判決處刑書（110年度撤緩偵字第33號）","count":1},{"name":"桃園地方檢察署檢察官聲請簡易判決處刑書（110年度撤緩偵字第54號）","count":1},{"name":"桃園地方檢察署檢察官起訴書（109年度偵字第7403號）","count":1},{"name":"桃園地方檢察署檢察官起訴書（109年度偵字第9570號）","count":1},{"name":"桃園地方法院刑事判決（109年度易字第223號）","count":1},{"name":"桃園地方法院刑事判決（109年度易字第559號）","count":1},{"name":"桃園地方法院刑事判決（109年度易字第739號）","count":1},{"name":"桃園地方法院刑事簡易判決（109年度壢簡字第1888號）","count":1},{"name":"桃園地方法院刑事簡易判決（109年度審簡字第579號）","count":1},{"name":"桃園地方法院刑事簡易判決（109年度桃簡字第969號）","count":1},{"name":"桃園地方法院刑事簡易判決（110年度壢簡字第667號）","count":1},{"name":"桃園地方法院刑事簡易判決（110年度桃簡字第1114號）","count":1},{"name":"桃園地方法院刑事裁定（109年度秩抗字第8號）","count":1},{"name":"桃園地方法院裁定（109年度壢秩字第103號）","count":1},{"name":"桃園地方法院裁定（109年度壢秩字第104號）","count":1},{"name":"桃園地方法院裁定（109年度壢秩字第111號）","count":1},{"name":"桃園地方法院裁定（109年度壢秩字第121號）","count":1},{"name":"桃園地方法院裁定（109年度壢秩字第168號）","count":1},{"name":"桃園地方法院裁定（109年度壢秩字第68號）","count":1},{"name":"桃園地方法院裁定（109年度壢秩字第74號）","count":1},{"name":"桃園地方法院裁定（109年度桃秩字第103號）","count":1},{"name":"桃園地方法院裁定（109年度桃秩字第132號）","count":1},{"name":"桃園地方法院裁定（109年度桃秩字第186號）","count":1},{"name":"桃園地方法院裁定（109年度桃秩字第295號）","count":1},{"name":"桃園地方法院裁定（109年度桃秩字第325號）","count":1},{"name":"桃園地方法院裁定（109年度桃秩字第57號）","count":1},{"name":"桃園地方法院裁定（109年度桃秩字第94號）","count":1},{"name":"桃園地方法院裁定（109年度桃秩字第99號）","count":1},{"name":"桃園地方法院裁定（110年度桃秩字第34號）","count":1},{"name":"橋頭地方法院岡山簡易庭裁定（109岡秩字第19號）","count":1},{"name":"橋頭地方法院旗山簡易庭裁定（109年度旗秩字第2號）","count":1},{"name":"橋頭地方法院普通庭裁定（109年度橋秩抗字第4號）","count":1},{"name":"橋頭地方法院橋頭簡易庭裁定（109橋秩字第14號）","count":1},{"name":"橋頭地方法院橋頭簡易庭裁定（109橋秩字第21號）","count":1},{"name":"橋頭地方法院橋頭簡易庭裁定（109橋秩字第28號）","count":1},{"name":"橋頭地方法院橋頭簡易庭裁定（109橋秩字第30號）","count":1},{"name":"橋頭地方法院橋頭簡易庭裁定（109橋秩字第33號）","count":1},{"name":"橋頭地方法院橋頭簡易庭裁定（109橋秩字第34號）","count":1},{"name":"福建金門地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第145號）","count":1},{"name":"福建金門地方法院刑事簡易判決（109年度城簡字第29號）","count":1},{"name":"福建金門地方法院刑事裁定（109年度秩抗字第1號）","count":1},{"name":"福建金門地方法院裁定（109年度城秩字第1號）","count":1},{"name":"臺中地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第10269號）","count":1},{"name":"臺中地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第11886號）","count":1},{"name":"臺中地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第11966號）","count":1},{"name":"臺中地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第12770號）","count":1},{"name":"臺中地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第6097號）","count":1},{"name":"臺中地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第8888號）","count":1},{"name":"臺中地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第9997號）","count":1},{"name":"臺中地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第9999號）","count":1},{"name":"臺中地方檢察署檢察官聲請簡易判決處刑書（109年度撤緩偵字第378號）","count":1},{"name":"臺中地方檢察署檢察官聲請簡易判決處刑書（109年度撤緩偵字第492號）","count":1},{"name":"臺中地方檢察署檢察官起訴書（109年度偵字第3405號）","count":1},{"name":"臺中地方檢察署檢察官起訴書（109年度偵字第7320號）","count":1},{"name":"臺中地方檢察署檢察官起訴書（109年度偵字第9785號）","count":1},{"name":"臺中地方法院刑事判決（109年度易字第2436號）","count":1},{"name":"臺中地方法院刑事判決（109年度易字第436號）","count":1},{"name":"臺中地方法院刑事簡易判決（109年度中原簡字第41號）","count":1},{"name":"臺中地方法院刑事簡易判決（109年度中簡字第1024號）","count":1},{"name":"臺中地方法院刑事簡易判決（109年度中簡字第1162號）","count":1},{"name":"臺中地方法院刑事簡易判決（109年度中簡字第888號）","count":1},{"name":"臺中地方法院刑事簡易判決（109年度中簡字第915號）","count":1},{"name":"臺中地方法院刑事簡易判決（109年度沙簡字第292號）","count":1},{"name":"臺中地方法院刑事簡易判決（109年度簡字第677號）","count":1},{"name":"臺中地方法院刑事簡易判決（109年度豐原簡字第22號）","count":1},{"name":"臺中地方法院刑事簡易判決（109年度豐簡字第185號）","count":1},{"name":"臺中地方法院刑事簡易判決（109年度豐簡字第646號）","count":1},{"name":"臺中地方法院刑事簡易判決（110年度豐簡字第6號）","count":1},{"name":"臺中地方法院臺中簡易庭小額民事判決（110年度中小字第43號）","count":1},{"name":"臺中地方法院裁定（109年度中秩字第156號）","count":1},{"name":"臺中地方法院裁定（109年度中秩字第71號）","count":1},{"name":"臺中地方法院裁定（109年度中秩字第93號）","count":1},{"name":"臺中地方法院裁定（109年度中秩字第94號）","count":1},{"name":"臺中地方法院裁定（109年度中秩字第99號）","count":1},{"name":"臺中地方法院裁定（109年度豐秩字第20號）","count":1},{"name":"臺中地方法院裁定（109年度豐秩字第23號）","count":1},{"name":"臺北地方檢察署檢察官起訴書（109年度偵字第13840號）","count":1},{"name":"臺北地方檢察署檢察官起訴書（109年度偵字第8189號）","count":1},{"name":"臺北地方法院刑事判決（109年度審易字第1890號）","count":1},{"name":"臺北地方法院刑事判決（109年度易字第650號）","count":1},{"name":"臺北地方法院刑事裁定（109年度秩抗字第7號）","count":1},{"name":"臺北地方法院裁定（109年度北秩字第275號）","count":1},{"name":"臺北地方法院裁定（109年度北秩字第304號）","count":1},{"name":"臺北地方法院裁定（109年度北秩字第341號）","count":1},{"name":"臺北地方法院裁定（109年度北秩字第366號）","count":1},{"name":"臺北地方法院裁定（109年度北秩字第376號）","count":1},{"name":"臺北地方法院裁定（109年度北秩字第414號）","count":1},{"name":"臺北地方法院裁定（109年度北秩字第422號）","count":1},{"name":"臺北地方法院裁定（109年度店秩字第42號）","count":1},{"name":"臺北地方法院裁定（109年度店秩字第44號）","count":1},{"name":"臺北地方法院裁定（109年度店秩字第45號）","count":1},{"name":"臺北地方法院裁定（109年度店秩字第52號）","count":1},{"name":"臺北地方法院裁定（109年度店秩字第59號）","count":1},{"name":"臺北地方法院裁定（109年度店秩字第78號）","count":1},{"name":"臺北地方法院裁定（110年度店秩字第47號）","count":1},{"name":"臺南地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第11554號）","count":1},{"name":"臺南地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第5191號）","count":1},{"name":"臺南地方檢察署檢察官起訴書（109年度偵字第14129號）","count":1},{"name":"臺南地方法院刑事判決（109年度訴字第1189號）","count":1},{"name":"臺南地方法院刑事簡易判決（109年度簡字第1429號）","count":1},{"name":"臺南地方法院刑事簡易判決（109年度簡字第1915號）","count":1},{"name":"臺南地方法院刑事簡易判決（109年度簡字第2884號）","count":1},{"name":"臺南地方法院新市簡易庭裁定（109年度新秩字第11號）","count":1},{"name":"臺南地方法院新市簡易庭裁定（110年度新秩字第19號）","count":1},{"name":"臺南地方法院柳營簡易庭裁定（109年度營秩字第8號）","count":1},{"name":"臺南地方法院臺南普通庭裁定（109南秩抗字第8號）","count":1},{"name":"臺南地方法院臺南簡易庭裁定（109南秩字第27號）","count":1},{"name":"臺南地方法院臺南簡易庭裁定（109南秩字第28號）","count":1},{"name":"臺南地方法院臺南簡易庭裁定（109南秩字第29號）","count":1},{"name":"臺南地方法院臺南簡易庭裁定（109南秩字第31號）","count":1},{"name":"臺南地方法院臺南簡易庭裁定（109南秩字第83號）","count":1},{"name":"臺南地方法院臺南簡易庭裁定（110南秩字第33號）","count":1},{"name":"臺東地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第826號）","count":1},{"name":"臺東地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第986號）","count":1},{"name":"臺東地方法院刑事簡易判決（109年度東簡字第107號）","count":1},{"name":"臺東地方法院刑事簡易判決（109年度東簡字第108號）","count":1},{"name":"臺灣桃園地方檢察署檢察官起訴書（109年度偵字第3272號）","count":1},{"name":"臺灣桃園地方檢察署檢察官起訴書（109年度偵字第7110號）","count":1},{"name":"臺灣高等法院刑事判決（109年度上易字第1432號）","count":1},{"name":"花蓮地方法院花蓮簡易庭裁定（109年度花秩字第15號）","count":1},{"name":"苗栗地方法院簡易庭裁定（109年度苗秩字第5號）","count":1},{"name":"苗栗地方法院簡易庭裁定（109年度苗秩字第9號）","count":1},{"name":"雲林地方法院刑事裁定（109年度六秩字第5號）","count":1},{"name":"雲林地方法院刑事裁定（109年度虎秩字第4號）","count":1},{"name":"高雄地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第18275號）","count":1},{"name":"高雄地方檢察署檢察官聲請簡易判決處刑書（109年度偵字第4781號）","count":1},{"name":"高雄地方法院刑事簡易判決（109年度簡字第2220號）","count":1},{"name":"高雄地方法院高雄簡易庭裁定（109年度雄秩字第176號）","count":1},{"name":"高雄地方法院高雄簡易庭裁定（109年度雄秩字第240號）","count":1},{"name":"高雄地方法院高雄簡易庭裁定（109年度雄秩字第57號）","count":1},{"name":"高雄地方法院高雄簡易庭裁定（110年度雄秩字第139號）","count":1},{"name":"高雄地方法院鳳山簡易庭裁定（109年度鳳秩字第16號）","count":1},{"name":"高雄地方法院鳳山簡易庭裁定（109年度鳳秩字第28號）","count":1},{"name":"高雄地方法院鳳山簡易庭裁定（109年度鳳秩字第44號）","count":1}]},{"name":"林佳範違反集會遊行法案","count":37},{"name":"美麗島事件","count":580},{"name":"臺灣高中課程綱要微調案","count":11},{"name":"金溥聰控告王拓誹謗案","count":24},{"name":"鍾秀梅違反集遊法案","count":29},{"name":"高成炎違反集遊法案","count":26}]},{"name":"環境人權","count":551,"children":[{"name":"1997瑪家水庫生態保育","count":3},{"name":"1999大肚溪出海口違法魚塭養殖場遭盜採土石傾倒垃圾","count":2},{"name":"中科三期開發案","count":4},{"name":"六輕","count":32},{"name":"塑化劑事件","count":59},{"name":"工廠汙染事件","count":79},{"name":"彰化縣花壇鄉煙害事件","count":2},{"name":"景美義芳化工廠排放有毒廢水事件","count":1},{"name":"水土保持事件","count":4},{"name":"永和葡萄園煙害事件","count":1},{"name":"瓦斯爆炸案件","count":7},{"name":"米糠油集體中毒事件","count":233},{"name":"輻射汙染案件","count":7},{"name":"都市規劃事件","count":6},{"name":"雅美族海砂屋國宅重建事件","count":2},{"name":"電磁波汙染事件","count":44},{"name":"高爾夫球場事件","count":65}]},{"name":"資訊人權","count":55,"children":[{"name":"大巨蛋資訊公開案","count":16},{"name":"無心跳者器官捐贈法律爭議案","count":4},{"name":"臺北市政府密件資訊公開案","count":13},{"name":"臺北市政府美河市資訊公開案","count":19},{"name":"高雄市政府八一石化氣爆案","count":3}]},{"name":"醫療人權","count":1055,"children":[{"name":"愛滋感染者人權案件","count":1002},{"name":"關愛之家再興社區案","count":53}]}]},{"name":"個別法律文件","count":4287,"children":[{"name":"人格身份","count":334,"children":[{"name":"人格身份啟事刊登剪報","count":92},{"name":"人格身份新聞相關剪報","count":126},{"name":"子女改姓","count":3},{"name":"專業證書","count":5},{"name":"戶口名簿","count":56},{"name":"結婚","count":7},{"name":"繼承","count":7},{"name":"身份證件","count":23},{"name":"門牌","count":4},{"name":"離婚","count":11}]},{"name":"人身安全","count":569,"children":[{"name":"場所安全","count":10},{"name":"場所安全相關剪報","count":27},{"name":"食品及藥品衛生","count":81},{"name":"食品及藥品衛生相關剪報","count":451}]},{"name":"公寓大廈","count":19,"children":[{"name":"雅美族海砂屋國宅重建事件","count":19}]},{"name":"其他","count":115,"children":[{"name":"不動產營建","count":33},{"name":"休閒旅遊或運動","count":10},{"name":"其它契約類型","count":41},{"name":"其它文書","count":31}]},{"name":"刑事司法文書","count":849,"children":[{"name":"再審成功案件","count":98},{"name":"蘇炳坤案","count":39},{"name":"鄭性澤案","count":712}]},{"name":"勞僱關係","count":217,"children":[{"name":"不定期勞動契約關係","count":6},{"name":"公教人員","count":6},{"name":"勞動廣告","count":48},{"name":"勞動政策宣導","count":45},{"name":"外籍移工","count":15},{"name":"定期勞動契約關係","count":77},{"name":"托育定型化契約","count":20}]},{"name":"法令宣導","count":12,"children":[{"name":"雅美族海砂屋國宅重建事件","count":12}]},{"name":"紛爭解決","count":92,"children":[{"name":"公證書","count":3},{"name":"其它途徑","count":1},{"name":"法院裁決","count":83},{"name":"調解","count":5}]},{"name":"買賣租賃","count":792,"children":[{"name":"不動產其他權利設定","count":22},{"name":"不動產相關新聞","count":50},{"name":"不動產租賃","count":109},{"name":"不動產經紀業","count":4},{"name":"不動產買賣","count":393},{"name":"其他","count":23},{"name":"凶宅","count":131},{"name":"建築物室內裝修","count":6},{"name":"押租金","count":53},{"name":"租賃專法草案","count":1}]},{"name":"醫療關係","count":56,"children":[{"name":"雅美族海砂屋國宅重建事件","count":56}]},{"name":"金融保險","count":1232,"children":[{"name":"人身保險","count":42},{"name":"信用卡","count":78},{"name":"其它","count":13},{"name":"消費者債務清理事件卡債自救會書狀範例","count":6},{"name":"消費者債務清理司法院提供相關書狀","count":9},{"name":"消費者債務清理更生認可個案","count":526},{"name":"消費者債務清理條例個案","count":363},{"name":"產物保險","count":20},{"name":"財團法人法律扶助基金會","count":27},{"name":"連動債","count":16},{"name":"金融機構借貸","count":19},{"name":"金融機構開戶","count":21},{"name":"金融消費者評議中心","count":92}]}]},{"name":"特定法律議題","count":3664,"children":[{"name":"COVID-19法律議題","count":39,"children":[{"name":"中央政府防疫措施","count":39}]},{"name":"台灣勞工陣線","count":597,"children":[{"name":"1992籌組產業總工會","count":16},{"name":"1992郵政差工爭取設置內勤士制度","count":22},{"name":"1993勞動權益相關公聽會","count":5},{"name":"1995教育改革與教師會家長會","count":16},{"name":"1995計程車合作社","count":18},{"name":"1995郵務工會與郵工權益保障","count":26},{"name":"1995霖園企業三井公司解雇案","count":17},{"name":"1996反金權聯盟","count":9},{"name":"1996台中客運","count":2},{"name":"1997中科院漢翔公司民營化","count":9},{"name":"1997年推動全民健保修正案","count":18},{"name":"1997縣市長勞工政策調查問卷及報告","count":2},{"name":"2002工會版電業法修正說帖","count":4},{"name":"勞動者雜誌","count":162},{"name":"勞資爭議","count":15},{"name":"歷年新聞稿","count":244},{"name":"法規條文","count":12}]},{"name":"台灣油症受害者支持協會","count":48,"children":[{"name":"其他文件","count":5},{"name":"媒體報導","count":5},{"name":"新聞稿","count":1},{"name":"油症受害者救濟法之倡議","count":5},{"name":"油症患者健康照護","count":19},{"name":"設立登記與變更登記","count":13}]},{"name":"台灣環境保護聯盟","count":362,"children":[{"name":"1992工業區劃設爭議","count":1},{"name":"1999彰化東外環道路環境影響評估","count":1},{"name":"2000高雄事業廢棄物水汙染相關事件","count":2},{"name":"2002水泥窯焚燒問題","count":1},{"name":"北投國小PU跑道材質選擇問題","count":4},{"name":"工廠汙染相關事件","count":123},{"name":"廖彬良羅財成 國庫支票案","count":10},{"name":"廢棄物處理相關事件","count":29},{"name":"森林保育事件","count":8},{"name":"毒化物管理","count":6},{"name":"水資源相關事件","count":1},{"name":"環保聯盟運動","count":10},{"name":"環評相關法案及政策","count":59},{"name":"生態保育事件","count":48},{"name":"臭氧層破洞相關議題","count":2},{"name":"貢寮1003事件","count":29},{"name":"資源回收基金會_回收商造假事件","count":3},{"name":"電磁波相關事件","count":25}]},{"name":"性別議題倡議","count":214,"children":[{"name":"95年度弱勢婦女創業陪伴計畫","count":6},{"name":"單身女人社會處境調查報告","count":1},{"name":"夫妻住所釋憲案(三)","count":3},{"name":"夫妻財產制_立法院公聽會卷","count":25},{"name":"夫妻財產制各種版本","count":6},{"name":"夫妻財產制系列公聽會","count":17},{"name":"婦女人身安全","count":3},{"name":"婦女團體參與國際活動經驗發表論壇","count":1},{"name":"婦女團體自己寫歷史","count":2},{"name":"婦女法律劇場","count":4},{"name":"工作場所性騷擾公聽會","count":14},{"name":"已婚婦女繼耕權(釋字457號)","count":8},{"name":"幼兒托育整合","count":14},{"name":"性侵害減少被害人重複陳述","count":6},{"name":"性侵害防治推廣","count":16},{"name":"性侵害防治法","count":14},{"name":"性工作坊","count":1},{"name":"性暴力防治聯盟","count":10},{"name":"愛麗絲史瓦茲訪台座談","count":4},{"name":"憲政改革與婦女憲章","count":17},{"name":"民法親屬編修法-落實分居制 離婚有保障","count":6},{"name":"民法親屬編問卷調查","count":3},{"name":"法務部第四階段修法（離婚、分居）會議紀錄","count":18},{"name":"爭取憲法保障婦女參政","count":9},{"name":"生育保健法草案","count":2},{"name":"跨世紀婦女勞動與就業發展博覽會","count":1},{"name":"軍中性別人權","count":3}]},{"name":"戰後中小學法治教育影像資料庫","count":1400,"children":[{"name":"印國鈺─國民學校","count":26},{"name":"國立編譯館-初級中學","count":48},{"name":"國立編譯館-國民中學","count":602},{"name":"國立編譯館-國民學校","count":124},{"name":"國立編譯館-國民小學","count":589},{"name":"國立編譯館-高級小學","count":10},{"name":"簡介與凡例","count":1}]},{"name":"社團法人中華民國愛滋感染者權益促進會","count":1004,"children":[{"name":"其他權利案件","count":219},{"name":"受教權案件","count":30},{"name":"婚姻與家庭權案件","count":6},{"name":"居住遷徙權案件","count":226},{"name":"工作權案件","count":221},{"name":"醫療權案件","count":158},{"name":"隱私權案件","count":144}]}]}];
+
+// Paths that are actually in the database (have indexed embeddings)
+const DB_AVAILABLE = new Set([
+  '人權案件檔案/政治人權/COVID-19 疫情言論'
+]);
+
+function isInDB(path) {
+  for (const p of DB_AVAILABLE) {
+    if (path === p || path.startsWith(p + '/') || p.startsWith(path + '/')) return true;
+  }
+  return false;
+}
+
+function buildFilterTree() {
+  const container = document.getElementById('filterTree');
+  const ul = document.createElement('ul');
+  CATEGORY_TREE.forEach(node => ul.appendChild(buildNode(node, '')));
+  container.appendChild(ul);
+  updateFilterStats();
+}
+
+function buildNode(data, parentPath) {
+  const path = parentPath ? parentPath + '/' + data.name : data.name;
+  const hasChildren = data.children && data.children.length > 0;
+  const inDB = isInDB(path);
+
+  const li = document.createElement('li');
+
+  // Node row
+  const row = document.createElement('div');
+  row.className = 'fnode' + (inDB ? '' : ' disabled');
+
+  // Arrow
+  const arrow = document.createElement('span');
+  arrow.className = 'farrow' + (hasChildren ? '' : ' leaf');
+  arrow.textContent = '\u25B6';
+  arrow.addEventListener('click', () => {
+    if (!hasChildren) return;
+    arrow.classList.toggle('expanded');
+    childrenUl.classList.toggle('open');
+  });
+  row.appendChild(arrow);
+
+  // Checkbox
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.dataset.path = path;
+  cb.dataset.count = data.count;
+  if (inDB) {
+    cb.checked = true;
+  } else {
+    cb.disabled = true;
+    cb.checked = false;
+  }
+  cb.addEventListener('change', () => {
+    // Propagate to children
+    if (hasChildren) {
+      childrenUl.querySelectorAll('input[type="checkbox"]:not(:disabled)').forEach(c => {
+        c.checked = cb.checked;
+      });
+    }
+    // Update parent indeterminate states
+    updateParentState(li);
+    updateFilterStats();
+  });
+  row.appendChild(cb);
+
+  // Label
+  const label = document.createElement('span');
+  label.className = 'fname';
+  label.textContent = data.name;
+  label.title = path;
+  row.appendChild(label);
+
+  // Count
+  const count = document.createElement('span');
+  count.className = 'fcount';
+  count.textContent = data.count.toLocaleString();
+  row.appendChild(count);
+
+  li.appendChild(row);
+
+  // Children
+  let childrenUl = null;
+  if (hasChildren) {
+    childrenUl = document.createElement('ul');
+    childrenUl.className = 'fchildren';
+    data.children.forEach(child => childrenUl.appendChild(buildNode(child, path)));
+    li.appendChild(childrenUl);
+  }
+
+  return li;
+}
+
+function updateParentState(li) {
+  const parentUl = li.parentElement;
+  if (!parentUl || !parentUl.classList.contains('fchildren')) return;
+  const parentLi = parentUl.parentElement;
+  if (!parentLi) return;
+  const parentCb = parentLi.querySelector(':scope > .fnode > input[type="checkbox"]');
+  if (!parentCb || parentCb.disabled) return;
+
+  const childCbs = parentUl.querySelectorAll(':scope > li > .fnode > input[type="checkbox"]:not(:disabled)');
+  const checked = [...childCbs].filter(c => c.checked).length;
+  const total = childCbs.length;
+
+  if (total === 0) return;
+  parentCb.checked = checked > 0;
+  parentCb.indeterminate = checked > 0 && checked < total;
+  updateParentState(parentLi);
+}
+
+function updateFilterStats() {
+  const all = document.querySelectorAll('#filterTree input[type="checkbox"]');
+  const enabled = [...all].filter(c => !c.disabled);
+  const checked = enabled.filter(c => c.checked);
+  // Count docs from leaf-level checked items only
+  const leafChecked = checked.filter(c => {
+    const li = c.closest('li');
+    return !li.querySelector('ul.fchildren');
+  });
+  const docCount = leafChecked.reduce((s, c) => s + parseInt(c.dataset.count || 0), 0);
+
+  const statsEl = document.getElementById('filterStats');
+  const totalInDB = [...all].filter(c => !c.disabled).length;
+  statsEl.innerHTML = `<span class="fs-enabled">${docCount.toLocaleString()} 篇已選</span> / ${totalInDB} 項可用`;
+}
+
+function getSelectedPaths() {
+  const checked = document.querySelectorAll('#filterTree input[type="checkbox"]:checked:not(:disabled)');
+  // Return leaf paths only
+  return [...checked].filter(c => {
+    const li = c.closest('li');
+    return !li.querySelector('ul.fchildren');
+  }).map(c => c.dataset.path);
+}
+
+function getSelectedTitles() {
+  // Collect all leaf-level (document title) checkboxes
+  const allLeaf = document.querySelectorAll('#filterTree input[type="checkbox"]:not(:disabled)');
+  const checkedTitles = [];
+  let totalLeaf = 0;
+  allLeaf.forEach(cb => {
+    const li = cb.closest('li');
+    if (!li.querySelector(':scope > ul.fchildren')) {
+      totalLeaf++;
+      if (cb.checked) {
+        const path = cb.dataset.path;
+        const parts = path.split('/');
+        checkedTitles.push(parts[parts.length - 1]);
+      }
+    }
+  });
+  console.log(`[Filter] ${checkedTitles.length}/${totalLeaf} docs selected`);
+  // Always send the list — backend filters; null only if totalLeaf is 0 (no tree)
+  if (totalLeaf === 0) return null;
+  return checkedTitles;
+}
+
+buildFilterTree();
+
+const chatArea = document.getElementById('chatArea');
+const input = document.getElementById('input');
+const sendBtn = document.getElementById('sendBtn');
+const welcome = document.getElementById('welcome');
+let isLoading = false;
+
+input.addEventListener('input', () => {
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+});
+
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    send();
+  }
+});
+
+function askExample(btn) {
+  input.value = btn.textContent;
+  send();
+}
+
+async function send() {
+  const text = input.value.trim();
+  if (!text || isLoading) return;
+
+  if (welcome) welcome.remove();
+
+  addMsg('user', text);
+  input.value = '';
+  input.style.height = 'auto';
+
+  const typingEl = addTyping();
+  isLoading = true;
+  sendBtn.disabled = true;
+
+  try {
+    const resp = await fetch('/api/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        question: text,
+        use_rewrite: document.getElementById('opt-rewrite').checked,
+        use_hyde: document.getElementById('opt-hyde').checked,
+        use_rerank: document.getElementById('opt-rerank').checked,
+        use_entities: document.getElementById('opt-entities').checked,
+        filter_titles: getSelectedTitles(),
+      }),
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+
+    // Typewriter helper
+    function typewrite(el, text, speed = 25) {
+      return new Promise(resolve => {
+        let i = 0;
+        function tick() {
+          if (i < text.length) {
+            el.textContent += text[i++];
+            chatArea.scrollTop = chatArea.scrollHeight;
+            setTimeout(tick, speed);
+          } else { resolve(); }
+        }
+        tick();
+      });
+    }
+
+    // Read NDJSON stream with step progress
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let finalData = null;
+    const t0 = performance.now();
+    let stepStart = t0;
+
+    // Add steps log container
+    const bubble = typingEl.querySelector('.msg-bubble');
+    const stepsLog = document.createElement('div');
+    stepsLog.className = 'steps-log';
+    bubble.appendChild(stepsLog);
+    let currentStepEl = null;
+    let typewriteQueue = Promise.resolve();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        const msg = JSON.parse(line);
+        if (msg.type === 'step') {
+          const now = performance.now();
+          // Mark previous step as done
+          if (currentStepEl) {
+            const elapsed = ((now - stepStart) / 1000).toFixed(1);
+            currentStepEl.classList.remove('active');
+            currentStepEl.classList.add('done');
+            currentStepEl.querySelector('.step-icon').innerHTML = '&#10003;';
+            currentStepEl.querySelector('.step-time').textContent = elapsed + 's';
+          }
+          stepStart = now;
+          // Add new step line
+          const div = document.createElement('div');
+          div.className = 'step-line active';
+          div.innerHTML = `<span class="step-icon">&#9679;</span><span class="step-label"><span class="step-cursor"></span></span><span class="step-time">...</span>`;
+          stepsLog.appendChild(div);
+          currentStepEl = div;
+          // Typewriter the label
+          const label = div.querySelector('.step-label');
+          const cursor = label.querySelector('.step-cursor');
+          const stepText = msg.step;
+          typewriteQueue = typewriteQueue.then(() => {
+            return new Promise(resolve => {
+              let i = 0;
+              function tick() {
+                if (i < stepText.length) {
+                  cursor.before(document.createTextNode(stepText[i++]));
+                  chatArea.scrollTop = chatArea.scrollHeight;
+                  setTimeout(tick, 20);
+                } else { resolve(); }
+              }
+              tick();
+            });
+          });
+          chatArea.scrollTop = chatArea.scrollHeight;
+        } else if (msg.type === 'result') {
+          // Wait for any pending typewriter to finish
+          await typewriteQueue;
+          // Mark last step done
+          if (currentStepEl) {
+            const elapsed = ((performance.now() - stepStart) / 1000).toFixed(1);
+            currentStepEl.classList.remove('active');
+            currentStepEl.classList.add('done');
+            currentStepEl.querySelector('.step-icon').innerHTML = '&#10003;';
+            currentStepEl.querySelector('.step-time').textContent = elapsed + 's';
+          }
+          // Add total time
+          const total = ((performance.now() - t0) / 1000).toFixed(1);
+          const totalDiv = document.createElement('div');
+          totalDiv.className = 'step-line done';
+          totalDiv.style.marginTop = '4px';
+          totalDiv.style.fontWeight = '500';
+          totalDiv.style.color = 'var(--green)';
+          totalDiv.innerHTML = `<span class="step-icon">&#10003;</span><span class="step-label">Done</span><span class="step-time">${total}s total</span>`;
+          stepsLog.appendChild(totalDiv);
+          finalData = msg;
+          finalData._stepsHtml = stepsLog.innerHTML;
+        } else if (msg.type === 'error') {
+          throw new Error(msg.detail);
+        }
+      }
+    }
+
+    typingEl.remove();
+    if (finalData) addBotMsg(finalData);
+  } catch (e) {
+    typingEl.remove();
+    addMsg('bot', `Error: ${e.message}`);
+  }
+
+  isLoading = false;
+  sendBtn.disabled = false;
+  input.focus();
+}
+
+function addMsg(role, text) {
+  const div = document.createElement('div');
+  div.className = `msg msg-${role}`;
+  div.innerHTML = `<div class="msg-bubble">${esc(text)}</div>`;
+  chatArea.appendChild(div);
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function addTyping() {
+  const div = document.createElement('div');
+  div.className = 'msg msg-bot';
+  div.innerHTML = `<div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  chatArea.appendChild(div);
+  chatArea.scrollTop = chatArea.scrollHeight;
+  return div;
+}
+
+function addBotMsg(data) {
+  const div = document.createElement('div');
+  div.className = 'msg msg-bot';
+
+  // Store refs data globally for side panel access
+  let refsHtml = '';
+  if (data.refs && data.refs.length) {
+    const refGroupId = 'rg-' + Date.now();
+    window[refGroupId] = data.refs;
+    refsHtml = `
+      <div class="refs-container">
+        <div class="refs-label">Referenced Documents (${data.refs.length})</div>
+        ${data.refs.map((ref, i) => `
+          <div class="ref-card" onclick="openRefPanel('${refGroupId}', ${i})">
+            <div class="ref-card-header">
+              <div>
+                <div class="ref-card-title">[${i+1}] ${esc(ref.title)}</div>
+                <div class="ref-card-id">${esc(ref.doc_id)}</div>
+              </div>
+              <span class="ref-chevron">&#9654;</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>`;
+  }
+
+  let debugHtml = '';
+  if (data.debug) {
+    const d = data.debug;
+    let debugText = '';
+    if (d.query_type) debugText += `Type: ${d.query_type}\n`;
+    if (d.rewritten) debugText += `Rewritten: ${d.rewritten}\n`;
+    if (d.sub_queries && d.sub_queries.length) debugText += `Sub-queries: ${JSON.stringify(d.sub_queries)}\n`;
+    if (d.hyde && document.getElementById('opt-hyde').checked) debugText += `HyDE: ${d.hyde}\n`;
+    if (data.entities && Object.keys(data.entities).length && document.getElementById('opt-entities').checked) {
+      debugText += `Entities: ${JSON.stringify(data.entities, null, 2)}`;
+    }
+    if (debugText) {
+      debugHtml = `
+        <span class="debug-toggle" onclick="this.nextElementSibling.classList.toggle('open')">debug info</span>
+        <div class="debug-content">${esc(debugText)}</div>`;
+    }
+  }
+
+  let stepsHtml = '';
+  if (data._stepsHtml) {
+    stepsHtml = `
+      <span class="debug-toggle" onclick="const el=this.nextElementSibling;el.classList.toggle('open');this.textContent=el.classList.contains('open')?'collapse steps':'expand steps'">expand steps</span>
+      <div class="steps-log debug-content">${data._stepsHtml}</div>`;
+  }
+
+  div.innerHTML = `
+    <div class="msg-bubble">
+      ${stepsHtml}
+      <div class="answer-text">${formatAnswer(data.answer)}</div>
+      ${refsHtml}
+      ${debugHtml}
+    </div>`;
+
+  chatArea.appendChild(div);
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+// ── Side Panel ──
+let currentRefGroup = null;
+let currentRefIdx = 0;
+
+function openRefPanel(groupId, idx) {
+  currentRefGroup = groupId;
+  currentRefIdx = idx;
+  const refs = window[groupId];
+  const ref = refs[idx];
+  const panel = document.getElementById('sidePanel');
+  const title = document.getElementById('sidePanelTitle');
+  const nav = document.getElementById('sidePanelNav');
+  const body = document.getElementById('sidePanelBody');
+
+  title.textContent = `[${idx+1}/${refs.length}] ${ref.title}`;
+
+  // Nav buttons
+  nav.innerHTML = refs.length > 1 ? `
+    <button onclick="openRefPanel('${groupId}', ${(idx - 1 + refs.length) % refs.length})">&larr;</button>
+    <button onclick="openRefPanel('${groupId}', ${(idx + 1) % refs.length})">&rarr;</button>
+  ` : '';
+
+  // Body content
+  body.innerHTML = `
+    <div class="side-panel-section">
+      <div class="side-panel-section-label">Metadata</div>
+      <div class="side-panel-id">${esc(ref.doc_id)}</div>
+      <div class="side-panel-meta" style="margin-top:8px">${esc(ref.metadata_text)}</div>
+    </div>
+    <div class="side-panel-section">
+      <div class="side-panel-section-label">Full Text</div>
+      <div class="side-panel-fulltext" id="sidePanelFullText">Loading...</div>
+    </div>
+  `;
+
+  panel.classList.add('open');
+
+  // Highlight active ref card
+  document.querySelectorAll('.ref-card').forEach(c => c.style.borderColor = '');
+  event && event.currentTarget && (event.currentTarget.style.borderColor = 'var(--accent)');
+
+  // Load full text
+  fetch(`/api/doc/${ref.doc_id}`)
+    .then(r => r.json())
+    .then(d => {
+      const el = document.getElementById('sidePanelFullText');
+      if (el) el.textContent = d.full_text || '(No content)';
+    })
+    .catch(() => {
+      const el = document.getElementById('sidePanelFullText');
+      if (el) el.textContent = 'Error loading full text';
+    });
+}
+
+function closeSidePanel() {
+  document.getElementById('sidePanel').classList.remove('open');
+  document.querySelectorAll('.ref-card').forEach(c => c.style.borderColor = '');
+}
+
+function esc(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function formatAnswer(s) {
+  if (!s) return '';
+  // Escape HTML, collapse 2+ newlines into one, convert single newlines to <br>
+  return esc(s.trim())
+    .replace(/\n{2,}/g, '\n')
+    .replace(/\n/g, '<br>');
+}
+</script>
+</body>
+</html>

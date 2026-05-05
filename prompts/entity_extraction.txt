@@ -1,0 +1,27 @@
+你是法律文件 QA 系統的 entity 抽取器。請從「答案」中判斷涉及哪些結構化實體。
+
+題目：{question}
+答案：{answer}
+
+該案件已知的 entity 資料：
+{entity_data}
+
+=== Entity Schema 定義 ===
+
+{schema_csv}
+
+=== 規則 ===
+1. 逐一檢查「該案件已知的 entity 資料」中的每個欄位
+2. 判斷答案的內容是否涵蓋該 entity 的概念，有涵蓋就標，沒涵蓋就不標
+3. 值直接使用「該案件已知的 entity 資料」中的值
+4. list 型欄位（如 LAW、DEFENDANT）要逐一確認每個元素都跟答案相關，只保留相關的
+5. OTHER：只有當答案的核心事實完全無法對應到 Schema 中任何已知欄位時，才用 OTHER 標注。如果已有其他欄位能涵蓋答案，就不需要 OTHER
+6. **輸出必須是扁平結構**：key 直接是欄位英文名（如 `DEFENDANT`、`LAW`、`FALSITY`、`SANCTION`），**絕對不要**把欄位嵌套在 `basic_info`、`elements`、`procedure` 等 section 底下
+7. 回傳純 JSON
+
+=== 輸出範例 ===
+正確（扁平）：
+{{"DEFENDANT": ["王思尹"], "LAW": ["傳染病防治法第63條"], "FALSITY": "肯定"}}
+
+錯誤（巢狀 — 不要這樣寫）：
+{{"basic_info": {{"DEFENDANT": ["王思尹"], "LAW": ["傳染病防治法第63條"]}}, "elements": {{"FALSITY": "肯定"}}}}

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entity Checker</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #242836;
+    --border: #2e3345;
+    --text: #e1e4ed;
+    --text2: #8b90a0;
+    --accent: #6c8cff;
+    --green: #4ade80;
+    --yellow: #facc15;
+    --red: #f87171;
+    --orange: #fb923c;
+    --highlight: rgba(250,204,21,.25);
+  }
+  html { scrollbar-gutter: stable; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    background: var(--surface);
+  }
+  .header h1 { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .beta-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(108,140,255,.15);
+    color: var(--accent);
+    border: 1px solid rgba(108,140,255,.3);
+    letter-spacing: .5px;
+  }
+  .header nav a {
+    color: var(--text2);
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 13px;
+  }
+  .header nav a:hover, .header nav a.active { color: var(--accent); }
+
+  /* ── Toolbar ── */
+  .toolbar {
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .search-box {
+    flex: 1;
+    min-width: 200px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 14px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    font-family: inherit;
+  }
+  .search-box:focus { border-color: var(--accent); }
+  .search-box::placeholder { color: var(--text2); }
+  .stat { font-size: 12px; color: var(--text2); flex-shrink: 0; }
+  .filter-select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 10px;
+    color: var(--text);
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  /* ── 3-column layout ── */
+  .main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* Left: case list */
+  .list-panel {
+    width: 320px;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  .list-item {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background .1s;
+  }
+  .list-item:hover { background: var(--surface2); }
+  .list-item.active { background: var(--surface2); border-left: 3px solid var(--accent); }
+  .list-title { font-size: 12px; font-weight: 500; line-height: 1.4; }
+  .list-meta { font-size: 10px; color: var(--text2); margin-top: 3px; display: flex; gap: 6px; }
+  .list-tag { padding: 0px 5px; border-radius: 3px; font-size: 10px; }
+  .tag-green { background: rgba(74,222,128,.15); color: var(--green); }
+  .tag-red { background: rgba(248,113,113,.15); color: var(--red); }
+  .tag-yellow { background: rgba(250,204,21,.15); color: var(--yellow); }
+
+  /* Middle: entity fields */
+  .entity-panel {
+    flex: 1;
+    min-width: 300px;
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+    padding: 16px;
+  }
+
+  /* Right: full text */
+  .fulltext-panel {
+    flex: 1;
+    min-width: 300px;
+    overflow-y: auto;
+    padding: 16px;
+  }
+
+  .panel-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text2);
+    font-size: 13px;
+  }
+  .panel-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Entity table */
+  .module { margin-bottom: 16px; }
+  .module-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--orange);
+    margin-bottom: 6px;
+  }
+  .field-table { width: 100%; border-collapse: collapse; }
+  .field-table tr { border-bottom: 1px solid var(--border); }
+  .field-table tr:hover { background: var(--surface2); }
+  .field-table tr.highlight-row { background: rgba(108,140,255,.1); }
+  .field-key {
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    width: 140px;
+    vertical-align: top;
+    white-space: nowrap;
+  }
+  .field-val {
+    padding: 6px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    word-break: break-all;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .field-val:hover { background: rgba(108,140,255,.08); }
+  .field-null { color: var(--text2); font-style: italic; }
+
+  /* Full text */
+  .fulltext-content {
+    font-size: 13px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .fulltext-content mark {
+    background: var(--highlight);
+    color: var(--text);
+    padding: 1px 2px;
+    border-radius: 2px;
+  }
+
+  .loading { text-align: center; padding: 40px; color: var(--text2); }
+  .spinner {
+    width: 24px; height: 24px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    margin: 0 auto 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Entity Checker <span class="beta-badge">Beta</span></h1>
+  <nav>
+    <a href="/intro">Intro</a>
+    <a href="/results">Results</a>
+    <a href="/chat">Chat</a>
+    <a href="/entities" class="active">Entities</a>
+    <a href="/qa">QA</a>
+  </nav>
+</div>
+
+<div class="toolbar">
+  <input class="search-box" id="search" placeholder="Search doc_id, title, defendant, content...">
+  <select class="filter-select" id="filterVerdict" onchange="applyFilters()">
+    <option value="">All verdicts</option>
+    <option value="不罰">不罰</option>
+    <option value="罰鍰">罰鍰</option>
+    <option value="有罪">有罪</option>
+    <option value="無罪">無罪</option>
+  </select>
+  <select class="filter-select" id="filterPlatform" onchange="applyFilters()">
+    <option value="">All platforms</option>
+    <option value="Facebook">Facebook</option>
+    <option value="LINE">LINE</option>
+    <option value="Instagram">Instagram</option>
+    <option value="PTT">PTT</option>
+  </select>
+  <span class="stat" id="stat"></span>
+</div>
+
+<div class="main">
+  <div class="list-panel" id="listPanel">
+    <div class="loading"><div class="spinner"></div>Loading 211 cases...</div>
+  </div>
+  <div class="entity-panel" id="entityPanel">
+    <div class="panel-empty">Select a case</div>
+  </div>
+  <div class="fulltext-panel" id="fulltextPanel">
+    <div class="panel-empty">Full text will appear here</div>
+  </div>
+</div>
+
+<script>
+let allEntities = [];
+let filtered = [];
+let selectedIdx = -1;
+let currentHighlight = '';
+
+async function init() {
+  const resp = await fetch('/api/entities');
+  const data = await resp.json();
+  allEntities = data.entities;
+  applyFilters();
+}
+
+document.getElementById('search').addEventListener('input', debounce(applyFilters, 200));
+
+function applyFilters() {
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const verdict = document.getElementById('filterVerdict').value;
+  const platform = document.getElementById('filterPlatform').value;
+
+  filtered = allEntities.filter(e => {
+    const info = e['案件基本資訊'] || {};
+    if (q && !JSON.stringify(e).toLowerCase().includes(q)) return false;
+    if (verdict && !toStr(info.VERDICT).includes(verdict)) return false;
+    if (platform && !toStr(info.PLATFORM).includes(platform)) return false;
+    return true;
+  });
+
+  document.getElementById('stat').textContent = `${filtered.length} / ${allEntities.length}`;
+  renderList();
+}
+
+function renderList() {
+  const el = document.getElementById('listPanel');
+  if (!filtered.length) {
+    el.innerHTML = '<div class="loading">No matches</div>';
+    return;
+  }
+  el.innerHTML = filtered.map((e, i) => {
+    const info = e['案件基本資訊'] || {};
+    const v = toStr(info.VERDICT);
+    const vc = v.includes('不罰') || v.includes('無罪') ? 'tag-green' :
+               v.includes('罰') || v.includes('有罪') ? 'tag-red' : 'tag-yellow';
+    return `<div class="list-item ${i === selectedIdx ? 'active' : ''}" onclick="selectCase(${i})">
+      <div class="list-title">${esc(e.title)}</div>
+      <div class="list-meta">
+        <span>${e.doc_id}</span>
+        <span>${esc(toStr(info.DEFENDANT))}</span>
+        <span class="list-tag ${vc}">${esc(v.substring(0,10))}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectCase(i) {
+  selectedIdx = i;
+  currentHighlight = '';
+  renderList();
+  const e = filtered[i];
+  renderEntity(e);
+  loadFullText(e.doc_id);
+}
+
+function renderEntity(e) {
+  const el = document.getElementById('entityPanel');
+  const modules = Object.keys(e).filter(k => k !== 'doc_id' && k !== 'title');
+
+  el.innerHTML = `
+    <div class="panel-title">${esc(e.title)}<br><span style="color:var(--text2);font-size:11px">${e.doc_id} — click any value to highlight in full text</span></div>
+    ${modules.map(mod => {
+      const fields = e[mod];
+      if (!fields || typeof fields !== 'object') return '';
+      return `<div class="module">
+        <div class="module-title">${esc(mod)}</div>
+        <table class="field-table">
+          ${Object.entries(fields).map(([k, v]) => {
+            const val = v === null || v === undefined
+              ? '<span class="field-null">null</span>'
+              : Array.isArray(v) ? esc(v.join('、')) : esc(String(v));
+            const raw = v === null || v === undefined ? '' :
+                        Array.isArray(v) ? v.join('、') : String(v);
+            return `<tr onclick="highlightInText('${escAttr(raw)}')" title="Click to find in full text">
+              <td class="field-key">${esc(k)}</td>
+              <td class="field-val">${val}</td>
+            </tr>`;
+          }).join('')}
+        </table>
+      </div>`;
+    }).join('')}`;
+  el.scrollTop = 0;
+}
+
+async function loadFullText(docId) {
+  const el = document.getElementById('fulltextPanel');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading full text...</div>';
+  try {
+    const resp = await fetch(`/api/doc/${docId}`);
+    const data = await resp.json();
+    el.dataset.rawText = data.full_text;
+    el.innerHTML = `<div class="panel-title">Full Text</div><div class="fulltext-content">${esc(data.full_text)}</div>`;
+  } catch (e) {
+    el.innerHTML = `<div class="loading" style="color:var(--red)">Error loading</div>`;
+  }
+}
+
+function highlightInText(value) {
+  if (!value || value.length < 2) return;
+  const el = document.getElementById('fulltextPanel');
+  const raw = el.dataset.rawText;
+  if (!raw) return;
+
+  // Highlight all rows
+  document.querySelectorAll('.highlight-row').forEach(r => r.classList.remove('highlight-row'));
+  event.currentTarget.classList.add('highlight-row');
+
+  // Take first 30 chars for highlight (long values are too noisy)
+  const needle = value.length > 60 ? value.substring(0, 60) : value;
+  const escaped = esc(raw);
+  const needleEsc = esc(needle);
+
+  if (!escaped.includes(needleEsc)) {
+    // Try shorter substring
+    const short = value.substring(0, 20);
+    const shortEsc = esc(short);
+    if (shortEsc.length >= 4 && escaped.includes(shortEsc)) {
+      const highlighted = escaped.replaceAll(shortEsc, `<mark>${shortEsc}</mark>`);
+      el.innerHTML = `<div class="panel-title">Full Text <span style="font-size:11px;color:var(--yellow)">— highlighting: ${esc(short)}...</span></div><div class="fulltext-content">${highlighted}</div>`;
+    } else {
+      el.innerHTML = `<div class="panel-title">Full Text <span style="font-size:11px;color:var(--red)">— "${esc(value.substring(0,30))}..." not found in text</span></div><div class="fulltext-content">${escaped}</div>`;
+    }
+  } else {
+    const highlighted = escaped.replaceAll(needleEsc, `<mark>${needleEsc}</mark>`);
+    el.innerHTML = `<div class="panel-title">Full Text <span style="font-size:11px;color:var(--green)">— highlighting: ${esc(needle.substring(0,30))}${needle.length > 30 ? '...' : ''}</span></div><div class="fulltext-content">${highlighted}</div>`;
+  }
+
+  // Scroll to first mark
+  el.dataset.rawText = raw;
+  setTimeout(() => {
+    const mark = el.querySelector('mark');
+    if (mark) mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 50);
+}
+
+function toStr(v) {
+  if (v === null || v === undefined) return '';
+  if (Array.isArray(v)) return v.join('、');
+  return String(v);
+}
+function esc(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escAttr(s) {
+  return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');
+}
+function debounce(fn, ms) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+你是法律文件 QA 系統的 entity 標注審查員。以下題目有兩組 entity 標注（舊版 vs 新版），部分欄位有差異。請判斷哪個正確。
+
+=== 原始文書 ===
+
+{document_text}
+
+=== Entity Schema 定義 ===
+
+{schema_json}
+
+=== 題目 ===
+問題：{question}
+答案：{answer}
+
+=== 有差異的欄位 ===
+{diff_details}
+
+=== 判斷依據 ===
+1. **相關性**：該 entity 欄位是否與問題直接相關？如果問題問的是罰鍰金額，就只需要 SANCTION，不需要額外標注 VERDICT_CATEGORY 等不相關的欄位。只保留回答問題所必需的 entity。
+2. 答案是否涵蓋該 entity 的概念？有涵蓋就該標，沒涵蓋就不該標
+3. 值應使用文件中的值
+4. OTHER：只有當答案的核心事實無法對應到 Schema 中任何已知欄位時，才用 OTHER 標注。如果答案已經能被其他欄位（如 RATIONALE、SANCTION 等）涵蓋，就不需要 OTHER
+
+對每個有差異的欄位，回傳你認為正確的值。如果該欄位不該出現（不相關或不該標），回傳 null。
+回傳純 JSON：{"欄位名": 值或null, ...}

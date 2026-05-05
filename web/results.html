@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG Evaluation Results</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #242836;
+    --border: #2e3345;
+    --text: #e1e4ed;
+    --text2: #8b90a0;
+    --accent: #6c8cff;
+    --green: #4ade80;
+    --yellow: #facc15;
+    --red: #f87171;
+    --orange: #fb923c;
+  }
+  html { scrollbar-gutter: stable; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* ── Header ── */
+  .header {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    background: var(--surface);
+  }
+  .header h1 { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .beta-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(108,140,255,.15);
+    color: var(--accent);
+    border: 1px solid rgba(108,140,255,.3);
+    letter-spacing: .5px;
+  }
+  .header nav a {
+    color: var(--text2);
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 13px;
+    transition: color .2s;
+  }
+  .header nav a:hover, .header nav a.active { color: var(--accent); }
+
+  /* ── Split Tabs ── */
+  .split-tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 32px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: thin;
+  }
+  .split-tab {
+    padding: 12px 24px;
+    font-size: 14px;
+    flex-shrink: 0;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all .2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+  .split-tab:hover { color: var(--text); }
+  .split-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .split-tab.disabled { opacity: .3; cursor: not-allowed; }
+  .split-tab .tab-count {
+    font-size: 11px;
+    color: var(--text2);
+    margin-left: 6px;
+    background: var(--surface2);
+    padding: 1px 7px;
+    border-radius: 8px;
+  }
+  .split-tab.active .tab-count { background: rgba(108,140,255,.2); color: var(--accent); }
+
+  /* ── Summary Cards ── */
+  .summary {
+    display: flex;
+    gap: 16px;
+    padding: 24px 32px;
+    flex-wrap: wrap;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    min-width: 150px;
+    flex: 1;
+  }
+  .card .label { font-size: 12px; color: var(--text2); text-transform: uppercase; letter-spacing: .5px; }
+  .card .value { font-size: 28px; font-weight: 700; margin-top: 4px; }
+  .card .sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  /* ── Filters ── */
+  .filters {
+    padding: 0 32px 16px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 6px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all .2s;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+  .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* ── Results Table ── */
+  .results-container { padding: 0 32px 32px; }
+  .result-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .result-item:hover { border-color: var(--accent); }
+
+  .result-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .result-header:hover { background: var(--surface2); }
+
+  .score-badge {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .score-perfect { background: rgba(74,222,128,.15); color: var(--green); }
+  .score-good { background: rgba(250,204,21,.15); color: var(--yellow); }
+  .score-bad { background: rgba(248,113,113,.15); color: var(--red); }
+
+  .result-info { flex: 1; min-width: 0; }
+  .result-qid { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+  .result-question { font-size: 15px; font-weight: 500; }
+
+  .type-tag {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+  .type-short { background: rgba(108,140,255,.15); color: var(--accent); }
+  .type-long { background: rgba(251,146,60,.15); color: var(--orange); }
+  .type-unanswerable { background: rgba(139,144,160,.15); color: var(--text2); }
+
+  .chevron {
+    color: var(--text2);
+    transition: transform .2s;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .result-item.open .chevron { transform: rotate(90deg); }
+
+  /* ── Expanded Detail ── */
+  .result-detail {
+    display: none;
+    padding: 0 20px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .result-item.open .result-detail { display: block; }
+
+  .answer-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .answer-box {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .answer-box .label { font-size: 12px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+  .answer-box .text { font-size: 14px; white-space: pre-wrap; word-break: break-all; }
+
+  .refs-section { margin-top: 16px; }
+  .refs-section h4 { font-size: 13px; color: var(--text2); margin-bottom: 8px; }
+  .ref-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+  .ref-item:hover { border-color: var(--accent); }
+  .ref-title { font-size: 13px; font-weight: 500; color: var(--accent); }
+  .ref-id { font-size: 11px; color: var(--text2); }
+  .ref-snippet {
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 6px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .3s;
+    white-space: pre-wrap;
+  }
+  .ref-item.open .ref-snippet { max-height: 500px; }
+  .ref-meta {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 6px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .3s;
+    white-space: pre-wrap;
+    background: var(--bg);
+    border-radius: 6px;
+    padding: 0;
+  }
+  .ref-item.open .ref-meta { max-height: 300px; padding: 10px 12px; margin-top: 8px; }
+  .ref-full-btn {
+    font-size: 11px;
+    color: var(--accent);
+    cursor: pointer;
+    margin-top: 8px;
+    user-select: none;
+    display: none;
+  }
+  .ref-full-btn:hover { text-decoration: underline; }
+  .ref-item.open .ref-full-btn { display: block; }
+  .ref-full-text {
+    display: none;
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 8px;
+    padding: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    white-space: pre-wrap;
+    max-height: 500px;
+    overflow-y: auto;
+    line-height: 1.6;
+  }
+  .ndcg-badge { font-size: 11px; color: var(--text2); margin-left: 8px; }
+
+  /* ── Debug info ── */
+  .debug-toggle {
+    font-size: 11px;
+    color: var(--text2);
+    cursor: pointer;
+    margin-top: 12px;
+    user-select: none;
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 4px;
+    transition: background .2s;
+  }
+  .debug-toggle:hover { background: var(--surface2); color: var(--accent); }
+  .debug-content {
+    display: none;
+    margin-top: 8px;
+    padding: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 11px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--text2);
+    white-space: pre-wrap;
+    line-height: 1.6;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .debug-content.open { display: block; }
+
+  /* ── Loading ── */
+  .loading {
+    text-align: center;
+    padding: 60px;
+    color: var(--text2);
+  }
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 768px) {
+    .answer-compare { grid-template-columns: 1fr; }
+    .summary { padding: 16px; }
+    .results-container { padding: 0 16px 16px; }
+    .split-tabs { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>RAG Evaluation Results <span class="beta-badge">Beta</span></h1>
+  <nav>
+    <a href="/intro">Intro</a>
+    <a href="/results" class="active">Results</a>
+    <a href="/chat">Chat</a>
+    <a href="/entities">Entities</a>
+    <a href="/qa">QA</a>
+  </nav>
+</div>
+
+<div class="split-tabs" id="splitTabs"></div>
+
+<div id="loading" class="loading">
+  <div class="spinner"></div>
+  Loading...
+</div>
+
+<div id="content" style="display:none">
+  <div class="summary" id="summary"></div>
+  <div class="filters" id="filters"></div>
+  <div class="results-container" id="results"></div>
+</div>
+
+<script>
+let allResults = [];
+let activeFilter = 'all';
+let activePred = 'val';
+let availablePreds = [];
+
+async function init() {
+  // Load available predictions
+  try {
+    const resp = await fetch('/api/predictions');
+    const data = await resp.json();
+    availablePreds = data.predictions;
+  } catch (e) {
+    availablePreds = [];
+  }
+
+  renderPredTabs();
+
+  // Auto-select first available
+  if (availablePreds.length) {
+    activePred = availablePreds[0].name;
+    await loadPred(activePred);
+  } else {
+    document.getElementById('loading').innerHTML =
+      `<div style="color:var(--red)">No prediction files found.<br><br>
+       <span style="color:var(--text2)">Run the pipeline first:<br>
+       <code>python3 rag_pipeline.py --split val</code></span></div>`;
+  }
+}
+
+function renderPredTabs() {
+  const el = document.getElementById('splitTabs');
+
+  el.innerHTML = availablePreds.map(p => {
+    return `<button class="split-tab ${p.name === activePred ? 'active' : ''}"
+      onclick="switchPred('${p.name}')">
+      ${p.name}<span class="tab-count">${p.count}</span>
+    </button>`;
+  }).join('');
+}
+
+async function switchPred(name) {
+  if (name === activePred) return;
+  activePred = name;
+  renderPredTabs();
+  document.getElementById('content').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('loading').innerHTML = '<div class="spinner"></div>Loading...';
+  await loadPred(name);
+}
+
+async function loadPred(name) {
+  try {
+    const resp = await fetch(`/api/results?name=${name}`);
+    if (!resp.ok) throw new Error(await resp.text());
+    const data = await resp.json();
+    allResults = data.results;
+    activeFilter = 'all';
+    renderSummary(data.summary);
+    renderFilters(data.summary);
+    renderResults(allResults);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+  } catch (e) {
+    document.getElementById('loading').innerHTML =
+      `<div style="color:var(--red)">Error: ${e.message}</div>`;
+  }
+}
+
+function renderSummary(s) {
+  const el = document.getElementById('summary');
+  const fmt = v => v !== null && v !== undefined ? v.toFixed(4) : 'N/A';
+  let html = `<div class="card">
+    <div class="label">Total</div>
+    <div class="value">${s.total}</div>
+    <div class="sub">${activePred}</div>
+  </div>`;
+  if (s.entity_matching_avg != null) {
+    html += `<div class="card">
+      <div class="label">Entity Score</div>
+      <div class="value" style="color:${scoreColor(s.entity_matching_avg)}">${fmt(s.entity_matching_avg)}</div>
+      <div class="sub">Answerable</div>
+    </div>`;
+  }
+  if (s.hallucination_avg != null) {
+    html += `<div class="card">
+      <div class="label">幻覺 P_h</div>
+      <div class="value" style="color:${scoreColor(1 - s.hallucination_avg)}">${fmt(s.hallucination_avg)}</div>
+      <div class="sub">越低越好</div>
+    </div>`;
+  }
+  if (s.ndcg5_avg != null) {
+    html += `<div class="card">
+      <div class="label">nDCG@5</div>
+      <div class="value" style="color:${scoreColor(s.ndcg5_avg)}">${fmt(s.ndcg5_avg)}</div>
+      <div class="sub">Retrieval</div>
+    </div>`;
+  }
+  for (const type of ['short', 'long', 'unanswerable']) {
+    const info = s[type];
+    if (!info || info.avg == null) continue;
+    html += `<div class="card">
+      <div class="label">${type}</div>
+      <div class="value" style="color:${scoreColor(info.avg)}">${fmt(info.avg)}</div>
+      <div class="sub">${info.count} questions</div>
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+function renderFilters(s) {
+  const el = document.getElementById('filters');
+  const types = ['all', 'short', 'long', 'unanswerable', 'perfect', 'errors'];
+
+  // 計算 perfect / errors 實際筆數
+  let perfectCount = 0, errorsCount = 0;
+  for (const r of allResults) {
+    const sc = r.entity_matching_score ?? r.unanswerable_em ?? 0;
+    if (sc >= 1.0) perfectCount++;
+    if (sc < 0.5) errorsCount++;
+  }
+
+  el.innerHTML = types.map(t =>
+    `<button class="filter-btn ${t === activeFilter ? 'active' : ''}" onclick="setFilter('${t}')">${
+      t === 'all' ? `All (${s.total})` :
+      t === 'perfect' ? `Perfect=1.0 (${perfectCount})` :
+      t === 'errors' ? `Errors&lt;0.5 (${errorsCount})` :
+      `${t} (${s[t]?.count || 0})`
+    }</button>`
+  ).join('');
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().startsWith(f)));
+  const filtered = allResults.filter(r => {
+    if (f === 'all') return true;
+    const sc = r.entity_matching_score ?? r.unanswerable_em ?? 0;
+    if (f === 'perfect') return sc >= 1.0;
+    if (f === 'errors') return sc < 0.5;
+    return r.type === f;
+  });
+  renderResults(filtered);
+}
+
+function renderResults(results) {
+  const el = document.getElementById('results');
+  if (!results.length) {
+    el.innerHTML = '<div class="loading" style="padding:40px">No results matching filter</div>';
+    return;
+  }
+  el.innerHTML = results.map((r, i) => {
+    const sc = r.entity_matching_score ?? r.unanswerable_em ?? 0;
+    const ph = r.hallucination_penalty ?? 0;
+    const scoreLabel = r.type === 'unanswerable' ? `EM: ${sc.toFixed(2)}` : `Entity: ${sc.toFixed(2)}`;
+    return `
+    <div class="result-item" id="item-${i}">
+      <div class="result-header" onclick="toggle(${i})">
+        <div class="score-badge ${sc >= 1 ? 'score-perfect' : sc >= 0.5 ? 'score-good' : 'score-bad'}">
+          ${sc.toFixed(2)}
+        </div>
+        <div class="result-info">
+          <div class="result-qid">${r.question_id} ${r.ndcg5 != null ? `<span class="ndcg-badge">nDCG@5: ${r.ndcg5}</span>` : ''} ${ph > 0 ? `<span class="ndcg-badge" style="background:rgba(248,113,113,.15);color:var(--red)">幻覺: ${ph.toFixed(2)}</span>` : ''}</div>
+          <div class="result-question">${esc(r.question)}</div>
+        </div>
+        <span class="type-tag type-${r.type}">${r.type}</span>
+        <span class="chevron">&#9654;</span>
+      </div>
+      <div class="result-detail">
+        <div class="answer-compare">
+          <div class="answer-box">
+            <div class="label">Ground Truth</div>
+            <div class="text">${esc(r.gt_answer)}</div>
+          </div>
+          <div class="answer-box">
+            <div class="label">Prediction (${scoreLabel})</div>
+            <div class="text">${esc(r.pred_answer)}</div>
+          </div>
+        </div>
+        ${r.gt_entities && Object.keys(r.gt_entities).length ? '<div style="margin-top:12px;padding:12px;background:var(--bg);border-radius:6px;font-size:13px"><div style="font-weight:600;margin-bottom:6px">Entities 比對</div><table style="width:100%;border-collapse:collapse"><tr style="color:var(--text2)"><td style="padding:2px 8px">欄位</td><td style="padding:2px 8px">GT</td><td style="padding:2px 8px">Pred</td><td style="padding:2px 8px">Score</td></tr>' + Object.entries(r.gt_entities).map(function([k, v]) { var pv = r.pred_entities ? r.pred_entities[k] : null; var ds = r.entity_detail ? r.entity_detail[k] : null; var vStr = typeof v === 'object' ? JSON.stringify(v) : String(v); var pvStr = pv != null ? (typeof pv === 'object' ? JSON.stringify(pv) : String(pv)) : '—'; var dsStr = ds != null ? ds.toFixed(2) : '0.00'; var clr = parseFloat(dsStr) >= 1 ? 'var(--green)' : parseFloat(dsStr) >= 0.5 ? 'var(--yellow)' : 'var(--red)'; return '<tr style="border-top:1px solid var(--border)"><td style="padding:4px 8px;font-family:monospace;font-size:12px">' + esc(k) + '</td><td style="padding:4px 8px">' + esc(vStr).substring(0,60) + '</td><td style="padding:4px 8px">' + esc(pvStr).substring(0,60) + '</td><td style="padding:4px 8px;color:' + clr + '">' + dsStr + '</td></tr>'; }).join('') + '</table></div>' : ''}
+        ${r.hallucination_detail && Object.keys(r.hallucination_detail).length ? '<div style="margin-top:12px;padding:12px;background:var(--bg);border-radius:6px;font-size:13px"><div style="font-weight:600;margin-bottom:6px;color:var(--red)">幻覺明細 (P_h = ' + (r.hallucination_penalty ?? 0).toFixed(2) + ')</div><table style="width:100%;border-collapse:collapse"><tr style="color:var(--text2)"><td style="padding:2px 8px">欄位</td><td style="padding:2px 8px">系統輸出值</td><td style="padding:2px 8px">分類</td><td style="padding:2px 8px">懲罰</td></tr>' + Object.entries(r.hallucination_detail).map(function([k, d]) { var valStr = typeof d.value === 'object' ? JSON.stringify(d.value) : String(d.value || ''); var typeClr = d.type === 'supported' ? 'var(--green)' : d.type === 'contradictory' ? 'var(--red)' : 'var(--yellow)'; var typeLabel = d.type === 'supported' ? '有文件支持' : d.type === 'contradictory' ? '與文件衝突' : '無文件支持'; return '<tr style="border-top:1px solid var(--border)"><td style="padding:4px 8px;font-family:monospace;font-size:12px">' + esc(k) + '</td><td style="padding:4px 8px">' + esc(valStr).substring(0,80) + '</td><td style="padding:4px 8px;color:' + typeClr + '">' + typeLabel + '</td><td style="padding:4px 8px;color:' + (d.penalty > 0 ? 'var(--red)' : 'var(--green)') + '">' + d.penalty.toFixed(2) + '</td></tr>'; }).join('') + '</table></div>' : ''}
+        ${r.refs && r.refs.length ? `
+        <div class="refs-section">
+          <h4>Referenced Documents (${r.refs.length})</h4>
+          ${r.refs.map((ref, ri) => `
+            <div class="ref-item" onclick="toggleRef(this, event)">
+              <div class="ref-title">[${ri+1}] ${esc(ref.title)}</div>
+              <div class="ref-id">${ref.doc_id}</div>
+              ${ref.source_metadata && Object.keys(ref.source_metadata).length ? `<div class="ref-meta">${Object.entries(ref.source_metadata).filter(([k,v])=>v).map(([k,v])=>`${esc(k)}：${esc(String(v))}`).join('\n')}</div>` : ''}
+              <div class="ref-snippet">${esc(ref.snippet)}</div>
+              <div class="ref-full-btn" onclick="event.stopPropagation(); loadFullText(this, '${ref.doc_id}')">Load full text...</div>
+              <div class="ref-full-text"></div>
+            </div>
+          `).join('')}
+        </div>` : ''}
+        ${r.debug_info ? `
+          <span class="debug-toggle" onclick="this.nextElementSibling.classList.toggle('open')">debug info</span>
+          <div class="debug-content">${esc(JSON.stringify(r.debug_info, null, 2))}</div>
+        ` : ''}
+      </div>
+    </div>
+  `}).join('');
+}
+
+function toggle(i) {
+  document.getElementById(`item-${i}`).classList.toggle('open');
+}
+function toggleRef(el, e) {
+  e.stopPropagation();
+  el.classList.toggle('open');
+}
+async function loadFullText(btn, docId) {
+  btn.textContent = 'Loading...';
+  try {
+    const resp = await fetch(`/api/doc/${docId}`);
+    const data = await resp.json();
+    const fullEl = btn.nextElementSibling;
+    fullEl.textContent = data.full_text;
+    fullEl.style.display = 'block';
+    btn.style.display = 'none';
+  } catch (e) {
+    btn.textContent = 'Error loading';
+  }
+}
+function scoreColor(s) {
+  if (s >= 0.8) return 'var(--green)';
+  if (s >= 0.5) return 'var(--yellow)';
+  return 'var(--red)';
+}
+function esc(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+init();
+</script>
+</body>
+</html>

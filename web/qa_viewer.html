@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QA Viewer</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #242836;
+    --border: #2e3345;
+    --text: #e1e4ed;
+    --text2: #8b90a0;
+    --accent: #6c8cff;
+    --green: #4ade80;
+    --yellow: #facc15;
+    --red: #f87171;
+    --orange: #fb923c;
+    --highlight: rgba(250,204,21,.25);
+  }
+  html { scrollbar-gutter: stable; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    background: var(--surface);
+  }
+  .header h1 { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .beta-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(108,140,255,.15);
+    color: var(--accent);
+    border: 1px solid rgba(108,140,255,.3);
+    letter-spacing: .5px;
+  }
+  .header nav a {
+    color: var(--text2); text-decoration: none; margin-left: 20px; font-size: 13px;
+  }
+  .header nav a:hover, .header nav a.active { color: var(--accent); }
+
+  .toolbar {
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .search-box {
+    flex: 1; min-width: 200px;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 14px; color: var(--text); font-size: 13px; outline: none; font-family: inherit;
+  }
+  .search-box:focus { border-color: var(--accent); }
+  .search-box::placeholder { color: var(--text2); }
+  .filter-select {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 10px; color: var(--text); font-size: 12px; outline: none; cursor: pointer;
+  }
+  .stat { font-size: 12px; color: var(--text2); }
+
+  .main { flex: 1; display: flex; overflow: hidden; }
+
+  /* Left: QA list */
+  .qa-list {
+    width: 480px;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  .qa-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background .1s;
+  }
+  .qa-item:hover { background: var(--surface2); }
+  .qa-item.active { background: var(--surface2); border-left: 3px solid var(--accent); }
+  .qa-question { font-size: 13px; font-weight: 500; line-height: 1.5; }
+  .qa-answer {
+    font-size: 12px; color: var(--text2); margin-top: 4px;
+    max-height: 40px; overflow: hidden;
+  }
+  .qa-meta { font-size: 10px; color: var(--text2); margin-top: 4px; display: flex; gap: 8px; align-items: center; }
+  .type-tag {
+    padding: 1px 7px; border-radius: 4px; font-size: 10px; font-weight: 500;
+  }
+  .type-short { background: rgba(108,140,255,.15); color: var(--accent); }
+  .type-long { background: rgba(251,146,60,.15); color: var(--orange); }
+  .type-unanswerable { background: rgba(139,144,160,.15); color: var(--text2); }
+
+  /* Right: detail + full text */
+  .detail-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+  }
+  .detail-empty {
+    display: flex; align-items: center; justify-content: center;
+    height: 100%; color: var(--text2); font-size: 13px;
+  }
+
+  .detail-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-title { font-size: 15px; font-weight: 600; }
+  .detail-id { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+  .qa-detail-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .qa-detail-label { font-size: 11px; color: var(--text2); font-weight: 600; margin-bottom: 4px; }
+  .qa-detail-q { font-size: 14px; font-weight: 500; margin-bottom: 12px; }
+  .qa-detail-a { font-size: 14px; line-height: 1.7; margin-bottom: 12px; }
+  .qa-detail-evidence {
+    font-size: 12px; color: var(--text2); line-height: 1.6;
+    background: var(--surface2); border-radius: 6px; padding: 10px 12px;
+  }
+
+  .fulltext-section { margin-top: 16px; }
+  .fulltext-toggle {
+    font-size: 12px; color: var(--accent); cursor: pointer; user-select: none;
+    padding: 6px 12px; border-radius: 6px; display: inline-block;
+    transition: background .2s;
+  }
+  .fulltext-toggle:hover { background: rgba(108,140,255,.1); }
+  .fulltext-content {
+    display: none;
+    font-size: 13px; line-height: 1.8; white-space: pre-wrap; word-break: break-all;
+    margin-top: 12px; padding: 16px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    max-height: 500px; overflow-y: auto;
+  }
+  .fulltext-content.open { display: block; }
+  .fulltext-content mark {
+    background: var(--highlight); color: var(--text); padding: 1px 2px; border-radius: 2px;
+  }
+
+  .loading { text-align: center; padding: 40px; color: var(--text2); }
+  .spinner {
+    width: 24px; height: 24px;
+    border: 3px solid var(--border); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>QA Viewer <span class="beta-badge">Beta</span></h1>
+  <nav>
+    <a href="/intro">Intro</a>
+    <a href="/results">Results</a>
+    <a href="/chat">Chat</a>
+    <a href="/entities">Entities</a>
+    <a href="/qa" class="active">QA</a>
+  </nav>
+</div>
+
+<div class="toolbar">
+  <input class="search-box" id="search" placeholder="Search question, answer, doc_id, title...">
+  <select class="filter-select" id="filterType" onchange="applyFilters()">
+    <option value="">All types</option>
+    <option value="short">short</option>
+    <option value="long">long</option>
+    <option value="unanswerable">unanswerable</option>
+  </select>
+  <select class="filter-select" id="filterCase" onchange="applyFilters()">
+    <option value="">All cases</option>
+  </select>
+  <span class="stat" id="stat"></span>
+</div>
+
+<div class="main">
+  <div class="qa-list" id="qaList">
+    <div class="loading"><div class="spinner"></div>Loading QA...</div>
+  </div>
+  <div class="detail-area" id="detailArea">
+    <div class="detail-empty">Select a question from the left</div>
+  </div>
+</div>
+
+<script>
+let allCases = [];
+let allQA = [];    // flattened: {doc_id, title, ...qa_pair}
+let filtered = [];
+let selectedIdx = -1;
+
+async function init() {
+  const resp = await fetch('/api/qa');
+  const data = await resp.json();
+  allCases = data.cases;
+
+  // Flatten
+  allQA = [];
+  for (const c of allCases) {
+    for (const q of (c.qa_pairs || [])) {
+      allQA.push({ doc_id: c.doc_id, title: c.title, ...q });
+    }
+  }
+
+  // Populate case dropdown
+  const sel = document.getElementById('filterCase');
+  allCases.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.doc_id;
+    opt.textContent = `${c.title.substring(0, 30)}... (${(c.qa_pairs||[]).length})`;
+    sel.appendChild(opt);
+  });
+
+  applyFilters();
+}
+
+document.getElementById('search').addEventListener('input', debounce(applyFilters, 200));
+
+function applyFilters() {
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const type = document.getElementById('filterType').value;
+  const caseId = document.getElementById('filterCase').value;
+
+  filtered = allQA.filter(qa => {
+    if (q) {
+      const h = (qa.question + qa.answer + qa.doc_id + qa.title + (qa.evidence||'')).toLowerCase();
+      if (!h.includes(q)) return false;
+    }
+    if (type && qa.type !== type) return false;
+    if (caseId && qa.doc_id !== caseId) return false;
+    return true;
+  });
+
+  document.getElementById('stat').textContent =
+    `${filtered.length} questions / ${new Set(filtered.map(q=>q.doc_id)).size} cases`;
+  selectedIdx = -1;
+  renderList();
+}
+
+function renderList() {
+  const el = document.getElementById('qaList');
+  if (!filtered.length) {
+    el.innerHTML = '<div class="loading">No matches</div>';
+    return;
+  }
+  el.innerHTML = filtered.map((qa, i) => `
+    <div class="qa-item ${i === selectedIdx ? 'active' : ''}" onclick="selectQA(${i})">
+      <div class="qa-question">${esc(qa.question)}</div>
+      <div class="qa-answer">${esc(qa.answer)}</div>
+      <div class="qa-meta">
+        <span class="type-tag type-${qa.type}">${qa.type}</span>
+        <span>${qa.question_id}</span>
+        <span>${esc(qa.title.substring(0, 25))}...</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectQA(i) {
+  selectedIdx = i;
+  renderList();
+  renderDetail(filtered[i]);
+}
+
+async function renderDetail(qa) {
+  const el = document.getElementById('detailArea');
+
+  el.innerHTML = `
+    <div class="detail-header">
+      <div class="detail-title">${esc(qa.title)}</div>
+      <div class="detail-id">${qa.doc_id} / ${qa.question_id}</div>
+    </div>
+
+    <div class="qa-detail-card">
+      <div class="qa-detail-label">Question <span class="type-tag type-${qa.type}">${qa.type}</span></div>
+      <div class="qa-detail-q">${esc(qa.question)}</div>
+
+      <div class="qa-detail-label">Answer</div>
+      <div class="qa-detail-a">${esc(qa.answer)}</div>
+
+      ${qa.evidence ? `
+        <div class="qa-detail-label">Evidence</div>
+        <div class="qa-detail-evidence">${esc(qa.evidence)}</div>
+      ` : ''}
+    </div>
+
+    <div class="fulltext-section">
+      <span class="fulltext-toggle" onclick="toggleFullText('${qa.doc_id}')">
+        Show full text with evidence highlighted
+      </span>
+      <div class="fulltext-content" id="fulltext"></div>
+    </div>
+  `;
+}
+
+async function toggleFullText(docId) {
+  const ftEl = document.getElementById('fulltext');
+  if (ftEl.classList.contains('open')) {
+    ftEl.classList.remove('open');
+    return;
+  }
+
+  if (!ftEl.dataset.loaded) {
+    ftEl.innerHTML = 'Loading...';
+    ftEl.classList.add('open');
+    try {
+      const resp = await fetch(`/api/doc/${docId}`);
+      const data = await resp.json();
+      ftEl.dataset.rawText = data.full_text;
+      ftEl.dataset.loaded = '1';
+    } catch (e) {
+      ftEl.innerHTML = 'Error loading';
+      return;
+    }
+  }
+
+  ftEl.classList.add('open');
+
+  // Highlight evidence in full text
+  const qa = filtered[selectedIdx];
+  const raw = ftEl.dataset.rawText;
+  let html = esc(raw);
+
+  if (qa.evidence) {
+    // Try highlight evidence, then answer
+    for (const needle of [qa.evidence, qa.answer]) {
+      if (!needle || needle === '無法從文件判斷') continue;
+      const ne = esc(needle);
+      // Try full match first, then first 40 chars
+      if (html.includes(ne)) {
+        html = html.replaceAll(ne, `<mark>${ne}</mark>`);
+        break;
+      }
+      const short = esc(needle.substring(0, 40));
+      if (short.length > 6 && html.includes(short)) {
+        html = html.replaceAll(short, `<mark>${short}</mark>`);
+        break;
+      }
+    }
+  }
+
+  ftEl.innerHTML = html;
+
+  setTimeout(() => {
+    const mark = ftEl.querySelector('mark');
+    if (mark) mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 50);
+}
+
+function esc(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function debounce(fn, ms) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+
+init();
+</script>
+</body>
+</html>

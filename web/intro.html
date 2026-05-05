@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG System Introduction</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #242836;
+    --border: #2e3345;
+    --text: #e1e4ed;
+    --text2: #8b90a0;
+    --accent: #6c8cff;
+    --green: #4ade80;
+    --yellow: #facc15;
+    --orange: #fb923c;
+  }
+  html { scrollbar-gutter: stable; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* ── Header ── */
+  .header {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    flex-shrink: 0;
+    background: var(--surface);
+    z-index: 10;
+  }
+  .header h1 { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .beta-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(108,140,255,.15);
+    color: var(--accent);
+    border: 1px solid rgba(108,140,255,.3);
+    letter-spacing: .5px;
+  }
+  .header nav a {
+    color: var(--text2);
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 13px;
+    transition: color .2s;
+  }
+  .header nav a:hover, .header nav a.active { color: var(--accent); }
+
+  /* ── Content ── */
+  .content {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 32px 80px;
+  }
+
+  /* ── Markdown Styles ── */
+  .md h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--accent);
+    color: var(--text);
+  }
+  .md h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 40px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .md h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 28px;
+    margin-bottom: 8px;
+    color: var(--accent);
+  }
+  .md p {
+    margin-bottom: 12px;
+    color: var(--text);
+    font-size: 14.5px;
+  }
+  .md ul, .md ol {
+    margin-bottom: 12px;
+    padding-left: 24px;
+  }
+  .md li {
+    margin-bottom: 4px;
+    font-size: 14.5px;
+  }
+  .md strong { color: var(--text); font-weight: 600; }
+  .md em { color: var(--text2); font-style: italic; }
+  .md code {
+    background: var(--surface2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    color: var(--orange);
+  }
+  .md pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    line-height: 1.5;
+  }
+  .md pre code {
+    background: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 13px;
+  }
+  .md table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  .md th {
+    background: var(--surface);
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    color: var(--accent);
+    font-size: 13px;
+  }
+  .md td {
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    font-size: 13.5px;
+  }
+  .md tr:nth-child(even) td { background: rgba(26,29,39,.5); }
+  .md tr:hover td { background: var(--surface2); }
+  .md blockquote {
+    border-left: 3px solid var(--accent);
+    padding: 8px 16px;
+    margin-bottom: 12px;
+    background: var(--surface);
+    border-radius: 0 8px 8px 0;
+    color: var(--text2);
+  }
+  .md hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+  .md a { color: var(--accent); text-decoration: none; }
+  .md a:hover { text-decoration: underline; }
+
+  /* ── Loading ── */
+  .loading {
+    text-align: center;
+    padding: 80px;
+    color: var(--text2);
+  }
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>System Introduction <span class="beta-badge">Beta</span></h1>
+  <nav>
+    <a href="/intro" class="active">Intro</a>
+    <a href="/results">Results</a>
+    <a href="/chat">Chat</a>
+    <a href="/entities">Entities</a>
+    <a href="/qa">QA</a>
+  </nav>
+</div>
+
+<div class="content">
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    Loading...
+  </div>
+  <div id="md" class="md" style="display:none"></div>
+</div>
+
+<script>
+// Minimal markdown parser (no external deps)
+function parseMd(md) {
+  let html = md;
+
+  // Code blocks (```...```)
+  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+    return `<pre><code class="lang-${lang}">${esc(code.trimEnd())}</code></pre>`;
+  });
+
+  // Tables
+  html = html.replace(/^(\|.+\|)\n(\|[\s:|-]+\|)\n((?:\|.+\|\n?)+)/gm, (_, header, sep, body) => {
+    const ths = header.split('|').filter(c => c.trim()).map(c => `<th>${c.trim()}</th>`).join('');
+    const rows = body.trim().split('\n').map(row => {
+      const tds = row.split('|').filter(c => c.trim()).map(c => `<td>${inline(c.trim())}</td>`).join('');
+      return `<tr>${tds}</tr>`;
+    }).join('');
+    return `<table><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table>`;
+  });
+
+  // Headers
+  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+
+  // Horizontal rules
+  html = html.replace(/^---$/gm, '<hr>');
+
+  // Blockquotes
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+
+  // Unordered lists
+  html = html.replace(/^((?:- .+\n?)+)/gm, (match) => {
+    const items = match.trim().split('\n').map(l => `<li>${inline(l.replace(/^- /, ''))}</li>`).join('');
+    return `<ul>${items}</ul>`;
+  });
+
+  // Ordered lists
+  html = html.replace(/^((?:\d+\. .+\n?)+)/gm, (match) => {
+    const items = match.trim().split('\n').map(l => `<li>${inline(l.replace(/^\d+\. /, ''))}</li>`).join('');
+    return `<ol>${items}</ol>`;
+  });
+
+  // Paragraphs (lines not already wrapped)
+  html = html.replace(/^(?!<[houpltb]|$)(.+)$/gm, '<p>$1</p>');
+
+  // Inline formatting
+  html = html.replace(/<(p|li|td|th|blockquote)>(.*?)<\/\1>/gs, (_, tag, content) => {
+    return `<${tag}>${inline(content)}</${tag}>`;
+  });
+
+  // Clean up empty paragraphs
+  html = html.replace(/<p>\s*<\/p>/g, '');
+
+  return html;
+}
+
+function inline(s) {
+  // Inline code
+  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // Bold
+  s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // Italic
+  s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  // Links
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+  // LaTeX-like (simple)
+  s = s.replace(/\$\$(.+?)\$\$/g, '<code>$1</code>');
+  s = s.replace(/\$(.+?)\$/g, '<code>$1</code>');
+  return s;
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+async function load() {
+  try {
+    const resp = await fetch('/api/intro');
+    const data = await resp.json();
+    document.getElementById('md').innerHTML = parseMd(data.content);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('md').style.display = 'block';
+  } catch (e) {
+    document.getElementById('loading').innerHTML =
+      `<div style="color:var(--red)">Error loading: ${e.message}</div>`;
+  }
+}
+
+load();
+</script>
+</body>
+</html>
