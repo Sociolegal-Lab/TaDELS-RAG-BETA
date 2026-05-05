@@ -3,10 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
 <title>RAG System Introduction</title>
 <link rel="icon" type="image/png" href="/favicon.png">
+<script>
+(function(){
+  const t = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+})();
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+}
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
 <style>
+  @view-transition { navigation: auto; }
   :root {
+    color-scheme: dark;
     --bg: #0f1117;
     --surface: #1a1d27;
     --surface2: #242836;
@@ -18,6 +35,37 @@
     --yellow: #facc15;
     --orange: #fb923c;
   }
+  [data-theme="light"] {
+    color-scheme: light;
+    --bg: #fcfbf7;
+    --surface: #ffffff;
+    --surface2: #f1efe9;
+    --border: #e0ddd3;
+    --text: #1f1c17;
+    --text2: #6b6356;
+    --accent: #4a63d8;
+    --green: #3da55b;
+    --yellow: #c89a13;
+    --orange: #d97706;
+  }
+  /* Theme toggle button */
+  .theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 14px;
+    padding: 4px 6px;
+    color: var(--text2);
+    display: inline-flex;
+    align-items: center;
+    border-radius: 6px;
+    transition: color .2s, background .2s;
+  }
+  .theme-toggle:hover { color: var(--accent); background: rgba(108,140,255,.08); }
+  .theme-toggle svg { width: 16px; height: 16px; }
+  .theme-toggle .icon-sun { display: none; }
+  [data-theme="light"] .theme-toggle .icon-sun { display: block; }
+  [data-theme="light"] .theme-toggle .icon-moon { display: none; }
   html { scrollbar-gutter: stable; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -92,6 +140,13 @@
     margin-bottom: 8px;
     color: var(--accent);
   }
+  .md h4 {
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-top: 18px;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
   .md p {
     margin-bottom: 12px;
     color: var(--text);
@@ -150,7 +205,7 @@
     border: 1px solid var(--border);
     font-size: 13.5px;
   }
-  .md tr:nth-child(even) td { background: rgba(26,29,39,.5); }
+  .md tr:nth-child(even) td { background: var(--surface2); }
   .md tr:hover td { background: var(--surface2); }
   .md blockquote {
     border-left: 3px solid var(--accent);
@@ -167,6 +222,576 @@
   }
   .md a { color: var(--accent); text-decoration: none; }
   .md a:hover { text-decoration: underline; }
+
+  /* ── KaTeX math blocks ── */
+  .md .math-block {
+    margin: 18px 0 22px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow-x: auto;
+  }
+  .md .math-block .katex-display { margin: 0; }
+  .md .math-inline .katex { font-size: 1em; }
+  .md .katex { color: var(--text); }
+  .md .math-block::-webkit-scrollbar { height: 6px; }
+  .md .math-block::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── Hero (first viewport) ── */
+  .md .hero {
+    min-height: calc(100vh - 110px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding-bottom: 140px;
+  }
+  /* visual order = source order: H1 → dots → paragraphs */
+  .md .hero h1 {
+    font-size: 38px;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: none;
+    padding-bottom: 0;
+    margin: 0 0 28px;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -.5px;
+    animation: hero-text .8s ease-out;
+  }
+  .md .hero h2 {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 6px;
+    text-align: center;
+    color: var(--accent);
+    border-bottom: none;
+    margin: 0 0 12px;
+    padding: 0;
+    text-transform: uppercase;
+    animation: hero-text .8s ease-out;
+  }
+  .md .hero p {
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.85;
+    max-width: 580px;
+    margin: 0 auto 14px;
+    text-wrap: balance;
+    animation: hero-text .8s ease-out .15s both;
+  }
+  .md .hero h1 {
+    text-wrap: balance;
+  }
+  [data-theme="light"] .md .hero h1 {
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .md .hero p strong {
+    color: var(--text);
+    background: linear-gradient(transparent 65%, rgba(108, 140, 255, 0.45) 65%);
+    padding: 0 2px;
+    font-weight: 600;
+  }
+  /* hero-cue: dots + blockquote + SCROLL share one flex container so they truly align */
+  .md .hero-cue {
+    position: absolute;
+    bottom: 26px;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    pointer-events: none;
+  }
+  .md .hero-cue blockquote {
+    margin: 0;
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--text2);
+    letter-spacing: .2px;
+    text-align: center;
+    max-width: 540px;
+    text-wrap: balance;
+    opacity: 0;
+    animation: bq-fade-in .8s ease-out .8s forwards;
+  }
+  @keyframes bq-fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: .75; transform: translateY(0); }
+  }
+  .md .hero-cue .scroll-cue {
+    position: static;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    pointer-events: auto;
+    margin: 0;
+  }
+  @keyframes hero-text {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Pipeline dots — sit between H1 title and body paragraphs */
+  .md .hero-flow {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0 26px;
+    animation: hero-text .8s ease-out .35s both;
+  }
+  .md .hero-flow .dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 14px rgba(108,140,255,.5);
+    animation: dot-flow 1.6s ease-in-out infinite;
+  }
+  .md .hero-flow > .dot:nth-child(3) { animation-delay: .25s; }
+  .md .hero-flow > .dot:nth-child(5) { animation-delay: .5s; }
+  .md .hero-flow .line {
+    width: 32px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(108,140,255,.5), transparent);
+  }
+  @keyframes dot-flow {
+    0%, 100% { opacity: .35; transform: scale(.8); }
+    50%      { opacity: 1;   transform: scale(1.15); }
+  }
+  .md .hero-tags {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 20px 0 0;
+    animation: hero-text .8s ease-out .7s both;
+  }
+  .md .hero-tags span {
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(108,140,255,.08);
+    border: 1px solid rgba(108,140,255,.25);
+    color: var(--text2);
+  }
+
+  /* Hero next cue — slide right or click to go to /chat */
+  .md .hero-next {
+    position: fixed;
+    right: 26px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 10px;
+    text-decoration: none !important;
+    color: var(--text2);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .35s ease, color .2s, transform .25s, right .2s;
+    z-index: 5;
+  }
+  .md .hero-next.in-hero {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .md .hero-next:hover {
+    color: var(--accent);
+    transform: translateY(-50%) translateX(-4px);
+  }
+  .md .hero-next .label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .md .hero-next .next-arrow {
+    width: 12px;
+    height: 12px;
+    border-top: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+    animation: next-bounce 1.6s ease-in-out infinite;
+  }
+  @keyframes next-bounce {
+    0%, 100% { transform: rotate(45deg) translate(-3px, 3px); opacity: .35; }
+    50%      { transform: rotate(45deg) translate(3px, -3px); opacity: 1; }
+  }
+
+  /* Scroll cue — bouncing arrow */
+  .scroll-cue {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    pointer-events: none;
+    animation: hero-text 1s ease-out 1s both;
+  }
+  .scroll-cue .label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text2);
+    opacity: .55;
+    text-transform: uppercase;
+  }
+  .scroll-arrow {
+    width: 12px;
+    height: 12px;
+    border-right: 2px solid var(--accent);
+    border-bottom: 2px solid var(--accent);
+    margin: 12px auto 0;
+    animation: arrow-bounce 1.6s ease-in-out infinite;
+  }
+  @keyframes arrow-bounce {
+    0%, 100% { transform: rotate(45deg) translate(-3px, -3px); opacity: .35; }
+    50%      { transform: rotate(45deg) translate(3px, 3px);   opacity: 1; }
+  }
+
+  /* ── Info block (always visible) ── */
+  .md .info-block {
+    margin: 14px 0 28px;
+    padding: 26px 30px 24px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(108,140,255,.04) 0%, rgba(0,0,0,0) 60%);
+    position: relative;
+    overflow: hidden;
+  }
+  .md .info-block > h2:first-child {
+    margin-top: 0;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+  }
+  .md .info-block > h3 {
+    margin-top: 26px;
+  }
+
+  /* ── Navigation cards ── */
+  .md .nav-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+    margin: 10px 0 4px;
+  }
+  .md .nav-card {
+    display: block;
+    padding: 18px 20px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    text-decoration: none !important;
+    color: var(--text);
+    transition: transform .25s ease, border-color .25s, background .25s, box-shadow .25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .md .nav-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(108,140,255,.5);
+    background: var(--surface2);
+    box-shadow: 0 8px 24px -10px rgba(108,140,255,.4);
+    text-decoration: none;
+  }
+  .md .nav-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    transition: left .6s ease;
+  }
+  .md .nav-card:hover::before { left: 100%; }
+  .md .nav-card .nav-icon {
+    width: 28px;
+    height: 28px;
+    color: var(--accent);
+    margin-bottom: 12px;
+    transition: transform .35s ease;
+  }
+  .md .nav-card:hover .nav-icon { transform: scale(1.1) rotate(-4deg); }
+  .md .nav-card .nav-icon svg { width: 100%; height: 100%; }
+  .md .nav-card .nav-title {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .md .nav-card:hover .nav-title { color: var(--accent); }
+  .md .nav-card .nav-desc {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.55;
+  }
+  .md .nav-card .arrow-cue {
+    position: absolute;
+    right: 14px;
+    bottom: 12px;
+    color: var(--accent);
+    font-size: 14px;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity .25s, transform .25s;
+  }
+  .md .nav-card:hover .arrow-cue {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* ── Animated Pipeline SVG ── */
+  .md .pipeline-svg {
+    display: block;
+    width: 100%;
+    max-width: 700px;
+    height: auto;
+    margin: 14px auto 24px;
+  }
+  .md .pipeline-svg .bot-icon { color: var(--accent); filter: drop-shadow(0 0 4px rgba(108,140,255,.5)); }
+  .md .pipeline-svg .bot-mini { color: var(--text2); opacity: .85; }
+  .md .pipeline-svg .bidi-line {
+    stroke: rgba(108,140,255,.65);
+    stroke-width: 2;
+    fill: none;
+  }
+  .md .pipeline-svg .db-cyl {
+    fill: rgba(108,140,255,.05);
+    stroke: rgba(108,140,255,.5);
+    stroke-width: 1.2;
+  }
+  .md .pipeline-svg .db-cyl-top {
+    fill: rgba(108,140,255,.18);
+    stroke: rgba(108,140,255,.55);
+    stroke-width: 1.2;
+  }
+  .md .pipeline-svg .ptravel-l {
+    fill: var(--accent);
+    filter: drop-shadow(0 0 6px var(--accent));
+    animation: travel-l 1.5s ease-in-out infinite;
+  }
+  .md .pipeline-svg .ptravel-r {
+    fill: var(--accent);
+    filter: drop-shadow(0 0 6px var(--accent));
+    animation: travel-r 1.5s ease-in-out infinite;
+    animation-delay: .75s;
+  }
+  @keyframes travel-l {
+    0%   { opacity: 0; transform: translateX(0); }
+    15%  { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { opacity: 0; transform: translateX(-33px); }
+  }
+  @keyframes travel-r {
+    0%   { opacity: 0; transform: translateX(0); }
+    15%  { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { opacity: 0; transform: translateX(33px); }
+  }
+  .md .pipeline-svg .db-pill {
+    fill: rgba(108,140,255,.08);
+    stroke: rgba(108,140,255,.3);
+    stroke-width: 1;
+  }
+  .md .pipeline-svg .db-pt {
+    fill: var(--text2);
+    font-size: 11px;
+    font-weight: 500;
+    text-anchor: middle;
+  }
+  .md .pipeline-svg .db-title {
+    fill: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-anchor: middle;
+    text-transform: uppercase;
+  }
+  .md .pipeline-svg .pbox {
+    fill: var(--surface2);
+    stroke: var(--border);
+    stroke-width: 1;
+    transition: stroke .25s, filter .25s;
+  }
+  .md .pipeline-svg .pbox:hover {
+    stroke: var(--accent);
+    filter: drop-shadow(0 0 10px rgba(108,140,255,.35));
+  }
+  .md .pipeline-svg .accent-pbox {
+    stroke: var(--accent);
+    stroke-width: 1.5;
+  }
+  .md .pipeline-svg .final-pbox {
+    fill: rgba(108,140,255,.08);
+    stroke: var(--accent);
+  }
+  .md .pipeline-svg .ptitle {
+    fill: var(--text);
+    font-size: 14px;
+    font-weight: 700;
+    text-anchor: middle;
+  }
+  .md .pipeline-svg .accent-text { fill: var(--accent); }
+  .md .pipeline-svg .pdesc {
+    fill: var(--text2);
+    font-size: 11px;
+    text-anchor: middle;
+  }
+  .md .pipeline-svg .ppill {
+    fill: rgba(108,140,255,.12);
+    stroke: rgba(108,140,255,.35);
+    stroke-width: 1;
+    transition: fill .25s, stroke .25s;
+  }
+  .md .pipeline-svg .ppill:hover {
+    fill: rgba(108,140,255,.25);
+    stroke: var(--accent);
+  }
+  .md .pipeline-svg .ppt {
+    fill: var(--accent);
+    font-size: 10px;
+    font-weight: 600;
+    text-anchor: middle;
+  }
+  .md .pipeline-svg .ppt-row {
+    fill: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    text-anchor: start;
+  }
+  .md .pipeline-svg .parrow {
+    stroke: rgba(108,140,255,.45);
+    stroke-width: 2;
+    fill: none;
+    stroke-dasharray: 5 4;
+    animation: pmarch .7s linear infinite;
+  }
+  @keyframes pmarch { to { stroke-dashoffset: -9; } }
+  .md .pipeline-svg .phead {
+    fill: rgba(108,140,255,.7);
+  }
+  .md .pipeline-svg .ptravel {
+    fill: var(--accent);
+    filter: drop-shadow(0 0 6px var(--accent));
+    animation: ptravel 1.6s linear infinite;
+  }
+  @keyframes ptravel {
+    0%   { opacity: 0; transform: translateY(0); }
+    15%  { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(44px); }
+  }
+
+  /* ── Collapsible sections ── */
+  .md .sections { padding-top: 20px; }
+  .md .sections > details,
+  .md .sections > .info-block {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+  .md .sections > details.in-view,
+  .md .sections > .info-block.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .md details {
+    margin: 14px 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    overflow: hidden;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .md details[open] {
+    border-color: rgba(108,140,255,.35);
+    box-shadow: 0 4px 24px -8px rgba(108,140,255,.2);
+  }
+  .md details > summary {
+    cursor: pointer;
+    padding: 13px 42px 13px 40px;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--text);
+    list-style: none;
+    user-select: none;
+    position: relative;
+    transition: background .15s, color .15s;
+  }
+  .md details > summary::-webkit-details-marker { display: none; }
+  .md details > summary::before {
+    content: '';
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    width: 0;
+    height: 0;
+    border-left: 5px solid var(--accent);
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    transform: translateY(-50%);
+    transition: transform .25s;
+  }
+  .md details[open] > summary::before {
+    transform: translateY(-50%) rotate(90deg);
+  }
+  .md details > summary::after {
+    content: '';
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    transform: translateY(-50%);
+    animation: pulse-dot 2.4s ease-in-out infinite;
+    transition: opacity .3s;
+  }
+  .md details[open] > summary::after {
+    opacity: 0;
+    animation: none;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: .35; transform: translateY(-50%) scale(.85); box-shadow: 0 0 0 rgba(108,140,255,0); }
+    50%      { opacity: 1;   transform: translateY(-50%) scale(1.25); box-shadow: 0 0 10px rgba(108,140,255,.7); }
+  }
+  .md details > summary:hover {
+    background: var(--surface2);
+    color: var(--accent);
+  }
+  .md details > summary:hover::before {
+    transform: translateY(-50%) translateX(2px);
+  }
+  .md details[open] > summary:hover::before {
+    transform: translateY(-50%) rotate(90deg) translateX(2px);
+  }
+  .md details[open] > summary {
+    border-bottom: 1px solid var(--border);
+    background: rgba(108,140,255,.05);
+  }
+  .md details > .dbody {
+    padding: 18px 22px 4px;
+  }
+  .md details > .dbody > *:first-child { margin-top: 0; }
+  .md details > .dbody > h3:first-child { margin-top: 4px; }
+  .md details > .dbody > pre:first-child { margin-top: 0; }
+  .md details > .dbody > h3 { margin-top: 22px; }
 
   /* ── Loading ── */
   .loading {
@@ -192,10 +817,14 @@
   <h1>System Introduction <span class="beta-badge">Beta</span></h1>
   <nav>
     <a href="/intro" class="active">Intro</a>
-    <a href="/results">Results</a>
     <a href="/chat">Chat</a>
     <a href="/entities">Entities</a>
-    <a href="/qa">QA</a>
+    <a href="/qa">QA pairs</a>
+    <a href="/results">Results</a>
+    <button class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="切換主題">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+    </button>
   </nav>
 </div>
 
@@ -208,9 +837,32 @@
 </div>
 
 <script>
+function renderMath(tex, displayMode) {
+  if (typeof katex === 'undefined') return esc(tex);  // KaTeX not loaded yet
+  try {
+    return katex.renderToString(tex, { displayMode, throwOnError: false, output: 'html' });
+  } catch (e) {
+    return `<span style="color:#ef4444">${esc(tex)}</span>`;
+  }
+}
+
 // Minimal markdown parser (no external deps)
 function parseMd(md) {
   let html = md;
+
+  // ── Stage 1: extract LaTeX before markdown processing ──
+  // Block math $$...$$ (multi-line allowed)
+  const mathBlocks = [];
+  html = html.replace(/\$\$([\s\S]+?)\$\$/g, (_, tex) => {
+    const i = mathBlocks.push(tex.trim()) - 1;
+    return `\n<!--MATHBLK${i}-->\n`;
+  });
+  // Inline math $...$ (single line, no $)
+  const mathInlines = [];
+  html = html.replace(/\$([^\n$]+)\$/g, (_, tex) => {
+    const i = mathInlines.push(tex.trim()) - 1;
+    return `<!--MATHINL${i}-->`;
+  });
 
   // Code blocks (```...```)
   html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
@@ -227,7 +879,8 @@ function parseMd(md) {
     return `<table><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table>`;
   });
 
-  // Headers
+  // Headers (longer prefixes first so they don't get partially matched)
+  html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
   html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
   html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
   html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
@@ -250,8 +903,11 @@ function parseMd(md) {
     return `<ol>${items}</ol>`;
   });
 
-  // Paragraphs (lines not already wrapped)
-  html = html.replace(/^(?!<[houpltb]|$)(.+)$/gm, '<p>$1</p>');
+  // Paragraphs (lines not already wrapped — skip any line already starting with an HTML tag)
+  html = html.replace(/^(?!<|$)(.+)$/gm, '<p>$1</p>');
+
+  // Wrap details inner content (between </summary> and </details>) in a styled body
+  html = html.replace(/(<\/summary>)([\s\S]*?)(<\/details>)/g, '$1<div class="dbody">$2</div>$3');
 
   // Inline formatting
   html = html.replace(/<(p|li|td|th|blockquote)>(.*?)<\/\1>/gs, (_, tag, content) => {
@@ -261,8 +917,160 @@ function parseMd(md) {
   // Clean up empty paragraphs
   html = html.replace(/<p>\s*<\/p>/g, '');
 
+  // ── Stage 2: restore LaTeX placeholders with KaTeX-rendered HTML ──
+  html = html.replace(/<!--MATHBLK(\d+)-->/g, (_, i) =>
+    `<div class="math-block">${renderMath(mathBlocks[+i], true)}</div>`);
+  html = html.replace(/<!--MATHINL(\d+)-->/g, (_, i) =>
+    `<span class="math-inline">${renderMath(mathInlines[+i], false)}</span>`);
+
+  // Inject animated Pipeline SVG at placeholder
+  html = html.replace('<div class="pipeline-placeholder"></div>', PIPELINE_SVG);
+
+  // Split into hero + sections at the END-HERO marker
+  const HERO_MARKER = '<!--END-HERO-->';
+  const heroEnd = html.indexOf(HERO_MARKER);
+  if (heroEnd > 0) {
+    let heroContent = html.slice(0, heroEnd);
+    const sectionsContent = html.slice(heroEnd + HERO_MARKER.length);
+
+    // Lift blockquote out of hero body; quote and SCROLL align in .hero-cue
+    let blockquoteHtml = '';
+    heroContent = heroContent.replace(/<blockquote[\s\S]*?<\/blockquote>/, (m) => {
+      blockquoteHtml = m;
+      return '';
+    });
+
+    // Insert dots between H1 and the first paragraph
+    const dotsHtml =
+      '<div class="hero-flow">' +
+        '<span class="dot"></span><span class="line"></span>' +
+        '<span class="dot"></span><span class="line"></span>' +
+        '<span class="dot"></span>' +
+      '</div>';
+    heroContent = heroContent.replace(/<\/h1>/, '</h1>' + dotsHtml);
+
+    html =
+      '<section class="hero">' + heroContent +
+        '<div class="hero-cue">' +
+          blockquoteHtml +
+          '<div class="scroll-cue">' +
+            '<div class="label">SCROLL</div>' +
+            '<div class="scroll-arrow"></div>' +
+          '</div>' +
+        '</div>' +
+        '<a class="hero-next" href="/chat" aria-label="Go to Chat">' +
+          '<span class="label">Chat</span>' +
+          '<span class="next-arrow"></span>' +
+        '</a>' +
+      '</section>' +
+      '<section class="sections">' + sectionsContent + '</section>';
+  }
+
   return html;
 }
+
+const PIPELINE_SVG = `
+<svg class="pipeline-svg" viewBox="0 0 700 760" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(108,140,255,0.18)"/>
+      <stop offset="100%" stop-color="rgba(108,140,255,0.04)"/>
+    </linearGradient>
+    <symbol id="boticon" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 8V4H8"/>
+        <rect x="4" y="8" width="16" height="12" rx="2"/>
+        <path d="M2 14h2"/>
+        <path d="M20 14h2"/>
+        <path d="M15 13v2"/>
+        <path d="M9 13v2"/>
+      </g>
+    </symbol>
+  </defs>
+
+  <!-- 1. Query -->
+  <rect class="pbox" x="230" y="30" width="240" height="60" rx="10"/>
+  <text class="ptitle" x="350" y="58">Query</text>
+  <text class="pdesc" x="350" y="78">使用者問題輸入</text>
+
+  <!-- arrow 1 -->
+  <line class="parrow" x1="350" y1="92" x2="350" y2="135"/>
+  <polygon class="phead" points="345,131 350,140 355,131"/>
+  <circle class="ptravel" cx="350" cy="92" r="4" style="animation-delay: 0s"/>
+
+  <!-- 2. Pre-Retrieval -->
+  <rect class="pbox" x="150" y="140" width="400" height="100" rx="10"/>
+  <text class="ptitle" x="350" y="166">Pre-Retrieval</text>
+  <text class="pdesc" x="350" y="186">輸入處理：抽取案號/姓名 · 改寫查詢 · 生成假設文件</text>
+  <rect class="ppill" x="175" y="206" width="115" height="20" rx="10"/>
+  <text class="ppt" x="232.5" y="220">Metadata 抽取</text>
+  <rect class="ppill" x="295" y="206" width="115" height="20" rx="10"/>
+  <text class="ppt" x="352.5" y="220">Query Rewrite</text>
+  <rect class="ppill" x="415" y="206" width="115" height="20" rx="10"/>
+  <text class="ppt" x="472.5" y="220">HyDE</text>
+
+  <!-- arrow 2 -->
+  <line class="parrow" x1="350" y1="242" x2="350" y2="285"/>
+  <polygon class="phead" points="345,281 350,290 355,281"/>
+  <circle class="ptravel" cx="350" cy="242" r="4" style="animation-delay: 0.4s"/>
+
+  <!-- Database (cylinder shape, vertical) -->
+  <path class="db-cyl" d="M 23 279 A 42 8 0 0 0 107 279 L 107 381 A 42 8 0 0 1 23 381 Z"/>
+  <ellipse class="db-cyl-top" cx="65" cy="279" rx="42" ry="8"/>
+  <text class="db-title" x="65" y="308">DATABASE</text>
+  <text class="db-pt" x="65" y="332">原文資料</text>
+  <text class="db-pt" x="65" y="354">Metadata</text>
+  <text class="db-pt" x="65" y="376">Entities</text>
+
+  <!-- DB ↔ Retrieval — two arrows, opposite directions, each with a flowing dot -->
+  <!-- Top: Retrieval → DB (query out) -->
+  <line class="parrow" x1="112" y1="325" x2="145" y2="325"/>
+  <polygon class="phead" points="112,321 106,325 112,329"/>
+  <circle class="ptravel-l" cx="145" cy="325" r="3.5"/>
+  <!-- Bottom: DB → Retrieval (data back) -->
+  <line class="parrow" x1="112" y1="335" x2="145" y2="335"/>
+  <polygon class="phead" points="145,331 151,335 145,339"/>
+  <circle class="ptravel-r" cx="112" cy="335" r="3.5"/>
+
+  <!-- 3. Retrieval (RRF) -->
+  <rect class="pbox accent-pbox" x="150" y="290" width="400" height="80" rx="10" fill="url(#ag)"/>
+  <text class="ptitle accent-text" x="350" y="318">Retrieval — Hybrid + RRF Fusion</text>
+  <text class="pdesc" x="350" y="340">6 signals (Dense×3 · BM25×2 · Metadata×2) → RRF → Top-10</text>
+
+  <!-- arrow 3 -->
+  <line class="parrow" x1="350" y1="372" x2="350" y2="415"/>
+  <polygon class="phead" points="345,411 350,420 355,411"/>
+  <circle class="ptravel" cx="350" cy="372" r="4" style="animation-delay: 0.8s"/>
+
+  <!-- 4. Post-Retrieval (= LLM Re-ranking step) -->
+  <rect class="pbox" x="150" y="420" width="400" height="70" rx="10"/>
+  <use class="bot-mini" href="#boticon" x="170" y="438" width="18" height="18"/>
+  <text class="ptitle" x="350" y="448">Post-Retrieval</text>
+  <text class="pdesc" x="350" y="470">LLM Re-ranking · Top-10 → Top-3</text>
+
+  <!-- arrow → Generation -->
+  <line class="parrow" x1="350" y1="492" x2="350" y2="535"/>
+  <polygon class="phead" points="345,531 350,540 355,531"/>
+  <circle class="ptravel" cx="350" cy="492" r="4" style="animation-delay: 1.2s"/>
+
+  <!-- 5. Generation (= Type-Specific Answer Generation) -->
+  <rect class="pbox" x="150" y="540" width="400" height="80" rx="10"/>
+  <use class="bot-icon" href="#boticon" x="166" y="566" width="28" height="28"/>
+  <text class="ptitle" x="350" y="568">Generation</text>
+  <text class="pdesc" x="350" y="590">Type-Specific Answer Generation</text>
+  <text class="pdesc" x="350" y="606">short / long / unanswerable</text>
+
+  <!-- arrow → Answer -->
+  <line class="parrow" x1="350" y1="622" x2="350" y2="665"/>
+  <polygon class="phead" points="345,661 350,670 355,661"/>
+  <circle class="ptravel" cx="350" cy="622" r="4" style="animation-delay: 1.6s"/>
+
+  <!-- 6. Answer -->
+  <rect class="pbox final-pbox" x="230" y="670" width="240" height="60" rx="10"/>
+  <text class="ptitle accent-text" x="350" y="698">Answer</text>
+  <text class="pdesc" x="350" y="718">結構化回答 + 文件引用</text>
+</svg>
+`;
 
 function inline(s) {
   // Inline code
@@ -273,9 +1081,6 @@ function inline(s) {
   s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
   // Links
   s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-  // LaTeX-like (simple)
-  s = s.replace(/\$\$(.+?)\$\$/g, '<code>$1</code>');
-  s = s.replace(/\$(.+?)\$/g, '<code>$1</code>');
   return s;
 }
 
@@ -283,13 +1088,98 @@ function esc(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+function setupRevealOnScroll() {
+  const targets = document.querySelectorAll('.md .sections > details, .md .sections > .info-block');
+  if (!('IntersectionObserver' in window)) {
+    targets.forEach(el => el.classList.add('in-view'));
+    return;
+  }
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  targets.forEach(el => observer.observe(el));
+}
+
+// Hero swipe-right gesture → /chat (only when hero is in view)
+function setupHeroSwipe() {
+  const hero = document.querySelector('.md .hero');
+  if (!hero) return;
+  const heroNext = document.querySelector('.md .hero-next');
+
+  let heroVisible = true;
+  const setHeroVisible = (v) => {
+    heroVisible = v;
+    if (heroNext) heroNext.classList.toggle('in-hero', v);
+  };
+  setHeroVisible(true);
+  if ('IntersectionObserver' in window) {
+    const obs = new IntersectionObserver(([entry]) => {
+      setHeroVisible(entry.intersectionRatio > 0.5);
+    }, { threshold: [0, 0.5, 1] });
+    obs.observe(hero);
+  }
+
+  // Trackpad horizontal scroll
+  let wheelLockUntil = 0;
+  let wheelAccum = 0;
+  window.addEventListener('wheel', e => {
+    if (!heroVisible) return;
+    if (Date.now() < wheelLockUntil) return;
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.2 && e.deltaX > 8) {
+      wheelAccum += e.deltaX;
+      if (wheelAccum > 80) {
+        wheelLockUntil = Date.now() + 1500;
+        wheelAccum = 0;
+        location.href = '/chat';
+      }
+    } else {
+      wheelAccum = 0;
+    }
+  }, { passive: true });
+
+  // Touch swipe right
+  let touchStartX = 0, touchStartY = 0;
+  hero.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  hero.addEventListener('touchend', e => {
+    if (!heroVisible) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5 && dx > 0) {
+      location.href = '/chat';
+    }
+  }, { passive: true });
+}
+
+function whenKatexReady() {
+  return new Promise(resolve => {
+    if (typeof katex !== 'undefined') return resolve();
+    const t0 = Date.now();
+    const id = setInterval(() => {
+      if (typeof katex !== 'undefined' || Date.now() - t0 > 4000) {
+        clearInterval(id);
+        resolve();
+      }
+    }, 50);
+  });
+}
+
 async function load() {
   try {
-    const resp = await fetch('/api/intro');
+    const [resp] = await Promise.all([fetch('/api/intro'), whenKatexReady()]);
     const data = await resp.json();
     document.getElementById('md').innerHTML = parseMd(data.content);
     document.getElementById('loading').style.display = 'none';
     document.getElementById('md').style.display = 'block';
+    setupRevealOnScroll();
+    setupHeroSwipe();
   } catch (e) {
     document.getElementById('loading').innerHTML =
       `<div style="color:var(--red)">Error loading: ${e.message}</div>`;

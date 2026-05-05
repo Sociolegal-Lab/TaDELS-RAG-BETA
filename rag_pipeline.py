@@ -76,10 +76,10 @@ LLM_OLLAMA_URL = os.getenv("LLM_OLLAMA_URL", "")
 LLM_OLLAMA_MODEL = os.getenv("LLM_OLLAMA_MODEL", "gemma4:31b")
 LLM_CLAUDE_URL = os.getenv("LLM_CLAUDE_URL", "")
 
-DATA_DIR = Path(__file__).parent / "dataset" / "challenge1_dataset" / "full_content"
-ENTITIES_PATH = Path(__file__).parent / "dataset" / "challenge1_dataset" / "v4_0415" / "dataset_entities_v4.json"
-SPLIT_DIR = Path(__file__).parent / "dataset" / "challenge1_dataset" / "v4_0415" / "dataset_split_v4"
-SCHEMA_PATH = Path(__file__).parent / "dataset" / "challenge1_dataset" / "v4_0415" / "entity_schema.json"
+DATA_DIR = Path(__file__).parent / "dataset" / "covid_19_discourse" / "full_content"
+ENTITIES_PATH = Path(__file__).parent / "dataset" / "covid_19_discourse" /"dataset_entities_v4.json"
+SPLIT_DIR = Path(__file__).parent / "dataset" / "covid_19_discourse" / "dataset_split_v4"
+SCHEMA_PATH = Path(__file__).parent / "dataset" / "covid_19_discourse" / "entity_schema.json"
 CACHE_DIR = Path(__file__).parent / "cache"
 PROMPTS_DIR = Path(__file__).parent / "prompts"
 
@@ -1300,9 +1300,9 @@ def main():
 
     print(f"\n[Pipeline] Done! {len(predictions)} predictions in {output_path}")
     print(f"[Pipeline] Run evaluation with:")
-    print(f"  python dataset/challenge1_dataset/qa_eval.py --mode batch \\")
+    print(f"  python dataset/covid_19_discourse/qa_eval.py --mode batch \\")
     print(f"    --pred {output_path} \\")
-    print(f"    --gt dataset/challenge1_dataset/dataset_split/qa_{args.split}.json")
+    print(f"    --gt dataset/covid_19_discourse/dataset_split/qa_{args.split}.json")
 
 
 if __name__ == "__main__":

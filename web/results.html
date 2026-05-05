@@ -3,10 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
 <title>RAG Evaluation Results</title>
 <link rel="icon" type="image/png" href="/favicon.png">
+<script>
+(function(){
+  const t = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+})();
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+}
+</script>
 <style>
+  @view-transition { navigation: auto; }
   :root {
+    color-scheme: dark;
     --bg: #0f1117;
     --surface: #1a1d27;
     --surface2: #242836;
@@ -19,6 +34,38 @@
     --red: #f87171;
     --orange: #fb923c;
   }
+  [data-theme="light"] {
+    color-scheme: light;
+    --bg: #fcfbf7;
+    --surface: #ffffff;
+    --surface2: #f1efe9;
+    --border: #e0ddd3;
+    --text: #1f1c17;
+    --text2: #6b6356;
+    --accent: #4a63d8;
+    --green: #3da55b;
+    --yellow: #c89a13;
+    --red: #c74a4a;
+    --orange: #d97706;
+  }
+  /* Theme toggle button */
+  .theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 14px;
+    padding: 4px 6px;
+    color: var(--text2);
+    display: inline-flex;
+    align-items: center;
+    border-radius: 6px;
+    transition: color .2s, background .2s;
+  }
+  .theme-toggle:hover { color: var(--accent); background: rgba(108,140,255,.08); }
+  .theme-toggle svg { width: 16px; height: 16px; }
+  .theme-toggle .icon-sun { display: none; }
+  [data-theme="light"] .theme-toggle .icon-sun { display: block; }
+  [data-theme="light"] .theme-toggle .icon-moon { display: none; }
   html { scrollbar-gutter: stable; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -340,10 +387,14 @@
   <h1>RAG Evaluation Results <span class="beta-badge">Beta</span></h1>
   <nav>
     <a href="/intro">Intro</a>
-    <a href="/results" class="active">Results</a>
     <a href="/chat">Chat</a>
     <a href="/entities">Entities</a>
-    <a href="/qa">QA</a>
+    <a href="/qa">QA pairs</a>
+    <a href="/results" class="active">Results</a>
+    <button class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="切換主題">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+    </button>
   </nav>
 </div>
 

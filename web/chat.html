@@ -3,10 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
 <title>TaDELS RAG Chat</title>
 <link rel="icon" type="image/png" href="/favicon.png">
+<script>
+(function(){
+  const t = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+})();
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+}
+</script>
 <style>
+  @view-transition { navigation: auto; }
   :root {
+    color-scheme: dark;
     --bg: #0f1117;
     --surface: #1a1d27;
     --surface2: #242836;
@@ -18,6 +33,43 @@
     --user-bg: #1e3a5f;
     --bot-bg: #1a1d27;
   }
+  [data-theme="light"] {
+    color-scheme: light;
+    --bg: #fcfbf7;
+    --surface: #ffffff;
+    --surface2: #f1efe9;
+    --border: #e0ddd3;
+    --text: #1f1c17;
+    --text2: #6b6356;
+    --accent: #4a63d8;
+    --green: #3da55b;
+    --user-bg: #e3ebfa;
+    --bot-bg: #ffffff;
+  }
+  /* Welcome H2 gradient: in light mode #fff blends into white bg */
+  [data-theme="light"] .welcome h2 {
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  /* Theme toggle button */
+  .theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 14px;
+    padding: 4px 6px;
+    color: var(--text2);
+    display: inline-flex;
+    align-items: center;
+    border-radius: 6px;
+    transition: color .2s, background .2s;
+  }
+  .theme-toggle:hover { color: var(--accent); background: rgba(108,140,255,.08); }
+  .theme-toggle svg { width: 16px; height: 16px; }
+  .theme-toggle .icon-sun { display: none; }
+  [data-theme="light"] .theme-toggle .icon-sun { display: block; }
+  [data-theme="light"] .theme-toggle .icon-moon { display: none; }
   html { scrollbar-gutter: stable; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -58,50 +110,28 @@
     transition: color .2s;
   }
   .header nav a:hover, .header nav a.active { color: var(--accent); }
-
-  /* ── Options (inline in header) ── */
-  .options {
-    display: flex;
-    gap: 14px;
-    font-size: 12px;
-    color: var(--text2);
-    align-items: center;
-    margin-right: 16px;
-  }
-  .options label {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    transition: color .2s;
-    position: relative;
-  }
-  .options label:hover { color: var(--text); }
-  .options label .tip {
-    display: none;
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--surface);
+  .help-btn {
+    width: 20px;
+    height: 20px;
+    box-sizing: border-box;
+    border-radius: 50%;
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 12px;
-    line-height: 1.6;
-    color: var(--text);
-    white-space: pre-line;
-    width: 320px;
-    z-index: 100;
-    box-shadow: 0 4px 20px rgba(0,0,0,.4);
-    pointer-events: none;
+    background: transparent;
+    color: var(--text2);
+    font: 600 12px/1 inherit;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color .15s, border-color .15s, background .15s;
   }
-  .options label:hover .tip { display: block; }
-  .options input[type="checkbox"] {
-    accent-color: var(--accent);
-    width: 13px;
-    height: 13px;
+  .help-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(108,140,255,.1);
   }
+
 
   /* ── Main Content (chat + side panel) ── */
   .main-content {
@@ -449,35 +479,58 @@
     justify-content: center;
     color: var(--text2);
     text-align: center;
-    gap: 12px;
+    gap: 16px;
   }
-  .welcome h2 { font-size: 22px; color: var(--text); font-weight: 600; }
-  .welcome p { font-size: 14px; max-width: 440px; line-height: 1.7; }
+  .welcome h2 {
+    font-size: 38px;
+    font-weight: 700;
+    letter-spacing: -.5px;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-wrap: balance;
+    max-width: 640px;
+    animation: welcome-fade .8s ease-out;
+  }
+  .welcome p {
+    font-size: 15px;
+    line-height: 1.85;
+    max-width: 520px;
+    text-wrap: balance;
+    animation: welcome-fade .8s ease-out .15s both;
+  }
+  @keyframes welcome-fade {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @media (max-width: 640px) {
+    .welcome h2 { font-size: 28px; }
+  }
   .examples {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 12px;
-    max-width: 640px;
+    gap: 14px;
+    margin-top: 24px;
+    max-width: 923px;
     width: 100%;
   }
   .example-btn {
     background: var(--surface);
     border: 1px solid var(--border);
     color: var(--text);
-    padding: 12px 16px;
+    padding: 14px 18px;
     border-radius: 12px;
     cursor: pointer;
     font-size: 13px;
     text-align: left;
     transition: border-color .2s, background .2s;
-    line-height: 1.5;
+    line-height: 1.6;
   }
   .example-btn:hover { border-color: var(--accent); background: var(--surface2); }
 
   @media (max-width: 640px) {
     .examples { grid-template-columns: 1fr; }
-    .options { display: none; }
     .filter-panel { max-height: 50vh !important; }
   }
 
@@ -511,6 +564,131 @@
     color: var(--text2);
   }
   .filter-bar.open .filter-toggle-left .ft-icon { transform: rotate(90deg); }
+
+  /* ── Options popover (next to send button) ── */
+  .opt-wrap { position: relative; flex-shrink: 0; }
+  .opt-btn {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: none;
+    border-radius: 9px;
+    color: var(--text2);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color .2s, background .2s;
+    padding: 0;
+  }
+  .opt-btn svg { width: 18px; height: 18px; }
+  .opt-btn:hover, .opt-btn.active {
+    color: var(--accent);
+    background: rgba(108,140,255,.1);
+  }
+  .opt-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 9px;
+    border: 2px solid var(--bg);
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .opt-popover {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    right: -8px;
+    width: 360px;
+    max-width: calc(100vw - 32px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 12px 36px rgba(0,0,0,.55);
+    padding: 10px;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+    transition: opacity .2s, transform .2s, visibility 0s linear .2s;
+  }
+  .opt-popover.show {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: opacity .2s, transform .2s, visibility 0s;
+  }
+  .opt-popover::after {
+    content: '';
+    position: absolute;
+    bottom: -7px;
+    right: 18px;
+    width: 12px;
+    height: 12px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    transform: rotate(45deg);
+  }
+  .opt-popover-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    padding: 6px 10px 10px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 6px;
+  }
+  .opt-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .opt-item:hover { background: var(--surface2); }
+  .opt-item input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 14px;
+    height: 14px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .opt-item-text { flex: 1; min-width: 0; }
+  .opt-item-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .opt-item-desc {
+    font-size: 11.5px;
+    color: var(--text2);
+    line-height: 1.65;
+  }
+  .opt-ref {
+    color: var(--text2);
+    opacity: .7;
+    font-style: italic;
+  }
+  @media (max-width: 640px) {
+    .opt-popover { width: calc(100vw - 32px); right: -8px; }
+  }
   .filter-stats {
     font-size: 11px;
     color: var(--text2);
@@ -603,6 +781,259 @@
   /* depth-based indent colors */
   .ftree > ul > li > .fnode .fname { font-weight: 600; font-size: 13px; }
   .ftree > ul > li > .fchildren > li > .fnode .fname { font-weight: 500; }
+
+  /* ── Onboarding Modal ── */
+  .ob-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.65);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s;
+  }
+  .ob-backdrop.show { opacity: 1; pointer-events: auto; }
+  .ob-modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    width: min(460px, 92vw);
+    padding: 48px 44px 32px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    text-align: center;
+    transform: translateY(12px) scale(.97);
+    transition: transform .35s cubic-bezier(.2,.8,.3,1.1);
+  }
+  .ob-backdrop.show .ob-modal { transform: none; }
+  .ob-logo {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 22px;
+    background: linear-gradient(135deg, #6c8cff 0%, #8b5cf6 100%);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(108,140,255,.35);
+  }
+  .ob-logo svg { width: 32px; height: 32px; }
+  .ob-modal h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: var(--text);
+  }
+  .ob-sub {
+    color: var(--text2);
+    font-size: 14px;
+    line-height: 1.9;
+    margin-bottom: 36px;
+  }
+  .ob-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  .ob-btn {
+    padding: 9px 18px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    transition: background .2s, border-color .2s;
+    font-family: inherit;
+  }
+  .ob-btn:hover { background: var(--border); }
+  .ob-btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .ob-btn.primary:hover { opacity: .95; background: var(--accent); }
+
+  /* Pulsing primary CTA inside welcome modal */
+  .ob-modal .ob-btn.primary {
+    animation: obCtaPulse 2.6s ease-in-out infinite;
+  }
+  .ob-modal .ob-btn.primary:hover {
+    animation-play-state: paused;
+    box-shadow: 0 0 18px rgba(108,140,255,.6);
+  }
+  @keyframes obCtaPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(108,140,255,.35), 0 0 8px  rgba(108,140,255,.18); }
+    50%      { box-shadow: 0 0 0 8px rgba(108,140,255,0), 0 0 16px rgba(108,140,255,.42); }
+  }
+  .ob-arrow {
+    display: inline-block;
+    margin-left: 6px;
+    transition: transform .25s cubic-bezier(.2,.8,.3,1.1), opacity .2s;
+  }
+  .ob-modal .ob-btn.primary:hover .ob-arrow {
+    transform: translateX(4px);
+  }
+  .ob-modal .ob-btn.primary.flying {
+    animation: none;
+    box-shadow: 0 0 30px rgba(108,140,255,.85);
+  }
+  .ob-modal .ob-btn.primary.flying .ob-arrow {
+    transform: translateX(80px);
+    opacity: 0;
+  }
+
+  /* ── Tour Overlay & Spotlight ── */
+  .tour-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9990;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .3s;
+  }
+  .tour-overlay.show { opacity: 1; pointer-events: auto; }
+  .tour-spot {
+    position: absolute;
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,.6), 0 0 30px rgba(108,140,255,.6);
+    transition: top .4s cubic-bezier(.2,.8,.3,1.1),
+                left .4s cubic-bezier(.2,.8,.3,1.1),
+                width .4s cubic-bezier(.2,.8,.3,1.1),
+                height .4s cubic-bezier(.2,.8,.3,1.1);
+    pointer-events: none;
+    animation: tourPulse 2s ease-in-out infinite;
+  }
+  @keyframes tourPulse {
+    0%, 100% { box-shadow: 0 0 0 9999px rgba(0,0,0,.6), 0 0 18px rgba(108,140,255,.4); }
+    50%      { box-shadow: 0 0 0 9999px rgba(0,0,0,.6), 0 0 32px rgba(108,140,255,.85); }
+  }
+  .tour-tooltip {
+    position: absolute;
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 16px 18px 14px;
+    width: min(340px, 88vw);
+    box-shadow: 0 12px 40px rgba(0,0,0,.5);
+    transition: top .4s cubic-bezier(.2,.8,.3,1.1),
+                left .4s cubic-bezier(.2,.8,.3,1.1),
+                opacity .25s;
+    pointer-events: none;
+  }
+  .tour-overlay.show .tour-tooltip { pointer-events: auto; }
+  .tour-tooltip::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: var(--surface);
+    border-left: 1px solid var(--accent);
+    border-top: 1px solid var(--accent);
+    transform: rotate(45deg);
+  }
+  .tour-tooltip[data-arrow="top"]::before    { top: -7px;    left: 24px; }
+  .tour-tooltip[data-arrow="bottom"]::before { bottom: -7px; left: 24px; transform: rotate(225deg); }
+  .tour-tooltip[data-arrow="left"]::before   { left: -7px;   top: 24px;  transform: rotate(-45deg); }
+  .tour-tooltip[data-arrow="right"]::before  { right: -7px;  top: 24px;  transform: rotate(135deg); }
+  .tt-step {
+    font-size: 11px;
+    color: var(--text2);
+    font-weight: 600;
+    letter-spacing: .5px;
+    margin-bottom: 4px;
+  }
+  .tt-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .tt-desc {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.85;
+    margin-bottom: 14px;
+  }
+  .tt-desc b { color: var(--accent); font-weight: 600; }
+  .tt-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .tt-dots {
+    display: flex;
+    gap: 5px;
+  }
+  .tt-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background .2s, width .2s;
+  }
+  .tt-dot.active {
+    background: var(--accent);
+    width: 18px;
+    border-radius: 3px;
+  }
+  .tt-btns { display: flex; gap: 6px; }
+  .tt-btn {
+    padding: 6px 14px;
+    font-size: 12px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .2s;
+  }
+  .tt-btn:hover { background: var(--border); }
+  .tt-btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    animation: obCtaPulse 2.6s ease-in-out infinite;
+  }
+  .tt-btn.primary:hover {
+    opacity: .95;
+    background: var(--accent);
+    animation-play-state: paused;
+    box-shadow: 0 0 16px rgba(108,140,255,.55);
+  }
+  .tt-arrow {
+    display: inline-block;
+    margin-left: 6px;
+    transition: transform .25s cubic-bezier(.2,.8,.3,1.1), opacity .2s;
+  }
+  .tt-btn.primary:hover .tt-arrow { transform: translateX(4px); }
+  .tt-btn.primary.flying {
+    animation: none;
+    box-shadow: 0 0 22px rgba(108,140,255,.8);
+  }
+  .tt-btn.primary.flying .tt-arrow {
+    transform: translateX(60px);
+    opacity: 0;
+  }
+  .tt-skip {
+    font-size: 11px;
+    color: var(--text2);
+    cursor: pointer;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    font-family: inherit;
+    padding: 4px;
+  }
+  .tt-skip:hover { color: var(--text); }
 </style>
 </head>
 <body>
@@ -610,28 +1041,16 @@
 <div class="header">
   <h1>TaDELS RAG Chat <span class="beta-badge">Beta</span></h1>
   <nav>
-    <div class="options">
-      <label><input type="checkbox" id="opt-rewrite" checked> Rewrite
-        <span class="tip">用 LLM 改寫問題，以更符合法律文件用語。
-例：「猩猩比中指被罰多少？」→「被移送人於社群媒體散布猩猩比中指貼圖，違反社會秩序維護法第63條，裁處罰鍰金額為何？」</span>
-      </label>
-      <label><input type="checkbox" id="opt-hyde"> HyDE
-        <span class="tip">Hypothetical Document Embeddings — LLM 先生成一段假設性回答，再用該段落的 embedding 做語意檢索，提升召回率。
-Ref: Gao et al. (2023) Precise Zero-Shot Dense Retrieval without Relevance Labels, ACL 2023.</span>
-      </label>
-      <label><input type="checkbox" id="opt-rerank" checked> Re-rank
-        <span class="tip">用 LLM 對初步檢索到的文件重新排序，挑出與問題最相關的前 3 篇送去生成答案。
-例：初步撈回 10 篇 → LLM 判斷相關性 → 只保留最相關的 3 篇。</span>
-      </label>
-      <label><input type="checkbox" id="opt-entities"> Entities
-        <span class="tip">從回答中抽取結構化欄位（被告、法條、罰鍰金額等），用於評估準確度。</span>
-      </label>
-    </div>
+    <button type="button" class="help-btn" onclick="document.getElementById('obBackdrop').classList.add('show')" title="查看新手教學" aria-label="查看新手教學">?</button>
     <a href="/intro">Intro</a>
-    <a href="/results">Results</a>
     <a href="/chat" class="active">Chat</a>
     <a href="/entities">Entities</a>
-    <a href="/qa">QA</a>
+    <a href="/qa">QA pairs</a>
+    <a href="/results">Results</a>
+    <button class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="切換主題">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+    </button>
   </nav>
 </div>
 
@@ -653,13 +1072,15 @@ Ref: Gao et al. (2023) Precise Zero-Shot Dense Retrieval without Relevance Label
 <div class="main-content">
 <div class="chat-area" id="chatArea">
   <div class="welcome" id="welcome">
-    <h2>TaDELS RAG</h2>
-    <p>挑戰一：針對 211 篇 COVID-19 相關法律判決文件進行問答<br>支援案號、被告姓名、法條等檢索</p>
+    <h2>嗨，今天想聊什麼法律文本？</h2>
+    <p>關於案號、被告、法條都可以，直接問就好</p>
     <div class="examples">
       <button class="example-btn" onclick="askExample(this)">109年度士秩字第59號裁定中，對被移送人蔡宗龍裁處的罰鍰金額為何？</button>
       <button class="example-btn" onclick="askExample(this)">109年度中秩字第99號裁定中，證人王慧貞的身份為何？</button>
       <button class="example-btn" onclick="askExample(this)">109年度店秩字第78號裁定中，法院裁定駁回本件移送的原因為何？請說明事實經過與法律依據。</button>
       <button class="example-btn" onclick="askExample(this)">109年度店秩字第45號裁定中，被移送人汪庭維不罰的理由為何？</button>
+      <button class="example-btn" onclick="askExample(this)">在所有211件案件中，刑事罰金最高的是哪一件？金額是多少？為什麼這麼重？</button>
+      <button class="example-btn" onclick="askExample(this)">同樣是轉傳「臺灣明天起實施COVID-19假期兩星期」附猩猩比中指連結的訊息，臺北地方法院109年度北秩字第304號（趙冠倫）裁處罰鍰8000元，但同一天109年度店秩字第52號（劉恩）卻裁定不罰，兩案的關鍵差異在哪裡？</button>
     </div>
   </div>
 </div>
@@ -676,12 +1097,91 @@ Ref: Gao et al. (2023) Precise Zero-Shot Dense Retrieval without Relevance Label
 <div class="input-bar">
   <div class="input-wrap">
     <textarea id="input" placeholder="輸入問題... (Enter 送出)" rows="1"></textarea>
+    <div class="opt-wrap">
+      <button class="opt-btn" id="optBtn" onclick="toggleOptPopover(event)" title="RAG 組件設定">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        <span class="opt-badge" id="optBadge">2</span>
+      </button>
+      <div class="opt-popover" id="optPopover">
+        <div class="opt-popover-title">RAG 組件設定</div>
+        <label class="opt-item">
+          <input type="checkbox" id="opt-rewrite" checked>
+          <div class="opt-item-text">
+            <div class="opt-item-name">Rewrite</div>
+            <div class="opt-item-desc">用 LLM 改寫問題，更符合法律文件用語。<br>例：「猩猩比中指被罰多少？」→「被移送人於社群媒體散布猩猩比中指貼圖，違反社會秩序維護法第63條，裁處罰鍰金額為何？」</div>
+          </div>
+        </label>
+        <label class="opt-item">
+          <input type="checkbox" id="opt-hyde">
+          <div class="opt-item-text">
+            <div class="opt-item-name">HyDE</div>
+            <div class="opt-item-desc">Hypothetical Document Embeddings — LLM 先生成一段假設性回答，再用該段落的 embedding 做語意檢索，提升召回率。</div>
+          </div>
+        </label>
+        <label class="opt-item">
+          <input type="checkbox" id="opt-rerank" checked>
+          <div class="opt-item-text">
+            <div class="opt-item-name">Re-rank</div>
+            <div class="opt-item-desc">用 LLM 對初步檢索到的文件重新排序，挑出與問題最相關的前 3 篇送去生成答案。<br>例：初步撈回 10 篇 → LLM 判斷相關性 → 只保留最相關的 3 篇。</div>
+          </div>
+        </label>
+        <label class="opt-item">
+          <input type="checkbox" id="opt-entities">
+          <div class="opt-item-text">
+            <div class="opt-item-name">Entities</div>
+            <div class="opt-item-desc">從回答中抽取結構化欄位（被告、法條、罰鍰金額等），用於評估準確度。</div>
+          </div>
+        </label>
+      </div>
+    </div>
     <button class="send-btn" id="sendBtn" onclick="send()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
   </div>
 </div>
-<div class="disclaimer">AI 生成內容僅供參考，可能存在錯誤或不完整之處，請務必自行查證。</div>
+<div class="disclaimer">AI 僅根據你已勾選的判決文件回答；內容可能不完整或有誤，請以原始判決書為準。</div>
+
+<!-- ── Onboarding Welcome Modal ── -->
+<div class="ob-backdrop" id="obBackdrop" onclick="if (event.target === this) skipTour()">
+  <div class="ob-modal">
+    <div class="ob-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+        <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+        <path d="M7 21h10"/>
+        <path d="M12 3v18"/>
+        <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>
+      </svg>
+    </div>
+    <h2>歡迎使用 TaDELS RAG</h2>
+    <p class="ob-sub">我幫你在台灣法律判決裡找答案<br>目前收錄 211 篇 COVID-19 相關判決</p>
+    <div class="ob-actions">
+      <button class="ob-btn" onclick="skipTour()">直接開始</button>
+      <button class="ob-btn primary" id="obStartBtn" onclick="startTourAnimated(this)">開始操作介紹<span class="ob-arrow">&rarr;</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Tour Overlay ── -->
+<div class="tour-overlay" id="tourOverlay">
+  <div class="tour-spot" id="tourSpot"></div>
+  <div class="tour-tooltip" id="tourTooltip" data-arrow="top">
+    <div class="tt-step" id="ttStep"></div>
+    <div class="tt-title" id="ttTitle"></div>
+    <div class="tt-desc" id="ttDesc"></div>
+    <div class="tt-actions">
+      <div class="tt-dots" id="ttDots"></div>
+      <div class="tt-btns">
+        <button class="tt-skip" onclick="endTour()">跳過</button>
+        <button class="tt-btn" id="ttPrev" onclick="prevTourStep()">上一步</button>
+        <button class="tt-btn primary" id="ttNext" onclick="nextTourStepAnimated(this)">下一步<span class="tt-arrow" id="ttNextArrow">&rarr;</span></button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ── Filter Tree ── */
@@ -717,6 +1217,9 @@ function buildNode(data, parentPath) {
   // Node row
   const row = document.createElement('div');
   row.className = 'fnode' + (inDB ? '' : ' disabled');
+  if (!inDB) {
+    row.title = '此案件收錄持續開發測試中，敬請期待';
+  }
 
   // Arrow
   const arrow = document.createElement('span');
@@ -798,20 +1301,30 @@ function updateParentState(li) {
   updateParentState(parentLi);
 }
 
+// 「案件」= 樹狀結構第三層節點（如 COVID-19 疫情言論、美麗島事件、RCA工殤案…）
+const TOTAL_CASES = (() => {
+  let n = 0;
+  CATEGORY_TREE.forEach(l1 => (l1.children || []).forEach(l2 => { n += (l2.children || []).length; }));
+  return n;
+})();
+
 function updateFilterStats() {
-  const all = document.querySelectorAll('#filterTree input[type="checkbox"]');
-  const enabled = [...all].filter(c => !c.disabled);
-  const checked = enabled.filter(c => c.checked);
-  // Count docs from leaf-level checked items only
-  const leafChecked = checked.filter(c => {
-    const li = c.closest('li');
-    return !li.querySelector('ul.fchildren');
+  let selectedCases = 0;
+  let selectedDocs = 0;
+
+  document.querySelectorAll('#filterTree input[type="checkbox"]').forEach(cb => {
+    if (!DB_AVAILABLE.has(cb.dataset.path)) return;
+    // 此 cb 是有索引的案件分類，計算底下勾選的判決文件
+    const folderLi = cb.closest('li');
+    const leafCbs = [...folderLi.querySelectorAll('input[type="checkbox"]:not(:disabled)')]
+      .filter(c => !c.closest('li').querySelector('ul.fchildren'));
+    const checkedLeafCbs = leafCbs.filter(c => c.checked);
+    selectedDocs += checkedLeafCbs.length;
+    if (checkedLeafCbs.length > 0) selectedCases++;
   });
-  const docCount = leafChecked.reduce((s, c) => s + parseInt(c.dataset.count || 0), 0);
 
   const statsEl = document.getElementById('filterStats');
-  const totalInDB = [...all].filter(c => !c.disabled).length;
-  statsEl.innerHTML = `<span class="fs-enabled">${docCount.toLocaleString()} 篇已選</span> / ${totalInDB} 項可用`;
+  statsEl.innerHTML = `已勾選 <span class="fs-enabled">${selectedCases}</span> 件（共 <span class="fs-enabled">${selectedDocs.toLocaleString()}</span> 筆資料）／ 總共 ${TOTAL_CASES.toLocaleString()} 案件`;
 }
 
 function getSelectedPaths() {
@@ -846,6 +1359,36 @@ function getSelectedTitles() {
 }
 
 buildFilterTree();
+
+/* ── Options popover ── */
+function toggleOptPopover(e) {
+  e.stopPropagation();
+  document.getElementById('optPopover').classList.toggle('show');
+  document.getElementById('optBtn').classList.toggle('active');
+}
+function closeOptPopover() {
+  document.getElementById('optPopover').classList.remove('show');
+  document.getElementById('optBtn').classList.remove('active');
+}
+document.addEventListener('click', (e) => {
+  const wrap = document.querySelector('.opt-wrap');
+  if (wrap && !wrap.contains(e.target)) closeOptPopover();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeOptPopover();
+});
+
+function updateOptBadge() {
+  const ids = ['opt-rewrite', 'opt-hyde', 'opt-rerank', 'opt-entities'];
+  const n = ids.filter(id => document.getElementById(id).checked).length;
+  const badge = document.getElementById('optBadge');
+  badge.textContent = n;
+  badge.style.display = n === 0 ? 'none' : '';
+}
+['opt-rewrite', 'opt-hyde', 'opt-rerank', 'opt-entities'].forEach(id => {
+  document.getElementById(id).addEventListener('change', updateOptBadge);
+});
+updateOptBadge();
 
 const chatArea = document.getElementById('chatArea');
 const input = document.getElementById('input');
@@ -1164,6 +1707,204 @@ function formatAnswer(s) {
     .replace(/\n{2,}/g, '\n')
     .replace(/\n/g, '<br>');
 }
+
+/* ── Onboarding & Tour ── */
+const TOUR_STEPS = [
+  {
+    selector: '#filterBar',
+    title: '步驟 1：選擇文件範圍',
+    desc: '在這裡可以展開資料夾樹，勾選你想查詢的判決文件。預設會包含全部 211 篇 COVID-19 案件。',
+    arrow: 'top',
+    action: () => { document.getElementById('filterBar').classList.add('open'); }
+  },
+  {
+    selector: '.opt-popover',
+    title: '步驟 2：勾選 RAG 組件',
+    desc: '輸入框旁邊的齒輪按鈕可以開關 Rewrite（改寫問題）、HyDE（假設文件）、Re-rank（重新排序）、Entities（抽取實體）。每項旁邊都有詳細說明。',
+    arrow: 'bottom',
+    action: () => {
+      document.getElementById('filterBar').classList.remove('open');
+      document.getElementById('optPopover').classList.add('show');
+      document.getElementById('optBtn').classList.add('active');
+    }
+  },
+  {
+    selector: '.examples',
+    title: '步驟 3：點擊預設提問',
+    desc: '不知道怎麼開始？直接點擊任一個範例問題，系統會立刻送出並展示完整的檢索流程。',
+    arrow: 'bottom',
+    action: () => closeOptPopover()
+  },
+  {
+    selector: '.input-wrap',
+    title: '步驟 4：自由提問',
+    desc: '針對目前收錄的判決文件，輸入任何想問的問題（例：罰鍰金額、不罰理由、法條依據…），按 Enter 送出。',
+    arrow: 'bottom',
+    action: () => closeOptPopover()
+  },
+  {
+    selector: '.header nav',
+    title: '步驟 5：其他頁面',
+    desc: '頂部導覽列可切換到不同頁面：<br>'
+        + '<b>?</b> — 隨時重新打開這份教學<br>'
+        + '<b>Intro</b> — 系統架構與 pipeline 詳解<br>'
+        + '<b>Results</b> — 各組件評估分數比較<br>'
+        + '<b>Chat</b> — 互動問答（你現在這裡）<br>'
+        + '<b>Entities</b> — 結構化欄位抽取檢查<br>'
+        + '<b>QA</b> — 標準題目集瀏覽',
+    arrow: 'top',
+    action: () => closeOptPopover()
+  }
+];
+
+let tourIdx = 0;
+const TOUR_KEY = 'tadels_tour_seen_v1';
+
+function showWelcomeModal() {
+  const el = document.getElementById('obBackdrop');
+  if (el) el.classList.add('show');
+  else console.error('[showWelcomeModal] obBackdrop not found');
+}
+function hideWelcomeModal() {
+  const el = document.getElementById('obBackdrop');
+  if (el) el.classList.remove('show');
+}
+window.showWelcomeModal = showWelcomeModal;
+window.hideWelcomeModal = hideWelcomeModal;
+function skipTour() {
+  hideWelcomeModal();
+  localStorage.setItem(TOUR_KEY, '1');
+}
+function startTour() {
+  hideWelcomeModal();
+  localStorage.setItem(TOUR_KEY, '1');
+  tourIdx = 0;
+  document.getElementById('tourOverlay').classList.add('show');
+  renderTourStep();
+}
+function startTourAnimated(btn) {
+  // Fly the arrow → fade modal → start tour
+  btn.classList.add('flying');
+  btn.disabled = true;
+  setTimeout(() => {
+    startTour();
+    // Reset for next time the modal is opened via "?" button
+    setTimeout(() => {
+      btn.classList.remove('flying');
+      btn.disabled = false;
+    }, 400);
+  }, 280);
+}
+function endTour() {
+  document.getElementById('tourOverlay').classList.remove('show');
+  document.getElementById('filterBar').classList.remove('open');
+  closeOptPopover();
+}
+function nextTourStep() {
+  if (tourIdx >= TOUR_STEPS.length - 1) { endTour(); return; }
+  tourIdx++;
+  renderTourStep();
+}
+function nextTourStepAnimated(btn) {
+  if (btn.disabled) return;
+  btn.classList.add('flying');
+  btn.disabled = true;
+  setTimeout(() => {
+    nextTourStep();
+    // renderTourStep() resets state for non-final step; for the final step,
+    // the overlay is fading out so resetting isn't visible — but do it anyway:
+    btn.classList.remove('flying');
+    btn.disabled = false;
+  }, 280);
+}
+function prevTourStep() {
+  if (tourIdx === 0) return;
+  tourIdx--;
+  renderTourStep();
+}
+function renderTourStep() {
+  const step = TOUR_STEPS[tourIdx];
+  if (step.action) step.action();
+
+  const target = document.querySelector(step.selector);
+  if (!target) { nextTourStep(); return; }
+
+  // Wait a tick so any layout changes (e.g. opening filter panel) settle
+  requestAnimationFrame(() => {
+    const rect = target.getBoundingClientRect();
+    const pad = 6;
+    const spot = document.getElementById('tourSpot');
+    spot.style.top    = (rect.top - pad) + 'px';
+    spot.style.left   = (rect.left - pad) + 'px';
+    spot.style.width  = (rect.width + pad * 2) + 'px';
+    spot.style.height = (rect.height + pad * 2) + 'px';
+
+    const tip = document.getElementById('tourTooltip');
+    tip.dataset.arrow = step.arrow;
+    document.getElementById('ttStep').textContent  = `STEP ${tourIdx + 1} / ${TOUR_STEPS.length}`;
+    document.getElementById('ttTitle').textContent = step.title;
+    document.getElementById('ttDesc').innerHTML    = step.desc;
+
+    // Position tooltip
+    const tipW = 340, tipH = tip.offsetHeight || 180;
+    let top, left;
+    if (step.arrow === 'top') {
+      top  = rect.bottom + 14;
+      left = Math.max(12, Math.min(window.innerWidth - tipW - 12, rect.left));
+    } else if (step.arrow === 'bottom') {
+      top  = rect.top - tipH - 14;
+      left = Math.max(12, Math.min(window.innerWidth - tipW - 12, rect.left));
+    } else if (step.arrow === 'left') {
+      top  = Math.max(12, rect.top);
+      left = rect.right + 14;
+    } else {
+      top  = Math.max(12, rect.top);
+      left = rect.left - tipW - 14;
+    }
+    tip.style.top  = top  + 'px';
+    tip.style.left = left + 'px';
+
+    // Dots
+    const dots = document.getElementById('ttDots');
+    dots.innerHTML = '';
+    TOUR_STEPS.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'tt-dot' + (i === tourIdx ? ' active' : '');
+      dots.appendChild(d);
+    });
+
+    // Buttons
+    const prev = document.getElementById('ttPrev');
+    const next = document.getElementById('ttNext');
+    prev.style.visibility = tourIdx === 0 ? 'hidden' : 'visible';
+    const isLast = tourIdx === TOUR_STEPS.length - 1;
+    next.innerHTML = isLast
+      ? '完成<span class="tt-arrow">&#10003;</span>'
+      : '下一步<span class="tt-arrow">&rarr;</span>';
+    next.classList.remove('flying');
+    next.disabled = false;
+
+    target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+}
+
+window.addEventListener('resize', () => {
+  if (document.getElementById('tourOverlay').classList.contains('show')) renderTourStep();
+});
+document.addEventListener('keydown', (e) => {
+  if (!document.getElementById('tourOverlay').classList.contains('show')) return;
+  if (e.key === 'Escape')      endTour();
+  else if (e.key === 'ArrowRight') nextTourStep();
+  else if (e.key === 'ArrowLeft')  prevTourStep();
+});
+
+// Show welcome modal on first visit
+if (!localStorage.getItem(TOUR_KEY)) {
+  setTimeout(showWelcomeModal, 350);
+}
+
+// Expose a way to re-trigger from the console / other places
+window.restartTour = () => { localStorage.removeItem(TOUR_KEY); showWelcomeModal(); };
 </script>
 </body>
 </html>

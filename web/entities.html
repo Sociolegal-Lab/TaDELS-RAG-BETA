@@ -3,10 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
 <title>Entity Checker</title>
 <link rel="icon" type="image/png" href="/favicon.png">
+<script>
+(function(){
+  const t = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+})();
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+}
+</script>
 <style>
+  @view-transition { navigation: auto; }
   :root {
+    color-scheme: dark;
     --bg: #0f1117;
     --surface: #1a1d27;
     --surface2: #242836;
@@ -20,6 +35,39 @@
     --orange: #fb923c;
     --highlight: rgba(250,204,21,.25);
   }
+  [data-theme="light"] {
+    color-scheme: light;
+    --bg: #fcfbf7;
+    --surface: #ffffff;
+    --surface2: #f1efe9;
+    --border: #e0ddd3;
+    --text: #1f1c17;
+    --text2: #6b6356;
+    --accent: #4a63d8;
+    --green: #3da55b;
+    --yellow: #c89a13;
+    --red: #c74a4a;
+    --orange: #d97706;
+    --highlight: rgba(200,154,19,.32);
+  }
+  /* Theme toggle button */
+  .theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 14px;
+    padding: 4px 6px;
+    color: var(--text2);
+    display: inline-flex;
+    align-items: center;
+    border-radius: 6px;
+    transition: color .2s, background .2s;
+  }
+  .theme-toggle:hover { color: var(--accent); background: rgba(108,140,255,.08); }
+  .theme-toggle svg { width: 16px; height: 16px; }
+  .theme-toggle .icon-sun { display: none; }
+  [data-theme="light"] .theme-toggle .icon-sun { display: block; }
+  [data-theme="light"] .theme-toggle .icon-moon { display: none; }
   html { scrollbar-gutter: stable; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -223,10 +271,14 @@
   <h1>Entity Checker <span class="beta-badge">Beta</span></h1>
   <nav>
     <a href="/intro">Intro</a>
-    <a href="/results">Results</a>
     <a href="/chat">Chat</a>
     <a href="/entities" class="active">Entities</a>
-    <a href="/qa">QA</a>
+    <a href="/qa">QA pairs</a>
+    <a href="/results">Results</a>
+    <button class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="切換主題">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+    </button>
   </nav>
 </div>
 
@@ -235,8 +287,10 @@
   <select class="filter-select" id="filterVerdict" onchange="applyFilters()">
     <option value="">All verdicts</option>
     <option value="不罰">不罰</option>
-    <option value="罰鍰">罰鍰</option>
     <option value="有罪">有罪</option>
+    <option value="罰鍰">罰鍰</option>
+    <option value="起訴">起訴</option>
+    <option value="駁回">駁回</option>
     <option value="無罪">無罪</option>
   </select>
   <select class="filter-select" id="filterPlatform" onchange="applyFilters()">
@@ -245,13 +299,14 @@
     <option value="LINE">LINE</option>
     <option value="Instagram">Instagram</option>
     <option value="PTT">PTT</option>
+    <option value="Dcard">Dcard</option>
   </select>
   <span class="stat" id="stat"></span>
 </div>
 
 <div class="main">
   <div class="list-panel" id="listPanel">
-    <div class="loading"><div class="spinner"></div>Loading 211 cases...</div>
+    <div class="loading"><div class="spinner"></div>Loading cases...</div>
   </div>
   <div class="entity-panel" id="entityPanel">
     <div class="panel-empty">Select a case</div>
@@ -264,14 +319,45 @@
 <script>
 let allEntities = [];
 let filtered = [];
-let selectedIdx = -1;
+let selectedDocId = null;
 let currentHighlight = '';
 
+const MODULE_LABEL = {
+  basic_info: '案件基本資訊',
+  elements: '構成要件',
+  procedure: '程序資訊',
+  cited_authority: '引用法源',
+};
+
+const FIELD_LABEL = {
+  DOC_TYPE: '文書種類', COURT: '法院', TRANSFER_AGENCY: '移送機關',
+  PROSECUTION: '起訴情形', CASE_NO: '案號', RELATED_CASE_NO: '相關案號',
+  DEFENDANT: '被告', VICTIM: '被害人', VICTIM_ORG: '被害機關',
+  APPELLANT: '抗告人', JUDGE: '法官', PROSECUTOR: '檢察官',
+  DEFENSE_LAWYER: '辯護人', LEGAL_GUARDIAN: '法定代理人',
+  LAW: '適用法條', LAW_CLASSIFIED: '法條分類',
+  ACT_TIME: '行為時間', RULING_TIME: '裁判時間', ACT_PLACE: '行為地點',
+  PLATFORM: '散布平台', GROUP_NAME: '群組名稱', ACT_TYPE: '行為類型',
+  RUMOR_CONTENT: '謠言內容', SPREAD_TYPE: '散布方式', SPREAD_DETAIL: '散布細節',
+  VERDICT_CATEGORY: '判決類別', SANCTION: '處分', RATIONALE: '理由', OTHER: '其他',
+  FALSITY: '虛偽性', FALSITY_DESC: '虛偽性說明',
+  PUBLIC_HARM: '公共危害', PUBLIC_HARM_DESC: '公共危害說明',
+  INTENT_BINARY: '主觀故意', INTENT_DETAIL: '故意細節', INTENT_DESC: '故意說明',
+  LAW_COMPARISON: '法律比較',
+  PROC_STAGE: '程序階段', PREV_DOC: '前案文書', NEXT_DOC: '後案文書',
+};
+
 async function init() {
-  const resp = await fetch('/api/entities');
-  const data = await resp.json();
-  allEntities = data.entities;
-  applyFilters();
+  try {
+    const resp = await fetch('/api/entities');
+    if (!resp.ok) throw new Error(resp.status);
+    const data = await resp.json();
+    allEntities = data.entities || [];
+    applyFilters();
+  } catch (err) {
+    document.getElementById('listPanel').innerHTML =
+      `<div class="loading" style="color:var(--red)">Failed to load: ${esc(String(err))}</div>`;
+  }
 }
 
 document.getElementById('search').addEventListener('input', debounce(applyFilters, 200));
@@ -282,9 +368,9 @@ function applyFilters() {
   const platform = document.getElementById('filterPlatform').value;
 
   filtered = allEntities.filter(e => {
-    const info = e['案件基本資訊'] || {};
+    const info = e.basic_info || {};
     if (q && !JSON.stringify(e).toLowerCase().includes(q)) return false;
-    if (verdict && !toStr(info.VERDICT).includes(verdict)) return false;
+    if (verdict && !toStr(info.VERDICT_CATEGORY).includes(verdict)) return false;
     if (platform && !toStr(info.PLATFORM).includes(platform)) return false;
     return true;
   });
@@ -300,26 +386,28 @@ function renderList() {
     return;
   }
   el.innerHTML = filtered.map((e, i) => {
-    const info = e['案件基本資訊'] || {};
-    const v = toStr(info.VERDICT);
+    const info = e.basic_info || {};
+    const v = toStr(info.VERDICT_CATEGORY);
     const vc = v.includes('不罰') || v.includes('無罪') ? 'tag-green' :
-               v.includes('罰') || v.includes('有罪') ? 'tag-red' : 'tag-yellow';
-    return `<div class="list-item ${i === selectedIdx ? 'active' : ''}" onclick="selectCase(${i})">
+               v.includes('罰') || v.includes('有罪') || v.includes('起訴') ? 'tag-red' : 'tag-yellow';
+    const active = e.doc_id === selectedDocId ? 'active' : '';
+    return `<div class="list-item ${active}" onclick="selectCase(${i})">
       <div class="list-title">${esc(e.title)}</div>
       <div class="list-meta">
-        <span>${e.doc_id}</span>
+        <span>${esc(e.doc_id)}</span>
         <span>${esc(toStr(info.DEFENDANT))}</span>
-        <span class="list-tag ${vc}">${esc(v.substring(0,10))}</span>
+        <span class="list-tag ${vc}">${esc(v.substring(0,10) || '—')}</span>
       </div>
     </div>`;
   }).join('');
 }
 
 function selectCase(i) {
-  selectedIdx = i;
+  const e = filtered[i];
+  if (!e) return;
+  selectedDocId = e.doc_id;
   currentHighlight = '';
   renderList();
-  const e = filtered[i];
   renderEntity(e);
   loadFullText(e.doc_id);
 }
@@ -329,28 +417,108 @@ function renderEntity(e) {
   const modules = Object.keys(e).filter(k => k !== 'doc_id' && k !== 'title');
 
   el.innerHTML = `
-    <div class="panel-title">${esc(e.title)}<br><span style="color:var(--text2);font-size:11px">${e.doc_id} — click any value to highlight in full text</span></div>
-    ${modules.map(mod => {
-      const fields = e[mod];
-      if (!fields || typeof fields !== 'object') return '';
-      return `<div class="module">
-        <div class="module-title">${esc(mod)}</div>
-        <table class="field-table">
-          ${Object.entries(fields).map(([k, v]) => {
-            const val = v === null || v === undefined
-              ? '<span class="field-null">null</span>'
-              : Array.isArray(v) ? esc(v.join('、')) : esc(String(v));
-            const raw = v === null || v === undefined ? '' :
-                        Array.isArray(v) ? v.join('、') : String(v);
-            return `<tr onclick="highlightInText('${escAttr(raw)}')" title="Click to find in full text">
-              <td class="field-key">${esc(k)}</td>
-              <td class="field-val">${val}</td>
-            </tr>`;
-          }).join('')}
-        </table>
-      </div>`;
-    }).join('')}`;
+    <div class="panel-title">${esc(e.title)}<br><span style="color:var(--text2);font-size:11px">${esc(e.doc_id)} — click any value to highlight in full text</span></div>
+    ${modules.map(mod => renderModule(mod, e[mod])).join('')}`;
   el.scrollTop = 0;
+
+  // Wire row clicks via dataset (safer than inline onclick with quoted values)
+  el.querySelectorAll('tr[data-needle]').forEach(tr => {
+    tr.addEventListener('click', () => highlightInText(tr.dataset.needle, tr));
+  });
+}
+
+// Format a heterogeneous value (string / list[str] / list[dict] / dict) for display.
+// Returns {html, raw}. raw is the plain text used for full-text search.
+function formatValue(v) {
+  if (v === null || v === undefined || v === '') {
+    return { html: '<span class="field-null">null</span>', raw: '' };
+  }
+  if (Array.isArray(v)) {
+    if (!v.length) return { html: '<span class="field-null">null</span>', raw: '' };
+    // list of dicts → render each item on its own line
+    if (v.every(x => x && typeof x === 'object' && !Array.isArray(x))) {
+      const lines = v.map(o => formatDict(o));
+      return {
+        html: lines.map(l => esc(l)).join('<br>'),
+        raw: lines.join(' ；'),
+      };
+    }
+    // list of primitives
+    const flat = v.map(x => (x && typeof x === 'object') ? formatDict(x) : String(x));
+    return { html: esc(flat.join('、')), raw: flat.join('、') };
+  }
+  if (typeof v === 'object') {
+    const s = formatDict(v);
+    return { html: esc(s), raw: s };
+  }
+  return { html: esc(String(v)), raw: String(v) };
+}
+
+// Render a {key: value, ...} as "key1：v1 ｜ key2：v2" with friendly labels.
+function formatDict(o) {
+  const PAIR_LABEL = {
+    article: '法條', role: '作用',
+    type: '類型', content: '內容', precedent: '判例',
+  };
+  return Object.entries(o)
+    .filter(([, vv]) => vv !== null && vv !== undefined && vv !== '')
+    .map(([k, vv]) => {
+      const lk = PAIR_LABEL[k] || k;
+      const lv = (vv && typeof vv === 'object') ? JSON.stringify(vv) : String(vv);
+      return `${lk}：${lv}`;
+    })
+    .join(' ｜ ');
+}
+
+function renderModule(mod, fields) {
+  if (fields === null || fields === undefined) return '';
+  const label = esc(MODULE_LABEL[mod] || mod);
+
+  // Normalize cited_authority shape: sometimes wrapped as {CITED_AUTHORITY: [...]}
+  if (mod === 'cited_authority' && fields && !Array.isArray(fields) && typeof fields === 'object') {
+    const inner = fields.CITED_AUTHORITY;
+    if (inner === null || inner === undefined) {
+      fields = [];
+    } else if (Array.isArray(inner)) {
+      fields = inner;
+    }
+  }
+
+  // Top-level list (cited_authority) → numbered rows
+  if (Array.isArray(fields)) {
+    if (!fields.length) {
+      return `<div class="module"><div class="module-title">${label}</div>
+        <div style="font-size:12px;color:var(--text2);padding:6px 10px">（無）</div></div>`;
+    }
+    return `<div class="module">
+      <div class="module-title">${label}</div>
+      <table class="field-table">
+        ${fields.map((item, i) => {
+          const f = formatValue(item);
+          return `<tr data-needle="${escAttr(f.raw)}" title="Click to find in full text">
+            <td class="field-key">${i + 1}</td>
+            <td class="field-val">${f.html}</td>
+          </tr>`;
+        }).join('')}
+      </table>
+    </div>`;
+  }
+
+  if (typeof fields !== 'object') return '';
+
+  return `<div class="module">
+    <div class="module-title">${label}</div>
+    <table class="field-table">
+      ${Object.entries(fields).map(([k, v]) => {
+        const f = formatValue(v);
+        const keyLabel = esc(FIELD_LABEL[k] || k);
+        return `<tr data-needle="${escAttr(f.raw)}" title="Click to find in full text">
+          <td class="field-key">${keyLabel}</td>
+          <td class="field-val">${f.html}</td>
+        </tr>`;
+      }).join('')}
+    </table>
+  </div>`;
 }
 
 async function loadFullText(docId) {
@@ -366,7 +534,7 @@ async function loadFullText(docId) {
   }
 }
 
-function highlightInText(value) {
+function highlightInText(value, rowEl) {
   if (!value || value.length < 2) return;
   const el = document.getElementById('fulltextPanel');
   const raw = el.dataset.rawText;
@@ -374,7 +542,7 @@ function highlightInText(value) {
 
   // Highlight all rows
   document.querySelectorAll('.highlight-row').forEach(r => r.classList.remove('highlight-row'));
-  event.currentTarget.classList.add('highlight-row');
+  if (rowEl) rowEl.classList.add('highlight-row');
 
   // Take first 30 chars for highlight (long values are too noisy)
   const needle = value.length > 60 ? value.substring(0, 60) : value;
@@ -414,7 +582,11 @@ function esc(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 function escAttr(s) {
-  return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');
+  if (s === null || s === undefined) return '';
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;')
+    .replace(/\n/g,' ');
 }
 function debounce(fn, ms) {
   let t;

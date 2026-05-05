@@ -20,7 +20,7 @@ from pydantic import BaseModel
 
 # Add parent to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
-sys.path.insert(0, str(Path(__file__).parent / "dataset" / "challenge1_dataset" / "v4_0415" / "eval"))
+sys.path.insert(0, str(Path(__file__).parent / "dataset" / "covid_19_discourse" / "eval"))
 
 from rag_pipeline import (
     DocumentStore,
@@ -48,10 +48,10 @@ store: DocumentStore = None
 eval_types = None
 WEB_DIR = Path(__file__).parent / "web"
 BASE_DIR = Path(__file__).parent
-V4_DIR = BASE_DIR / "dataset" / "challenge1_dataset" / "v4_0415"
-SPLIT_DIR = V4_DIR / "dataset_split_v4"
-ENTITIES_PATH = V4_DIR / "dataset_entities_v4.json"
-SCHEMA_PATH = V4_DIR / "entity_schema.json"
+COVID_DIR = BASE_DIR / "dataset" / "covid_19_discourse" 
+SPLIT_DIR = COVID_DIR / "dataset_split_v4"
+ENTITIES_PATH = COVID_DIR / "dataset_entities_v4.json"
+SCHEMA_PATH = COVID_DIR / "entity_schema.json"
 
 
 # ── Lifespan ──────────────────────────────────────────────────
@@ -92,7 +92,7 @@ def qa_page():
 
 @app.get("/api/qa")
 def api_qa():
-    qa_path = V4_DIR / "qa_dataset_final_v4.json"
+    qa_path = COVID_DIR / "qa_dataset_final_v4.json"
     with open(qa_path, encoding="utf-8") as f:
         data = json.load(f)
     return {"cases": data}
@@ -306,7 +306,7 @@ def api_results(name: str = "val"):
         preds = json.load(f)
 
     # 載入 GT
-    qa_path = V4_DIR / "qa_dataset_final_v4.json"
+    qa_path = COVID_DIR / "qa_dataset_final_v4.json"
     with open(qa_path, encoding="utf-8") as f:
         qa_data = json.load(f)
 
@@ -521,4 +521,4 @@ def api_doc(doc_id: str):
 # ── Run ───────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8866)
+    uvicorn.run(app, host="0.0.0.0", port=8867)

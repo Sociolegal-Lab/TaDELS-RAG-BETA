@@ -22,12 +22,12 @@ from typing import Any, Dict, List, Optional
 # 確保從任何目錄都能 import 同層模組
 sys.path.insert(0, str(Path(__file__).parent))
 
-from entities import (
+from dataset.covid_19_discourse.eval.entities import (
     entity_matching_score, _load_eval_types, normalize_text,
     score_type_a, score_type_b, score_type_c, score_entity,
 )
-from hallucination import hallucination_penalty
-from ndcg import evaluate_retrieval
+from dataset.covid_19_discourse.eval.hallucination import hallucination_penalty
+from dataset.covid_19_discourse.eval.ndcg import evaluate_retrieval
 
 
 def load_ground_truth(qa_path: str) -> Dict[str, dict]:
