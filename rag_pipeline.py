@@ -1,5 +1,5 @@
 """
-TDELS RAG Pipeline
+TaDELS RAG Pipeline
 
 用法：
     # 跑 val set
