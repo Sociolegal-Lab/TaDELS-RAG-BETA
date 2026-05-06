@@ -22,6 +22,7 @@ function toggleTheme(){
   @view-transition { navigation: auto; }
   :root {
     color-scheme: dark;
+    font-size: clamp(14px, calc(12px + 0.32vw), 18px);
     --bg: #0f1117;
     --surface: #1a1d27;
     --surface2: #242836;
@@ -89,9 +90,9 @@ function toggleTheme(){
     flex-shrink: 0;
     background: var(--surface);
   }
-  .header h1 { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .header h1 { font-size: 1.0625rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
   .beta-badge {
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: 600;
     padding: 2px 8px;
     border-radius: 6px;
@@ -101,7 +102,7 @@ function toggleTheme(){
     letter-spacing: .5px;
   }
   .header nav a {
-    color: var(--text2); text-decoration: none; margin-left: 20px; font-size: 13px;
+    color: var(--text2); text-decoration: none; margin-left: 20px; font-size: 0.8125rem;
   }
   .header nav a:hover, .header nav a.active { color: var(--accent); }
 
@@ -117,15 +118,15 @@ function toggleTheme(){
   .search-box {
     flex: 1; min-width: 200px;
     background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
-    padding: 7px 14px; color: var(--text); font-size: 13px; outline: none; font-family: inherit;
+    padding: 7px 14px; color: var(--text); font-size: 0.8125rem; outline: none; font-family: inherit;
   }
   .search-box:focus { border-color: var(--accent); }
   .search-box::placeholder { color: var(--text2); }
   .filter-select {
     background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
-    padding: 7px 10px; color: var(--text); font-size: 12px; outline: none; cursor: pointer;
+    padding: 7px 10px; color: var(--text); font-size: 0.75rem; outline: none; cursor: pointer;
   }
-  .stat { font-size: 12px; color: var(--text2); }
+  .stat { font-size: 0.75rem; color: var(--text2); }
 
   .main { flex: 1; display: flex; overflow: hidden; }
 
@@ -144,14 +145,14 @@ function toggleTheme(){
   }
   .qa-item:hover { background: var(--surface2); }
   .qa-item.active { background: var(--surface2); border-left: 3px solid var(--accent); }
-  .qa-question { font-size: 13px; font-weight: 500; line-height: 1.5; }
+  .qa-question { font-size: 0.8125rem; font-weight: 500; line-height: 1.5; }
   .qa-answer {
-    font-size: 12px; color: var(--text2); margin-top: 4px;
+    font-size: 0.75rem; color: var(--text2); margin-top: 4px;
     max-height: 40px; overflow: hidden;
   }
-  .qa-meta { font-size: 10px; color: var(--text2); margin-top: 4px; display: flex; gap: 8px; align-items: center; }
+  .qa-meta { font-size: 0.625rem; color: var(--text2); margin-top: 4px; display: flex; gap: 8px; align-items: center; }
   .type-tag {
-    padding: 1px 7px; border-radius: 4px; font-size: 10px; font-weight: 500;
+    padding: 1px 7px; border-radius: 4px; font-size: 0.625rem; font-weight: 500;
   }
   .type-short { background: rgba(108,140,255,.15); color: var(--accent); }
   .type-long { background: rgba(251,146,60,.15); color: var(--orange); }
@@ -165,7 +166,7 @@ function toggleTheme(){
   }
   .detail-empty {
     display: flex; align-items: center; justify-content: center;
-    height: 100%; color: var(--text2); font-size: 13px;
+    height: 100%; color: var(--text2); font-size: 0.8125rem;
   }
 
   .detail-header {
@@ -173,8 +174,8 @@ function toggleTheme(){
     padding-bottom: 12px;
     border-bottom: 1px solid var(--border);
   }
-  .detail-title { font-size: 15px; font-weight: 600; }
-  .detail-id { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .detail-title { font-size: 0.9375rem; font-weight: 600; }
+  .detail-id { font-size: 0.6875rem; color: var(--text2); margin-top: 2px; }
 
   .qa-detail-card {
     background: var(--surface);
@@ -183,24 +184,24 @@ function toggleTheme(){
     padding: 16px;
     margin-bottom: 16px;
   }
-  .qa-detail-label { font-size: 11px; color: var(--text2); font-weight: 600; margin-bottom: 4px; }
-  .qa-detail-q { font-size: 14px; font-weight: 500; margin-bottom: 12px; }
-  .qa-detail-a { font-size: 14px; line-height: 1.7; margin-bottom: 12px; }
+  .qa-detail-label { font-size: 0.6875rem; color: var(--text2); font-weight: 600; margin-bottom: 4px; }
+  .qa-detail-q { font-size: 0.875rem; font-weight: 500; margin-bottom: 12px; }
+  .qa-detail-a { font-size: 0.875rem; line-height: 1.7; margin-bottom: 12px; }
   .qa-detail-evidence {
-    font-size: 12px; color: var(--text2); line-height: 1.6;
+    font-size: 0.75rem; color: var(--text2); line-height: 1.6;
     background: var(--surface2); border-radius: 6px; padding: 10px 12px;
   }
 
   .fulltext-section { margin-top: 16px; }
   .fulltext-toggle {
-    font-size: 12px; color: var(--accent); cursor: pointer; user-select: none;
+    font-size: 0.75rem; color: var(--accent); cursor: pointer; user-select: none;
     padding: 6px 12px; border-radius: 6px; display: inline-block;
     transition: background .2s;
   }
   .fulltext-toggle:hover { background: rgba(108,140,255,.1); }
   .fulltext-content {
     display: none;
-    font-size: 13px; line-height: 1.8; white-space: pre-wrap; word-break: break-all;
+    font-size: 0.8125rem; line-height: 1.8; white-space: pre-wrap; word-break: break-all;
     margin-top: 12px; padding: 16px;
     background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
     max-height: 500px; overflow-y: auto;
@@ -217,6 +218,25 @@ function toggleTheme(){
     border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 10px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Mobile (≤640px) — keep header from overflowing ── */
+  @media (max-width: 640px) {
+    .header { padding: 10px 14px; gap: 6px; flex-wrap: wrap; }
+    .header h1 { font-size: 0.875rem; }
+    .header nav { display: flex; flex-wrap: wrap; gap: 4px; }
+    .header nav a { margin-left: 0; padding: 2px 6px; font-size: 0.75rem; }
+    .theme-toggle { margin-left: 4px; padding: 2px 4px; }
+    .theme-toggle svg { width: 14px; height: 14px; }
+  }
+
+  /* Stack qa-list above detail on mobile to avoid horizontal overflow */
+  @media (max-width: 768px) {
+    body { height: auto; min-height: 100vh; }
+    .main { flex-direction: column; overflow: visible; }
+    .qa-list { width: 100%; max-height: 40vh; border-right: none; border-bottom: 1px solid var(--border); }
+    .detail-area { padding: 16px; }
+    .toolbar { padding: 8px 14px; }
+  }
 </style>
 </head>
 <body>

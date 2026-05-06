@@ -22,6 +22,7 @@ function toggleTheme(){
   @view-transition { navigation: auto; }
   :root {
     color-scheme: dark;
+    font-size: clamp(14px, calc(12px + 0.32vw), 18px);
     --bg: #0f1117;
     --surface: #1a1d27;
     --surface2: #242836;
@@ -85,9 +86,9 @@ function toggleTheme(){
     flex-shrink: 0;
     background: var(--surface);
   }
-  .header h1 { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .header h1 { font-size: 1.0625rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
   .beta-badge {
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: 600;
     padding: 2px 8px;
     border-radius: 6px;
@@ -100,7 +101,7 @@ function toggleTheme(){
     color: var(--text2);
     text-decoration: none;
     margin-left: 20px;
-    font-size: 13px;
+    font-size: 0.8125rem;
     transition: color .2s;
   }
   .header nav a:hover, .header nav a.active { color: var(--accent); }
@@ -117,7 +118,7 @@ function toggleTheme(){
   }
   .split-tab {
     padding: 12px 24px;
-    font-size: 14px;
+    font-size: 0.875rem;
     flex-shrink: 0;
     font-weight: 500;
     color: var(--text2);
@@ -133,7 +134,7 @@ function toggleTheme(){
   .split-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
   .split-tab.disabled { opacity: .3; cursor: not-allowed; }
   .split-tab .tab-count {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--text2);
     margin-left: 6px;
     background: var(--surface2);
@@ -157,9 +158,9 @@ function toggleTheme(){
     min-width: 150px;
     flex: 1;
   }
-  .card .label { font-size: 12px; color: var(--text2); text-transform: uppercase; letter-spacing: .5px; }
-  .card .value { font-size: 28px; font-weight: 700; margin-top: 4px; }
-  .card .sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .card .label { font-size: 0.75rem; color: var(--text2); text-transform: uppercase; letter-spacing: .5px; }
+  .card .value { font-size: 1.75rem; font-weight: 700; margin-top: 4px; }
+  .card .sub { font-size: 0.75rem; color: var(--text2); margin-top: 2px; }
 
   /* ── Filters ── */
   .filters {
@@ -175,7 +176,7 @@ function toggleTheme(){
     padding: 6px 16px;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 0.8125rem;
     transition: all .2s;
   }
   .filter-btn:hover { border-color: var(--accent); color: var(--text); }
@@ -212,18 +213,18 @@ function toggleTheme(){
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 0.9375rem;
   }
   .score-perfect { background: rgba(74,222,128,.15); color: var(--green); }
   .score-good { background: rgba(250,204,21,.15); color: var(--yellow); }
   .score-bad { background: rgba(248,113,113,.15); color: var(--red); }
 
   .result-info { flex: 1; min-width: 0; }
-  .result-qid { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
-  .result-question { font-size: 15px; font-weight: 500; }
+  .result-qid { font-size: 0.75rem; color: var(--text2); margin-bottom: 4px; }
+  .result-question { font-size: 0.9375rem; font-weight: 500; }
 
   .type-tag {
-    font-size: 11px;
+    font-size: 0.6875rem;
     padding: 2px 10px;
     border-radius: 10px;
     flex-shrink: 0;
@@ -260,11 +261,11 @@ function toggleTheme(){
     border-radius: 8px;
     padding: 14px 16px;
   }
-  .answer-box .label { font-size: 12px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
-  .answer-box .text { font-size: 14px; white-space: pre-wrap; word-break: break-all; }
+  .answer-box .label { font-size: 0.75rem; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+  .answer-box .text { font-size: 0.875rem; white-space: pre-wrap; word-break: break-all; }
 
   .refs-section { margin-top: 16px; }
-  .refs-section h4 { font-size: 13px; color: var(--text2); margin-bottom: 8px; }
+  .refs-section h4 { font-size: 0.8125rem; color: var(--text2); margin-bottom: 8px; }
   .ref-item {
     background: var(--surface2);
     border: 1px solid var(--border);
@@ -275,10 +276,10 @@ function toggleTheme(){
     transition: border-color .2s;
   }
   .ref-item:hover { border-color: var(--accent); }
-  .ref-title { font-size: 13px; font-weight: 500; color: var(--accent); }
-  .ref-id { font-size: 11px; color: var(--text2); }
+  .ref-title { font-size: 0.8125rem; font-weight: 500; color: var(--accent); }
+  .ref-id { font-size: 0.6875rem; color: var(--text2); }
   .ref-snippet {
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: var(--text2);
     margin-top: 6px;
     max-height: 0;
@@ -288,7 +289,7 @@ function toggleTheme(){
   }
   .ref-item.open .ref-snippet { max-height: 500px; }
   .ref-meta {
-    font-size: 12px;
+    font-size: 0.75rem;
     color: var(--text2);
     margin-top: 6px;
     max-height: 0;
@@ -301,7 +302,7 @@ function toggleTheme(){
   }
   .ref-item.open .ref-meta { max-height: 300px; padding: 10px 12px; margin-top: 8px; }
   .ref-full-btn {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--accent);
     cursor: pointer;
     margin-top: 8px;
@@ -312,7 +313,7 @@ function toggleTheme(){
   .ref-item.open .ref-full-btn { display: block; }
   .ref-full-text {
     display: none;
-    font-size: 12px;
+    font-size: 0.75rem;
     color: var(--text2);
     margin-top: 8px;
     padding: 12px;
@@ -324,11 +325,11 @@ function toggleTheme(){
     overflow-y: auto;
     line-height: 1.6;
   }
-  .ndcg-badge { font-size: 11px; color: var(--text2); margin-left: 8px; }
+  .ndcg-badge { font-size: 0.6875rem; color: var(--text2); margin-left: 8px; }
 
   /* ── Debug info ── */
   .debug-toggle {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--text2);
     cursor: pointer;
     margin-top: 12px;
@@ -346,7 +347,7 @@ function toggleTheme(){
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 8px;
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     color: var(--text2);
     white-space: pre-wrap;
@@ -378,6 +379,16 @@ function toggleTheme(){
     .summary { padding: 16px; }
     .results-container { padding: 0 16px 16px; }
     .split-tabs { padding: 0 16px; }
+  }
+
+  /* ── Mobile (≤640px) — keep header from overflowing ── */
+  @media (max-width: 640px) {
+    .header { padding: 10px 14px; gap: 6px; flex-wrap: wrap; }
+    .header h1 { font-size: 0.875rem; }
+    .header nav { display: flex; flex-wrap: wrap; gap: 4px; }
+    .header nav a { margin-left: 0; padding: 2px 6px; font-size: 0.75rem; }
+    .theme-toggle { margin-left: 4px; padding: 2px 4px; }
+    .theme-toggle svg { width: 14px; height: 14px; }
   }
 </style>
 </head>
@@ -590,8 +601,8 @@ function renderResults(results) {
             <div class="text">${esc(r.pred_answer)}</div>
           </div>
         </div>
-        ${r.gt_entities && Object.keys(r.gt_entities).length ? '<div style="margin-top:12px;padding:12px;background:var(--bg);border-radius:6px;font-size:13px"><div style="font-weight:600;margin-bottom:6px">Entities 比對</div><table style="width:100%;border-collapse:collapse"><tr style="color:var(--text2)"><td style="padding:2px 8px">欄位</td><td style="padding:2px 8px">GT</td><td style="padding:2px 8px">Pred</td><td style="padding:2px 8px">Score</td></tr>' + Object.entries(r.gt_entities).map(function([k, v]) { var pv = r.pred_entities ? r.pred_entities[k] : null; var ds = r.entity_detail ? r.entity_detail[k] : null; var vStr = typeof v === 'object' ? JSON.stringify(v) : String(v); var pvStr = pv != null ? (typeof pv === 'object' ? JSON.stringify(pv) : String(pv)) : '—'; var dsStr = ds != null ? ds.toFixed(2) : '0.00'; var clr = parseFloat(dsStr) >= 1 ? 'var(--green)' : parseFloat(dsStr) >= 0.5 ? 'var(--yellow)' : 'var(--red)'; return '<tr style="border-top:1px solid var(--border)"><td style="padding:4px 8px;font-family:monospace;font-size:12px">' + esc(k) + '</td><td style="padding:4px 8px">' + esc(vStr).substring(0,60) + '</td><td style="padding:4px 8px">' + esc(pvStr).substring(0,60) + '</td><td style="padding:4px 8px;color:' + clr + '">' + dsStr + '</td></tr>'; }).join('') + '</table></div>' : ''}
-        ${r.hallucination_detail && Object.keys(r.hallucination_detail).length ? '<div style="margin-top:12px;padding:12px;background:var(--bg);border-radius:6px;font-size:13px"><div style="font-weight:600;margin-bottom:6px;color:var(--red)">幻覺明細 (P_h = ' + (r.hallucination_penalty ?? 0).toFixed(2) + ')</div><table style="width:100%;border-collapse:collapse"><tr style="color:var(--text2)"><td style="padding:2px 8px">欄位</td><td style="padding:2px 8px">系統輸出值</td><td style="padding:2px 8px">分類</td><td style="padding:2px 8px">懲罰</td></tr>' + Object.entries(r.hallucination_detail).map(function([k, d]) { var valStr = typeof d.value === 'object' ? JSON.stringify(d.value) : String(d.value || ''); var typeClr = d.type === 'supported' ? 'var(--green)' : d.type === 'contradictory' ? 'var(--red)' : 'var(--yellow)'; var typeLabel = d.type === 'supported' ? '有文件支持' : d.type === 'contradictory' ? '與文件衝突' : '無文件支持'; return '<tr style="border-top:1px solid var(--border)"><td style="padding:4px 8px;font-family:monospace;font-size:12px">' + esc(k) + '</td><td style="padding:4px 8px">' + esc(valStr).substring(0,80) + '</td><td style="padding:4px 8px;color:' + typeClr + '">' + typeLabel + '</td><td style="padding:4px 8px;color:' + (d.penalty > 0 ? 'var(--red)' : 'var(--green)') + '">' + d.penalty.toFixed(2) + '</td></tr>'; }).join('') + '</table></div>' : ''}
+        ${r.gt_entities && Object.keys(r.gt_entities).length ? '<div style="margin-top:12px;padding:12px;background:var(--bg);border-radius:6px;font-size: 0.8125rem"><div style="font-weight:600;margin-bottom:6px">Entities 比對</div><table style="width:100%;border-collapse:collapse"><tr style="color:var(--text2)"><td style="padding:2px 8px">欄位</td><td style="padding:2px 8px">GT</td><td style="padding:2px 8px">Pred</td><td style="padding:2px 8px">Score</td></tr>' + Object.entries(r.gt_entities).map(function([k, v]) { var pv = r.pred_entities ? r.pred_entities[k] : null; var ds = r.entity_detail ? r.entity_detail[k] : null; var vStr = typeof v === 'object' ? JSON.stringify(v) : String(v); var pvStr = pv != null ? (typeof pv === 'object' ? JSON.stringify(pv) : String(pv)) : '—'; var dsStr = ds != null ? ds.toFixed(2) : '0.00'; var clr = parseFloat(dsStr) >= 1 ? 'var(--green)' : parseFloat(dsStr) >= 0.5 ? 'var(--yellow)' : 'var(--red)'; return '<tr style="border-top:1px solid var(--border)"><td style="padding:4px 8px;font-family:monospace;font-size: 0.75rem">' + esc(k) + '</td><td style="padding:4px 8px">' + esc(vStr).substring(0,60) + '</td><td style="padding:4px 8px">' + esc(pvStr).substring(0,60) + '</td><td style="padding:4px 8px;color:' + clr + '">' + dsStr + '</td></tr>'; }).join('') + '</table></div>' : ''}
+        ${r.hallucination_detail && Object.keys(r.hallucination_detail).length ? '<div style="margin-top:12px;padding:12px;background:var(--bg);border-radius:6px;font-size: 0.8125rem"><div style="font-weight:600;margin-bottom:6px;color:var(--red)">幻覺明細 (P_h = ' + (r.hallucination_penalty ?? 0).toFixed(2) + ')</div><table style="width:100%;border-collapse:collapse"><tr style="color:var(--text2)"><td style="padding:2px 8px">欄位</td><td style="padding:2px 8px">系統輸出值</td><td style="padding:2px 8px">分類</td><td style="padding:2px 8px">懲罰</td></tr>' + Object.entries(r.hallucination_detail).map(function([k, d]) { var valStr = typeof d.value === 'object' ? JSON.stringify(d.value) : String(d.value || ''); var typeClr = d.type === 'supported' ? 'var(--green)' : d.type === 'contradictory' ? 'var(--red)' : 'var(--yellow)'; var typeLabel = d.type === 'supported' ? '有文件支持' : d.type === 'contradictory' ? '與文件衝突' : '無文件支持'; return '<tr style="border-top:1px solid var(--border)"><td style="padding:4px 8px;font-family:monospace;font-size: 0.75rem">' + esc(k) + '</td><td style="padding:4px 8px">' + esc(valStr).substring(0,80) + '</td><td style="padding:4px 8px;color:' + typeClr + '">' + typeLabel + '</td><td style="padding:4px 8px;color:' + (d.penalty > 0 ? 'var(--red)' : 'var(--green)') + '">' + d.penalty.toFixed(2) + '</td></tr>'; }).join('') + '</table></div>' : ''}
         ${r.refs && r.refs.length ? `
         <div class="refs-section">
           <h4>Referenced Documents (${r.refs.length})</h4>

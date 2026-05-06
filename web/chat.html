@@ -22,6 +22,7 @@ function toggleTheme(){
   @view-transition { navigation: auto; }
   :root {
     color-scheme: dark;
+    font-size: clamp(14px, calc(12px + 0.32vw), 18px);
     --bg: #0f1117;
     --surface: #1a1d27;
     --surface2: #242836;
@@ -91,9 +92,9 @@ function toggleTheme(){
     flex-shrink: 0;
     background: var(--surface);
   }
-  .header h1 { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .header h1 { font-size: 1.0625rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
   .beta-badge {
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: 600;
     padding: 2px 8px;
     border-radius: 6px;
@@ -106,7 +107,7 @@ function toggleTheme(){
   .header nav a {
     color: var(--text2);
     text-decoration: none;
-    font-size: 13px;
+    font-size: 0.8125rem;
     transition: color .2s;
   }
   .header nav a:hover, .header nav a.active { color: var(--accent); }
@@ -175,7 +176,7 @@ function toggleTheme(){
     flex-shrink: 0;
   }
   .side-panel-title {
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: var(--text);
     overflow: hidden;
@@ -189,7 +190,7 @@ function toggleTheme(){
     border: none;
     color: var(--text2);
     cursor: pointer;
-    font-size: 18px;
+    font-size: 1.125rem;
     padding: 2px 6px;
     border-radius: 6px;
     transition: background .2s, color .2s;
@@ -207,7 +208,7 @@ function toggleTheme(){
     margin-bottom: 16px;
   }
   .side-panel-section-label {
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: 600;
     color: var(--text2);
     text-transform: uppercase;
@@ -215,7 +216,7 @@ function toggleTheme(){
     margin-bottom: 6px;
   }
   .side-panel-meta {
-    font-size: 12px;
+    font-size: 0.75rem;
     color: var(--text2);
     padding: 10px 12px;
     background: var(--bg);
@@ -225,7 +226,7 @@ function toggleTheme(){
     line-height: 1.6;
   }
   .side-panel-fulltext {
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: var(--text);
     padding: 14px;
     background: var(--bg);
@@ -236,10 +237,17 @@ function toggleTheme(){
     max-height: none;
   }
   .side-panel-id {
-    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.6875rem;
     color: var(--text2);
     font-family: 'SF Mono', 'Consolas', monospace;
+    text-decoration: none;
+    transition: color .15s;
   }
+  .side-panel-id:hover { color: var(--accent); text-decoration: underline; }
+  .side-panel-id .ext-arrow { font-size: 0.625rem; opacity: .7; }
   .side-panel-nav {
     display: flex;
     gap: 6px;
@@ -250,7 +258,7 @@ function toggleTheme(){
     border: 1px solid var(--border);
     color: var(--text2);
     cursor: pointer;
-    font-size: 12px;
+    font-size: 0.75rem;
     padding: 3px 10px;
     border-radius: 6px;
     transition: background .2s, color .2s;
@@ -275,7 +283,7 @@ function toggleTheme(){
     padding: 12px 16px;
     border-radius: 14px;
     border-bottom-right-radius: 4px;
-    font-size: 14px;
+    font-size: 0.875rem;
     line-height: 1.7;
     color: #dbeafe;
   }
@@ -286,7 +294,7 @@ function toggleTheme(){
   }
   .msg-bot .msg-bubble {
     padding: 16px 20px;
-    font-size: 14px;
+    font-size: 0.875rem;
     line-height: 1.8;
     border-bottom: 1px solid var(--border);
   }
@@ -295,7 +303,7 @@ function toggleTheme(){
 
   /* ── Debug ── */
   .debug-toggle {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--text2);
     cursor: pointer;
     margin-top: 8px;
@@ -313,7 +321,7 @@ function toggleTheme(){
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 8px;
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--text2);
     white-space: pre-wrap;
     line-height: 1.5;
@@ -327,7 +335,7 @@ function toggleTheme(){
     padding-top: 10px;
   }
   .refs-label {
-    font-size: 12px;
+    font-size: 0.75rem;
     color: var(--text2);
     margin-bottom: 8px;
     font-weight: 500;
@@ -347,18 +355,29 @@ function toggleTheme(){
     justify-content: space-between;
     align-items: center;
   }
-  .ref-card-title { font-size: 13px; font-weight: 500; color: #c8ccd6; }
-  .ref-card-id { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .ref-card-title { font-size: 0.8125rem; font-weight: 500; color: var(--text); }
+  .ref-card-id {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.6875rem;
+    color: var(--text2);
+    margin-top: 2px;
+    text-decoration: none;
+    transition: color .15s;
+  }
+  .ref-card-id:hover { color: var(--accent); text-decoration: underline; }
+  .ref-card-id .ext-arrow { font-size: 0.625rem; opacity: .7; }
   .ref-chevron {
     color: var(--text2);
-    font-size: 11px;
+    font-size: 0.6875rem;
     flex-shrink: 0;
   }
 
   /* ── Step progress ── */
   .steps-log {
     margin-top: 8px;
-    font-size: 12px;
+    font-size: 0.75rem;
     line-height: 1.8;
   }
   .step-line {
@@ -389,7 +408,7 @@ function toggleTheme(){
   @keyframes blink { 50% { opacity: 0; } }
   .step-time {
     margin-left: auto;
-    font-size: 10px;
+    font-size: 0.625rem;
     color: var(--text2);
     font-family: 'SF Mono', 'Consolas', monospace;
     opacity: .7;
@@ -420,7 +439,7 @@ function toggleTheme(){
   }
   .disclaimer {
     text-align: center;
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--text2);
     padding: 4px 24px 12px;
     opacity: .7;
@@ -442,7 +461,7 @@ function toggleTheme(){
     background: transparent;
     border: none;
     color: var(--text);
-    font-size: 14px;
+    font-size: 0.875rem;
     font-family: inherit;
     resize: none;
     outline: none;
@@ -482,7 +501,7 @@ function toggleTheme(){
     gap: 16px;
   }
   .welcome h2 {
-    font-size: 38px;
+    font-size: 2.375rem;
     font-weight: 700;
     letter-spacing: -.5px;
     background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
@@ -494,7 +513,7 @@ function toggleTheme(){
     animation: welcome-fade .8s ease-out;
   }
   .welcome p {
-    font-size: 15px;
+    font-size: 0.9375rem;
     line-height: 1.85;
     max-width: 520px;
     text-wrap: balance;
@@ -505,7 +524,7 @@ function toggleTheme(){
     to   { opacity: 1; transform: none; }
   }
   @media (max-width: 640px) {
-    .welcome h2 { font-size: 28px; }
+    .welcome h2 { font-size: 1.75rem; }
   }
   .examples {
     display: grid;
@@ -522,7 +541,7 @@ function toggleTheme(){
     padding: 14px 18px;
     border-radius: 12px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 0.8125rem;
     text-align: left;
     transition: border-color .2s, background .2s;
     line-height: 1.6;
@@ -554,12 +573,12 @@ function toggleTheme(){
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 500;
     color: var(--text2);
   }
   .filter-toggle-left .ft-icon {
-    font-size: 11px;
+    font-size: 0.6875rem;
     transition: transform .25s;
     color: var(--text2);
   }
@@ -593,7 +612,7 @@ function toggleTheme(){
     right: -2px;
     background: var(--accent);
     color: #fff;
-    font-size: 10px;
+    font-size: 0.625rem;
     font-weight: 700;
     min-width: 18px;
     height: 18px;
@@ -643,7 +662,7 @@ function toggleTheme(){
     transform: rotate(45deg);
   }
   .opt-popover-title {
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: 600;
     color: var(--text2);
     text-transform: uppercase;
@@ -671,13 +690,13 @@ function toggleTheme(){
   }
   .opt-item-text { flex: 1; min-width: 0; }
   .opt-item-name {
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: var(--text);
     margin-bottom: 3px;
   }
   .opt-item-desc {
-    font-size: 11.5px;
+    font-size: 0.71875rem;
     color: var(--text2);
     line-height: 1.65;
   }
@@ -690,7 +709,7 @@ function toggleTheme(){
     .opt-popover { width: calc(100vw - 32px); right: -8px; }
   }
   .filter-stats {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--text2);
     display: flex;
     gap: 12px;
@@ -722,7 +741,7 @@ function toggleTheme(){
     align-items: center;
     gap: 4px;
     padding: 3px 0;
-    font-size: 13px;
+    font-size: 0.8125rem;
     line-height: 1.5;
   }
   .ftree .fnode .farrow {
@@ -733,7 +752,7 @@ function toggleTheme(){
     justify-content: center;
     cursor: pointer;
     color: var(--text2);
-    font-size: 10px;
+    font-size: 0.625rem;
     transition: transform .2s;
     flex-shrink: 0;
     border-radius: 4px;
@@ -765,7 +784,7 @@ function toggleTheme(){
     opacity: .5;
   }
   .ftree .fnode .fcount {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--text2);
     flex-shrink: 0;
     margin-left: 4px;
@@ -779,7 +798,7 @@ function toggleTheme(){
   .ftree .fchildren.open { display: block; }
 
   /* depth-based indent colors */
-  .ftree > ul > li > .fnode .fname { font-weight: 600; font-size: 13px; }
+  .ftree > ul > li > .fnode .fname { font-weight: 600; font-size: 0.8125rem; }
   .ftree > ul > li > .fchildren > li > .fnode .fname { font-weight: 500; }
 
   /* ── Onboarding Modal ── */
@@ -823,14 +842,14 @@ function toggleTheme(){
   }
   .ob-logo svg { width: 32px; height: 32px; }
   .ob-modal h2 {
-    font-size: 22px;
+    font-size: 1.375rem;
     font-weight: 600;
     margin-bottom: 14px;
     color: var(--text);
   }
   .ob-sub {
     color: var(--text2);
-    font-size: 14px;
+    font-size: 0.875rem;
     line-height: 1.9;
     margin-bottom: 36px;
   }
@@ -842,7 +861,7 @@ function toggleTheme(){
   .ob-btn {
     padding: 9px 18px;
     border-radius: 9px;
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 500;
     cursor: pointer;
     border: 1px solid var(--border);
@@ -943,20 +962,20 @@ function toggleTheme(){
   .tour-tooltip[data-arrow="left"]::before   { left: -7px;   top: 24px;  transform: rotate(-45deg); }
   .tour-tooltip[data-arrow="right"]::before  { right: -7px;  top: 24px;  transform: rotate(135deg); }
   .tt-step {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--text2);
     font-weight: 600;
     letter-spacing: .5px;
     margin-bottom: 4px;
   }
   .tt-title {
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 600;
     color: var(--text);
     margin-bottom: 6px;
   }
   .tt-desc {
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: var(--text2);
     line-height: 1.85;
     margin-bottom: 14px;
@@ -987,7 +1006,7 @@ function toggleTheme(){
   .tt-btns { display: flex; gap: 6px; }
   .tt-btn {
     padding: 6px 14px;
-    font-size: 12px;
+    font-size: 0.75rem;
     border-radius: 7px;
     border: 1px solid var(--border);
     background: var(--surface2);
@@ -1024,7 +1043,7 @@ function toggleTheme(){
     opacity: 0;
   }
   .tt-skip {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--text2);
     cursor: pointer;
     text-decoration: underline;
@@ -1034,6 +1053,16 @@ function toggleTheme(){
     padding: 4px;
   }
   .tt-skip:hover { color: var(--text); }
+
+  /* ── Mobile (≤640px) — keep header from overflowing ── */
+  @media (max-width: 640px) {
+    .header { padding: 10px 14px; gap: 6px; flex-wrap: wrap; }
+    .header h1 { font-size: 0.875rem; }
+    .header nav { display: flex; flex-wrap: wrap; gap: 4px; }
+    .header nav a { margin-left: 0; padding: 2px 6px; font-size: 0.75rem; }
+    .theme-toggle { margin-left: 4px; padding: 2px 4px; }
+    .theme-toggle svg { width: 14px; height: 14px; }
+  }
 </style>
 </head>
 <body>
@@ -1591,7 +1620,7 @@ function addBotMsg(data) {
             <div class="ref-card-header">
               <div>
                 <div class="ref-card-title">[${i+1}] ${esc(ref.title)}</div>
-                <div class="ref-card-id">${esc(ref.doc_id)}</div>
+                <a class="ref-card-id" href="https://itdels.digital.ntu.edu.tw/Item.php?ID=${encodeURIComponent(ref.doc_id)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="開啟原始文件 (TaDELS)">${esc(ref.doc_id)}<span class="ext-arrow">↗</span></a>
               </div>
               <span class="ref-chevron">&#9654;</span>
             </div>
@@ -1633,8 +1662,15 @@ function addBotMsg(data) {
       ${debugHtml}
     </div>`;
 
+  // Mark this as the latest bot message so output tour can target it
+  document.querySelectorAll('.msg-bot[data-latest]').forEach(el => el.removeAttribute('data-latest'));
+  div.dataset.latest = '1';
+
   chatArea.appendChild(div);
   chatArea.scrollTop = chatArea.scrollHeight;
+
+  // Auto-trigger output tour after first response (only if not yet seen)
+  setTimeout(maybeStartOutputTour, 1200);
 }
 
 // ── Side Panel ──
@@ -1663,7 +1699,7 @@ function openRefPanel(groupId, idx) {
   body.innerHTML = `
     <div class="side-panel-section">
       <div class="side-panel-section-label">Metadata</div>
-      <div class="side-panel-id">${esc(ref.doc_id)}</div>
+      <a class="side-panel-id" href="https://itdels.digital.ntu.edu.tw/Item.php?ID=${encodeURIComponent(ref.doc_id)}" target="_blank" rel="noopener" title="開啟原始文件 (TaDELS)">${esc(ref.doc_id)}<span class="ext-arrow">↗</span></a>
       <div class="side-panel-meta" style="margin-top:8px">${esc(ref.metadata_text)}</div>
     </div>
     <div class="side-panel-section">
@@ -1757,8 +1793,54 @@ const TOUR_STEPS = [
   }
 ];
 
+// Output tour: triggers automatically after first response, explains the output flow
+const TOUR_STEPS_OUTPUT = [
+  {
+    selector: '.msg-bot[data-latest] .steps-log',
+    title: '步驟 6：觀察 RAG 處理流程',
+    desc: '送出問題後，這條 log 會即時顯示 pipeline 每個內部步驟（檢索 → re-rank → 答案生成），每步耗時也會列出。可以從這裡看出 RAG 在背後做了哪些工。',
+    arrow: 'top',
+    action: () => {
+      const lastBot = document.querySelector('.msg-bot[data-latest]');
+      if (!lastBot) return;
+      const dbg = lastBot.querySelector('.steps-log.debug-content');
+      if (dbg && !dbg.classList.contains('open')) {
+        dbg.classList.add('open');
+        const t = lastBot.querySelector('.debug-toggle');
+        if (t) t.textContent = 'collapse steps';
+      }
+    }
+  },
+  {
+    selector: '.msg-bot[data-latest] .answer-text',
+    title: '步驟 7：閱讀回答',
+    desc: '系統根據題型自動切換策略：<br>'
+        + '<b>short</b> — 從原文擷取（不改寫）<br>'
+        + '<b>long</b> — 一段連貫摘要<br>'
+        + '<b>unanswerable</b> — 直接回「無法從文件判斷」',
+    arrow: 'top',
+    action: () => {}
+  },
+  {
+    selector: '.msg-bot[data-latest] .refs-container',
+    title: '步驟 8：查看引用文件',
+    desc: '回答下方列出 RAG 使用的 Top-N 引用文件。<b>點任一張卡片</b>會在右側面板開啟該文件的原文 + 結構化欄位（被告、法條、裁判結果等）。',
+    arrow: 'top',
+    action: () => {}
+  },
+  {
+    selector: '.msg-bot[data-latest] .ref-card-id',
+    title: '步驟 9：開啟原始判決',
+    desc: '每張卡片下方的 ID（含 ↗ 箭頭）連回 TaDELS 原始判決頁面，可以在新分頁瀏覽完整 metadata 與全文。',
+    arrow: 'top',
+    action: () => {}
+  }
+];
+
 let tourIdx = 0;
+let activeTour = TOUR_STEPS;  // points to whichever tour set is currently active
 const TOUR_KEY = 'tadels_tour_seen_v1';
+const OUTPUT_TOUR_KEY = 'tadels_output_tour_seen_v1';
 
 function showWelcomeModal() {
   const el = document.getElementById('obBackdrop');
@@ -1775,25 +1857,35 @@ function skipTour() {
   hideWelcomeModal();
   localStorage.setItem(TOUR_KEY, '1');
 }
-function startTour() {
+function startTour(tourSet, flagKey) {
   hideWelcomeModal();
-  localStorage.setItem(TOUR_KEY, '1');
+  if (flagKey) localStorage.setItem(flagKey, '1');
+  activeTour = tourSet || TOUR_STEPS;
   tourIdx = 0;
   document.getElementById('tourOverlay').classList.add('show');
   renderTourStep();
 }
+function startSetupTour()  { startTour(TOUR_STEPS,        TOUR_KEY); }
+function startOutputTour() { startTour(TOUR_STEPS_OUTPUT, OUTPUT_TOUR_KEY); }
 function startTourAnimated(btn) {
-  // Fly the arrow → fade modal → start tour
+  // Fly the arrow → fade modal → start setup tour
   btn.classList.add('flying');
   btn.disabled = true;
   setTimeout(() => {
-    startTour();
-    // Reset for next time the modal is opened via "?" button
+    startSetupTour();
     setTimeout(() => {
       btn.classList.remove('flying');
       btn.disabled = false;
     }, 400);
   }, 280);
+}
+// Triggered automatically after the first bot response renders
+function maybeStartOutputTour() {
+  if (localStorage.getItem(OUTPUT_TOUR_KEY)) return;
+  if (document.getElementById('tourOverlay').classList.contains('show')) return;
+  if (document.getElementById('obBackdrop').classList.contains('show')) return;
+  if (!document.querySelector('.msg-bot[data-latest] .refs-container')) return;
+  startOutputTour();
 }
 function endTour() {
   document.getElementById('tourOverlay').classList.remove('show');
@@ -1801,7 +1893,7 @@ function endTour() {
   closeOptPopover();
 }
 function nextTourStep() {
-  if (tourIdx >= TOUR_STEPS.length - 1) { endTour(); return; }
+  if (tourIdx >= activeTour.length - 1) { endTour(); return; }
   tourIdx++;
   renderTourStep();
 }
@@ -1823,7 +1915,7 @@ function prevTourStep() {
   renderTourStep();
 }
 function renderTourStep() {
-  const step = TOUR_STEPS[tourIdx];
+  const step = activeTour[tourIdx];
   if (step.action) step.action();
 
   const target = document.querySelector(step.selector);
@@ -1841,7 +1933,7 @@ function renderTourStep() {
 
     const tip = document.getElementById('tourTooltip');
     tip.dataset.arrow = step.arrow;
-    document.getElementById('ttStep').textContent  = `STEP ${tourIdx + 1} / ${TOUR_STEPS.length}`;
+    document.getElementById('ttStep').textContent  = `STEP ${tourIdx + 1} / ${activeTour.length}`;
     document.getElementById('ttTitle').textContent = step.title;
     document.getElementById('ttDesc').innerHTML    = step.desc;
 
@@ -1867,7 +1959,7 @@ function renderTourStep() {
     // Dots
     const dots = document.getElementById('ttDots');
     dots.innerHTML = '';
-    TOUR_STEPS.forEach((_, i) => {
+    activeTour.forEach((_, i) => {
       const d = document.createElement('div');
       d.className = 'tt-dot' + (i === tourIdx ? ' active' : '');
       dots.appendChild(d);
@@ -1877,7 +1969,7 @@ function renderTourStep() {
     const prev = document.getElementById('ttPrev');
     const next = document.getElementById('ttNext');
     prev.style.visibility = tourIdx === 0 ? 'hidden' : 'visible';
-    const isLast = tourIdx === TOUR_STEPS.length - 1;
+    const isLast = tourIdx === activeTour.length - 1;
     next.innerHTML = isLast
       ? '完成<span class="tt-arrow">&#10003;</span>'
       : '下一步<span class="tt-arrow">&rarr;</span>';
@@ -1904,7 +1996,16 @@ if (!localStorage.getItem(TOUR_KEY)) {
 }
 
 // Expose a way to re-trigger from the console / other places
-window.restartTour = () => { localStorage.removeItem(TOUR_KEY); showWelcomeModal(); };
+window.restartTour = () => {
+  localStorage.removeItem(TOUR_KEY);
+  localStorage.removeItem(OUTPUT_TOUR_KEY);
+  showWelcomeModal();
+};
+window.restartOutputTour = () => {
+  localStorage.removeItem(OUTPUT_TOUR_KEY);
+  if (document.querySelector('.msg-bot[data-latest] .refs-container')) startOutputTour();
+  else console.warn('[restartOutputTour] 還沒有 response，先送出一題再執行');
+};
 </script>
 </body>
 </html>
