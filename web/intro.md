@@ -10,70 +10,6 @@ TaDELS RAG 處於**開發測試階段**，已收錄 **211 篇 COVID-19 相關台
 
 <!--END-HERO-->
 
-<details open>
-<summary><strong>評估資料：測試 RAG 系統表現所用的資料集</strong></summary>
-
-本節呈現開發階段所使用的測試資料集。為了驗證 RAG pipeline 在不同題型 (short / long / unanswerable) 下的表現，我們以 211 篇 COVID-19 相關裁判文書為基礎，整理出 668 題 QA 與 54 種結構化欄位，建立可重複測量的評估環境。
-
-| 項目          | 數量                                             |
-| ------------- | ------------------------------------------------ |
-| 法律文件      | 211 篇                                           |
-| Single-hop QA | 650 題 (short 212 / long 225 / unanswerable 213) |
-| Multi-hop QA  | 18 題                                            |
-| 結構化欄位    | 54 欄位 (7 大類)                                 |
-
-#### 結構化欄位類別
-
-| 類別           | 欄位數 | 內容                                   |
-| -------------- | -----: | -------------------------------------- |
-| 案件基本資訊   |     29 | 文書類型、案號、被告、法官、行為時地等 |
-| 構成要件分析   |      8 | 訊息不實性、公共危害、故意認定等       |
-| 競合罪名分析   |      5 | 競合類型、誹謗、恐嚇、個資法認定等     |
-| 民事侵權分析   |      6 | 侵權類型、名譽損害、損害賠償等         |
-| 程序歷程       |      3 | 程序階段、前/後階段文書                |
-| 程序與前案資訊 |      2 | 前科/累犯、累犯加重認定                |
-| 援引法源       |      1 | 援引法源彙整                           |
-
-### 資料切分
-
-| 集合      | 題數 | short | long | unanswerable |
-| --------- | ---- | ----- | ---- | ------------ |
-| Train     | 454  | 148   | 157  | 149          |
-| Val       | 98   | 32    | 34   | 32           |
-| Test      | 98   | 32    | 34   | 32           |
-| Multi-hop | 18   | —    | —   | —           |
-
-### 探索系統表現
-
-<div class="nav-cards">
-<a class="nav-card" href="/results">
-<div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><line x1="3" y1="20" x2="21" y2="20"/><rect x="5" y="12" width="3" height="8" rx="0.5"/><rect x="10.5" y="6" width="3" height="14" rx="0.5"/><rect x="16" y="9" width="3" height="11" rx="0.5"/></svg></div>
-<div class="nav-title">Results</div>
-<div class="nav-desc">每題評分與整體表現分數彙整</div>
-<div class="arrow-cue">→</div>
-</a>
-<a class="nav-card" href="/qa">
-<div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 10a3 3 0 0 1 5.5-1.5c.8 1.5-.5 2.7-2 3.3V14"/><circle cx="12.5" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg></div>
-<div class="nav-title">QA Viewer</div>
-<div class="nav-desc">瀏覽問題、檢索文件與系統回答</div>
-<div class="arrow-cue">→</div>
-</a>
-<a class="nav-card" href="/entities">
-<div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.6" fill="currentColor" stroke="none"/></svg></div>
-<div class="nav-title">Entities</div>
-<div class="nav-desc">結構化欄位 Type A / B / C 比對</div>
-<div class="arrow-cue">→</div>
-</a>
-<a class="nav-card" href="/chat">
-<div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M3 5h18v12H8l-5 4z"/><circle cx="9" cy="11" r="0.9" fill="currentColor" stroke="none"/><circle cx="13" cy="11" r="0.9" fill="currentColor" stroke="none"/><circle cx="17" cy="11" r="0.9" fill="currentColor" stroke="none"/></svg></div>
-<div class="nav-title">Chat</div>
-<div class="nav-desc">即時提問互動式問答</div>
-<div class="arrow-cue">→</div>
-</a>
-</div>
-
-</details>
-
 <details>
 <summary><strong>RAG 設計細節</strong></summary>
 
@@ -252,5 +188,69 @@ $k = 60$ 的作用：壓平排名差距。
 | 第1名  | 1.000            | 0.0164                      |
 | 第2名  | 0.500 (差2倍)    | 0.0161 (差1.8%)             |
 | 第10名 | 0.100 (差10倍)   | 0.0143 (差13%)              |
+
+</details>
+
+<details>
+<summary><strong>評估資料：測試 RAG 系統表現所用的資料集</strong></summary>
+
+本節呈現開發階段所使用的測試資料集。為了驗證 RAG pipeline 在不同題型 (short / long / unanswerable) 下的表現，我們以 211 篇 COVID-19 相關裁判文書為基礎，整理出 668 題 QA 與 54 種結構化欄位，建立可重複測量的評估環境。
+
+| 項目          | 數量                                             |
+| ------------- | ------------------------------------------------ |
+| 法律文件      | 211 篇                                           |
+| Single-hop QA | 650 題 (short 212 / long 225 / unanswerable 213) |
+| Multi-hop QA  | 18 題                                            |
+| 結構化欄位    | 54 欄位 (7 大類)                                 |
+
+#### 結構化欄位類別
+
+| 類別           | 欄位數 | 內容                                   |
+| -------------- | -----: | -------------------------------------- |
+| 案件基本資訊   |     29 | 文書類型、案號、被告、法官、行為時地等 |
+| 構成要件分析   |      8 | 訊息不實性、公共危害、故意認定等       |
+| 競合罪名分析   |      5 | 競合類型、誹謗、恐嚇、個資法認定等     |
+| 民事侵權分析   |      6 | 侵權類型、名譽損害、損害賠償等         |
+| 程序歷程       |      3 | 程序階段、前/後階段文書                |
+| 程序與前案資訊 |      2 | 前科/累犯、累犯加重認定                |
+| 援引法源       |      1 | 援引法源彙整                           |
+
+### 資料切分
+
+| 集合      | 題數 | short | long | unanswerable |
+| --------- | ---- | ----- | ---- | ------------ |
+| Train     | 454  | 148   | 157  | 149          |
+| Val       | 98   | 32    | 34   | 32           |
+| Test      | 98   | 32    | 34   | 32           |
+| Multi-hop | 18   | —    | —   | —           |
+
+### 探索系統表現
+
+<div class="nav-cards">
+<a class="nav-card" href="/results">
+<div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><line x1="3" y1="20" x2="21" y2="20"/><rect x="5" y="12" width="3" height="8" rx="0.5"/><rect x="10.5" y="6" width="3" height="14" rx="0.5"/><rect x="16" y="9" width="3" height="11" rx="0.5"/></svg></div>
+<div class="nav-title">Results</div>
+<div class="nav-desc">每題評分與整體表現分數彙整</div>
+<div class="arrow-cue">→</div>
+</a>
+<a class="nav-card" href="/qa">
+<div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 10a3 3 0 0 1 5.5-1.5c.8 1.5-.5 2.7-2 3.3V14"/><circle cx="12.5" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg></div>
+<div class="nav-title">QA Viewer</div>
+<div class="nav-desc">瀏覽問題、檢索文件與系統回答</div>
+<div class="arrow-cue">→</div>
+</a>
+<a class="nav-card" href="/entities">
+<div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.6" fill="currentColor" stroke="none"/></svg></div>
+<div class="nav-title">Entities</div>
+<div class="nav-desc">結構化欄位 Type A / B / C 比對</div>
+<div class="arrow-cue">→</div>
+</a>
+<a class="nav-card" href="/chat">
+<div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M3 5h18v12H8l-5 4z"/><circle cx="9" cy="11" r="0.9" fill="currentColor" stroke="none"/><circle cx="13" cy="11" r="0.9" fill="currentColor" stroke="none"/><circle cx="17" cy="11" r="0.9" fill="currentColor" stroke="none"/></svg></div>
+<div class="nav-title">Chat</div>
+<div class="nav-desc">即時提問互動式問答</div>
+<div class="arrow-cue">→</div>
+</a>
+</div>
 
 </details>

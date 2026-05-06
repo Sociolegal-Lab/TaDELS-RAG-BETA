@@ -151,6 +151,9 @@ function toggleTheme(){
     flex-direction: column;
     gap: 16px;
     min-width: 0;
+    max-width: 920px;
+    width: 100%;
+    margin: 0 auto;
   }
 
   /* ── Side Panel (Reference Viewer) ── */
@@ -165,7 +168,7 @@ function toggleTheme(){
     flex-direction: column;
   }
   .side-panel.open {
-    width: 480px;
+    width: clamp(420px, 36vw, 780px);
   }
   .side-panel-header {
     display: flex;
@@ -436,6 +439,9 @@ function toggleTheme(){
     padding: 12px 24px 8px;
     flex-shrink: 0;
     background: var(--bg);
+    max-width: 920px;
+    width: 100%;
+    margin: 0 auto;
   }
   .disclaimer {
     text-align: center;
@@ -443,6 +449,9 @@ function toggleTheme(){
     color: var(--text2);
     padding: 4px 24px 12px;
     opacity: .7;
+    max-width: 920px;
+    width: 100%;
+    margin: 0 auto;
   }
   .input-wrap {
     display: flex;
@@ -531,7 +540,7 @@ function toggleTheme(){
     grid-template-columns: 1fr 1fr;
     gap: 14px;
     margin-top: 24px;
-    max-width: 923px;
+    max-width: 920px;
     width: 100%;
   }
   .example-btn {
@@ -1062,6 +1071,21 @@ function toggleTheme(){
     .header nav a { margin-left: 0; padding: 2px 6px; font-size: 0.75rem; }
     .theme-toggle { margin-left: 4px; padding: 2px 4px; }
     .theme-toggle svg { width: 14px; height: 14px; }
+
+    /* Tour tooltip: pin to viewport bottom so Next button is always reachable */
+    .tour-tooltip {
+      position: fixed !important;
+      top: auto !important;
+      left: 4vw !important;
+      right: 4vw !important;
+      bottom: 14px !important;
+      width: auto !important;
+      max-width: 92vw;
+      max-height: 55vh;
+      overflow-y: auto;
+    }
+    .tour-tooltip::before { display: none; }
+    .tt-actions { position: sticky; bottom: -2px; background: var(--surface); padding-top: 8px; margin: 8px -18px -14px; padding-left: 18px; padding-right: 18px; padding-bottom: 8px; border-top: 1px solid var(--border); }
   }
 </style>
 </head>

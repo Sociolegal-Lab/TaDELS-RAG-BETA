@@ -67,7 +67,7 @@ function toggleTheme(){
   .theme-toggle .icon-sun { display: none; }
   [data-theme="light"] .theme-toggle .icon-sun { display: block; }
   [data-theme="light"] .theme-toggle .icon-moon { display: none; }
-  html { scrollbar-gutter: stable; }
+  html { scrollbar-gutter: stable; scroll-padding-top: 80px; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -111,7 +111,7 @@ function toggleTheme(){
 
   /* ── Content ── */
   .content {
-    max-width: 860px;
+    max-width: 1500px;
     margin: 0 auto;
     padding: 40px 32px 80px;
   }
@@ -699,6 +699,108 @@ function toggleTheme(){
 
   /* ── Collapsible sections ── */
   .md .sections { padding-top: 20px; }
+
+  /* ── 2-column layout: Pipeline (left, sticky, larger) + Details (right) ── */
+  .md .layout-2col {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+    margin-top: 12px;
+  }
+  .md .layout-2col .col-left {
+    position: sticky;
+    top: 80px;
+    align-self: start;
+  }
+  .md .layout-2col .col-left .pipeline-svg {
+    max-width: 100%;
+    margin: 0;
+  }
+  .md .layout-2col .col-right {
+    padding-top: 60px;
+  }
+  .md .layout-2col .col-right > details:first-child {
+    margin-top: 0;
+  }
+  /* Pipeline boxes are clickable navigation to corresponding sections */
+  .md .pipeline-svg .pclick { cursor: pointer; }
+  .md .pipeline-svg .pclick:hover .pbox {
+    stroke: var(--accent);
+    filter: drop-shadow(0 0 12px rgba(108,140,255,.45));
+  }
+  .md .pipeline-svg .pclick:hover .ppill {
+    fill: rgba(108,140,255,.28);
+    stroke: var(--accent);
+  }
+  .md .pipeline-svg .pclick:hover .db-cyl,
+  .md .pipeline-svg .pclick:hover .db-cyl-top {
+    stroke: var(--accent);
+    filter: drop-shadow(0 0 8px rgba(108,140,255,.4));
+  }
+  /* Brief flash on the heading after jump */
+  @keyframes jump-flash {
+    0%   { background: rgba(108,140,255, 0.32); }
+    100% { background: transparent; }
+  }
+  .md .jump-highlight {
+    animation: jump-flash 1.6s ease-out;
+    border-radius: 4px;
+  }
+
+  /* Sticky summary: when RAG 設計細節 is open, its summary stays at the top of right col */
+  .md .col-right details[open] > summary {
+    position: sticky;
+    top: 76px;  /* under sticky header */
+    z-index: 5;
+    background: var(--surface);
+  }
+
+  /* Scroll cue between 2-col layout and the 評估資料 section below */
+  .md .section-cue {
+    display: block;
+    text-align: center;
+    margin: 60px auto 36px;
+    color: var(--text2);
+    font-size: 0.8125rem;
+    letter-spacing: 2px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color .2s;
+  }
+  .md .section-cue:hover { color: var(--accent); text-decoration: none; }
+  .md .cue-arrow {
+    width: 14px;
+    height: 14px;
+    border-right: 2px solid var(--accent);
+    border-bottom: 2px solid var(--accent);
+    margin: 14px auto 0;
+    animation: cue-bounce 1.6s ease-in-out infinite;
+  }
+  @keyframes cue-bounce {
+    0%, 100% { transform: rotate(45deg) translate(-3px, -3px); opacity: .35; }
+    50%      { transform: rotate(45deg) translate(3px, 3px);   opacity: 1; }
+  }
+
+  /* Dataset block — full-width section below 2-col, always visible */
+  .md .dataset-block {
+    margin-top: 12px;
+    padding: 32px 36px 28px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(108,140,255,.04) 0%, rgba(0,0,0,0) 60%);
+  }
+  .md .dataset-block > h2:first-child {
+    margin-top: 0;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 14px;
+    margin-bottom: 18px;
+  }
+  /* Stack vertically on narrower screens */
+  @media (max-width: 1100px) {
+    .md .layout-2col { grid-template-columns: 1fr; gap: 16px; }
+    .md .layout-2col .col-left { position: static; }
+  }
   .md .sections > details,
   .md .sections > .info-block {
     opacity: 0;
@@ -716,7 +818,7 @@ function toggleTheme(){
     border: 1px solid var(--border);
     border-radius: 8px;
     background: var(--surface);
-    overflow: hidden;
+    overflow: clip;
     transition: border-color .2s, box-shadow .2s;
   }
   .md details[open] {
@@ -960,6 +1062,44 @@ function parseMd(md) {
       '</div>';
     heroContent = heroContent.replace(/<\/h1>/, '</h1>' + dotsHtml);
 
+    // Extract "Pipeline 架構" section from RAG 設計細節 → render in left column
+    let pipelineHtml = '';
+    let mainSections = sectionsContent;
+    const pipelineMatch = mainSections.match(/<h3>Pipeline 架構<\/h3>[\s\S]*?(?=<h3>)/);
+    if (pipelineMatch) {
+      pipelineHtml = pipelineMatch[0].replace('<h3>Pipeline 架構</h3>', '');
+      mainSections = mainSections.replace(pipelineMatch[0], '');
+    }
+
+    // Extract 評估資料 details → convert to a full-width section below 2-col
+    let datasetHtml = '';
+    const datasetMatch = mainSections.match(
+      /<details[^>]*>\s*<summary[^>]*><strong>(評估資料[^<]*)<\/strong><\/summary>([\s\S]*?)<\/details>/
+    );
+    if (datasetMatch) {
+      const title = datasetMatch[1];
+      let inner = datasetMatch[2].trim()
+        .replace(/^<div class="dbody">/, '')
+        .replace(/<\/div>$/, '');
+      datasetHtml =
+        '<a class="section-cue" href="#dataset" onclick="event.preventDefault(); document.getElementById(\'dataset\').scrollIntoView({behavior:\'smooth\', block:\'start\'})">' +
+          '<span>探索資料與系統表現</span>' +
+          '<div class="cue-arrow"></div>' +
+        '</a>' +
+        '<section id="dataset" class="dataset-block">' +
+          '<h2>' + title + '</h2>' +
+          inner +
+        '</section>';
+      mainSections = mainSections.replace(datasetMatch[0], '');
+    }
+
+    const sectionsLayout = pipelineHtml
+      ? '<div class="layout-2col">' +
+          '<aside class="col-left">' + pipelineHtml + '</aside>' +
+          '<div class="col-right">' + mainSections + '</div>' +
+        '</div>' + datasetHtml
+      : mainSections + datasetHtml;
+
     html =
       '<section class="hero">' + heroContent +
         '<div class="hero-cue">' +
@@ -974,7 +1114,7 @@ function parseMd(md) {
           '<span class="next-arrow"></span>' +
         '</a>' +
       '</section>' +
-      '<section class="sections">' + sectionsContent + '</section>';
+      '<section class="sections">' + sectionsLayout + '</section>';
   }
 
   return html;
@@ -1009,29 +1149,40 @@ const PIPELINE_SVG = `
   <polygon class="phead" points="345,131 350,140 355,131"/>
   <circle class="ptravel" cx="350" cy="92" r="4" style="animation-delay: 0s"/>
 
-  <!-- 2. Pre-Retrieval -->
-  <rect class="pbox" x="150" y="140" width="400" height="100" rx="10"/>
-  <text class="ptitle" x="350" y="166">Pre-Retrieval</text>
-  <text class="pdesc" x="350" y="186">輸入處理：抽取案號/姓名 · 改寫查詢 · 生成假設文件</text>
-  <rect class="ppill" x="175" y="206" width="115" height="20" rx="10"/>
-  <text class="ppt" x="232.5" y="220">Metadata 抽取</text>
-  <rect class="ppill" x="295" y="206" width="115" height="20" rx="10"/>
-  <text class="ppt" x="352.5" y="220">Query Rewrite</text>
-  <rect class="ppill" x="415" y="206" width="115" height="20" rx="10"/>
-  <text class="ppt" x="472.5" y="220">HyDE</text>
+  <!-- 2. Pre-Retrieval (clickable → ### Pre-Retrieval 策略) -->
+  <g class="pclick" onclick="jumpToSection('pre-retrieval')">
+    <rect class="pbox" x="150" y="140" width="400" height="100" rx="10"/>
+    <text class="ptitle" x="350" y="166">Pre-Retrieval</text>
+    <text class="pdesc" x="350" y="186">輸入處理：抽取案號/姓名 · 改寫查詢 · 生成假設文件</text>
+  </g>
+  <!-- Inner pills (each clickable to its own subsection) -->
+  <g class="pclick" onclick="event.stopPropagation(); jumpToSection('metadata')">
+    <rect class="ppill" x="175" y="206" width="115" height="20" rx="10"/>
+    <text class="ppt" x="232.5" y="220">Metadata 抽取</text>
+  </g>
+  <g class="pclick" onclick="event.stopPropagation(); jumpToSection('query-rewrite')">
+    <rect class="ppill" x="295" y="206" width="115" height="20" rx="10"/>
+    <text class="ppt" x="352.5" y="220">Query Rewrite</text>
+  </g>
+  <g class="pclick" onclick="event.stopPropagation(); jumpToSection('hyde')">
+    <rect class="ppill" x="415" y="206" width="115" height="20" rx="10"/>
+    <text class="ppt" x="472.5" y="220">HyDE</text>
+  </g>
 
   <!-- arrow 2 -->
   <line class="parrow" x1="350" y1="242" x2="350" y2="285"/>
   <polygon class="phead" points="345,281 350,290 355,281"/>
   <circle class="ptravel" cx="350" cy="242" r="4" style="animation-delay: 0.4s"/>
 
-  <!-- Database (cylinder shape, vertical) -->
-  <path class="db-cyl" d="M 23 279 A 42 8 0 0 0 107 279 L 107 381 A 42 8 0 0 1 23 381 Z"/>
-  <ellipse class="db-cyl-top" cx="65" cy="279" rx="42" ry="8"/>
-  <text class="db-title" x="65" y="308">DATABASE</text>
-  <text class="db-pt" x="65" y="332">原文資料</text>
-  <text class="db-pt" x="65" y="354">Metadata</text>
-  <text class="db-pt" x="65" y="376">Entities</text>
+  <!-- Database cylinder (clickable → ### Retrieval 策略) -->
+  <g class="pclick" onclick="jumpToSection('retrieval')">
+    <path class="db-cyl" d="M 23 279 A 42 8 0 0 0 107 279 L 107 381 A 42 8 0 0 1 23 381 Z"/>
+    <ellipse class="db-cyl-top" cx="65" cy="279" rx="42" ry="8"/>
+    <text class="db-title" x="65" y="308">DATABASE</text>
+    <text class="db-pt" x="65" y="332">原文資料</text>
+    <text class="db-pt" x="65" y="354">Metadata</text>
+    <text class="db-pt" x="65" y="376">Entities</text>
+  </g>
 
   <!-- DB ↔ Retrieval — two arrows, opposite directions, each with a flowing dot -->
   <!-- Top: Retrieval → DB (query out) -->
@@ -1043,33 +1194,39 @@ const PIPELINE_SVG = `
   <polygon class="phead" points="145,331 151,335 145,339"/>
   <circle class="ptravel-r" cx="112" cy="335" r="3.5"/>
 
-  <!-- 3. Retrieval (RRF) -->
-  <rect class="pbox accent-pbox" x="150" y="290" width="400" height="80" rx="10" fill="url(#ag)"/>
-  <text class="ptitle accent-text" x="350" y="318">Retrieval — Hybrid + RRF Fusion</text>
-  <text class="pdesc" x="350" y="340">6 signals (Dense×3 · BM25×2 · Metadata×2) → RRF → Top-10</text>
+  <!-- 3. Retrieval (clickable → ### Retrieval 策略) -->
+  <g class="pclick" onclick="jumpToSection('retrieval')">
+    <rect class="pbox accent-pbox" x="150" y="290" width="400" height="80" rx="10" fill="url(#ag)"/>
+    <text class="ptitle accent-text" x="350" y="318">Retrieval — Hybrid + RRF Fusion</text>
+    <text class="pdesc" x="350" y="340">6 signals (Dense×3 · BM25×2 · Metadata×2) → RRF → Top-10</text>
+  </g>
 
   <!-- arrow 3 -->
   <line class="parrow" x1="350" y1="372" x2="350" y2="415"/>
   <polygon class="phead" points="345,411 350,420 355,411"/>
   <circle class="ptravel" cx="350" cy="372" r="4" style="animation-delay: 0.8s"/>
 
-  <!-- 4. Post-Retrieval (= LLM Re-ranking step) -->
-  <rect class="pbox" x="150" y="420" width="400" height="70" rx="10"/>
-  <use class="bot-mini" href="#boticon" x="170" y="438" width="18" height="18"/>
-  <text class="ptitle" x="350" y="448">Post-Retrieval</text>
-  <text class="pdesc" x="350" y="470">LLM Re-ranking · Top-10 → Top-3</text>
+  <!-- 4. Post-Retrieval (clickable → ### Post-Retrieval 策略) -->
+  <g class="pclick" onclick="jumpToSection('post-retrieval')">
+    <rect class="pbox" x="150" y="420" width="400" height="70" rx="10"/>
+    <use class="bot-mini" href="#boticon" x="170" y="438" width="18" height="18"/>
+    <text class="ptitle" x="350" y="448">Post-Retrieval</text>
+    <text class="pdesc" x="350" y="470">LLM Re-ranking · Top-10 → Top-3</text>
+  </g>
 
   <!-- arrow → Generation -->
   <line class="parrow" x1="350" y1="492" x2="350" y2="535"/>
   <polygon class="phead" points="345,531 350,540 355,531"/>
   <circle class="ptravel" cx="350" cy="492" r="4" style="animation-delay: 1.2s"/>
 
-  <!-- 5. Generation (= Type-Specific Answer Generation) -->
-  <rect class="pbox" x="150" y="540" width="400" height="80" rx="10"/>
-  <use class="bot-icon" href="#boticon" x="166" y="566" width="28" height="28"/>
-  <text class="ptitle" x="350" y="568">Generation</text>
-  <text class="pdesc" x="350" y="590">Type-Specific Answer Generation</text>
-  <text class="pdesc" x="350" y="606">short / long / unanswerable</text>
+  <!-- 5. Generation (clickable → ### Generation 策略) -->
+  <g class="pclick" onclick="jumpToSection('generation')">
+    <rect class="pbox" x="150" y="540" width="400" height="80" rx="10"/>
+    <use class="bot-icon" href="#boticon" x="166" y="566" width="28" height="28"/>
+    <text class="ptitle" x="350" y="568">Generation</text>
+    <text class="pdesc" x="350" y="590">Type-Specific Answer Generation</text>
+    <text class="pdesc" x="350" y="606">short / long / unanswerable</text>
+  </g>
 
   <!-- arrow → Answer -->
   <line class="parrow" x1="350" y1="622" x2="350" y2="665"/>
@@ -1098,6 +1255,34 @@ function inline(s) {
 function esc(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+
+// Pipeline SVG box → markdown heading mapping
+const SECTION_MAP = {
+  'pre-retrieval':  'Pre-Retrieval 策略',
+  'retrieval':      'Retrieval 策略',
+  'post-retrieval': 'Post-Retrieval 策略',
+  'generation':     'Generation 策略',
+  'metadata':       '1. Metadata Extraction',
+  'query-rewrite':  '2. Query Rewriting',
+  'hyde':           '3. HyDE (Hypothetical Document Embedding)',
+};
+function jumpToSection(key) {
+  const headingText = SECTION_MAP[key];
+  if (!headingText) return;
+  const el = Array.from(document.querySelectorAll('.md .col-right h3, .md .col-right h4'))
+    .find(h => h.textContent.trim() === headingText);
+  if (!el) return;
+  // Open ancestor <details> if currently closed
+  const det = el.closest('details');
+  if (det && !det.open) det.open = true;
+  // Double RAF so layout fully settles after details.open=true reflows the grid
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    el.classList.add('jump-highlight');
+    setTimeout(() => el.classList.remove('jump-highlight'), 1600);
+  }));
+}
+window.jumpToSection = jumpToSection;
 
 function setupRevealOnScroll() {
   const targets = document.querySelectorAll('.md .sections > details, .md .sections > .info-block');
