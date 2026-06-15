@@ -47,6 +47,7 @@ from hallucination import hallucination_penalty
 from ndcg import ndcg_at_k
 
 import auth  # 認證模組（在 rag_pipeline 載入 .env 之後 import，才能讀到環境變數）
+import mailer  # 寄信模組（同上，需在 .env 載入後）
 
 # ── Global state ──────────────────────────────────────────────
 
@@ -162,8 +163,9 @@ def intro_page():
 
 @app.get("/chat", response_class=HTMLResponse)
 def chat_page(request: Request):
-    # 未登入 → 導向登入頁
-    if not auth.current_user(request):
+    # 未登入或未完成 Email 驗證 → 導向登入頁
+    user = auth.current_user(request)
+    if not user or not auth.is_verified(user):
         return RedirectResponse("/login", status_code=302)
     return (WEB_DIR / "chat.html").read_text(encoding="utf-8")
 
@@ -206,6 +208,33 @@ def _set_session(resp, email: str) -> None:
     )
 
 
+def _verify_email_html(link: str) -> str:
+    return f"""\
+<div style="font-family:-apple-system,Segoe UI,system-ui,sans-serif;max-width:480px;margin:0 auto;color:#1f1c17">
+  <h2 style="font-size:20px">驗證您的 Email</h2>
+  <p style="color:#6b6356;line-height:1.7">最後一步，即可開始使用 <b>TaDELS RAG</b>。請點擊下方按鈕完成 Email 驗證：</p>
+  <p style="margin:28px 0">
+    <a href="{link}" style="background:#4a63d8;color:#fff;text-decoration:none;padding:12px 24px;border-radius:9px;font-weight:600;display:inline-block">驗證我的 Email</a>
+  </p>
+  <p style="color:#6b6356;font-size:13px;line-height:1.7">若按鈕無法點擊，請複製以下連結至瀏覽器開啟：<br><span style="word-break:break-all">{link}</span></p>
+  <p style="color:#9b9486;font-size:12px;margin-top:24px">此連結 24 小時內有效。若您未註冊本服務，請忽略本信。</p>
+</div>"""
+
+
+def _send_verify_email(email: str) -> str:
+    """產生驗證連結並寄出（未設定 SMTP 時印到主控台）。回傳連結供 log/除錯。"""
+    token = auth.make_verify_token(email)
+    base = (auth.OAUTH_REDIRECT_BASE or "http://localhost:8867").rstrip("/")
+    link = f"{base}/verify?token={token}"
+    try:
+        mailer.send_email(email, "驗證您的 Email · TaDELS RAG",
+                          _verify_email_html(link),
+                          text=f"請點此連結完成 Email 驗證（24 小時內有效）：\n{link}")
+    except Exception as e:
+        print(f"  [verify-mail] 寄送失敗: {e}")
+    return link
+
+
 @app.post("/api/register")
 def api_register(req: RegisterReq):
     if not req.agree:
@@ -215,18 +244,26 @@ def api_register(req: RegisterReq):
     except ValueError as e:
         raise HTTPException(400, str(e))
     auth.record_consent(user["email"])
-    resp = JSONResponse({"ok": True, "email": user["email"], "name": user["name"]})
-    _set_session(resp, user["email"])
-    return resp
+    _send_verify_email(user["email"])
+    # 不建立 session：需先完成 Email 驗證才能登入
+    return JSONResponse({"ok": True, "need_verify": True, "email": user["email"]})
 
 
 @app.post("/api/login")
 def api_login(req: LoginReq):
-    if not req.agree:
-        raise HTTPException(400, "請先閱讀並勾選同意使用條款")
+    existing = auth.get_user(req.email)
+    if not existing:
+        # 此 Email 沒註冊過 → 明確提示去註冊
+        raise HTTPException(404, "ACCOUNT_NOT_FOUND")
+    if existing.get("provider") == "google" and not existing.get("pw_hash"):
+        # 此帳號是用 Google 建立的，沒有密碼
+        raise HTTPException(400, "GOOGLE_ACCOUNT")
     user = auth.verify_password(req.email, req.password)
     if not user:
-        raise HTTPException(401, "Email 或密碼錯誤")
+        raise HTTPException(401, "WRONG_PASSWORD")
+    if not auth.is_verified(user):
+        # 密碼正確但尚未驗證 → 擋下，前端引導去收信／重寄
+        raise HTTPException(403, "EMAIL_NOT_VERIFIED")
     auth.record_consent(user["email"])
     resp = JSONResponse({"ok": True, "email": user["email"], "name": user["name"]})
     _set_session(resp, user["email"])
@@ -238,6 +275,28 @@ def api_logout():
     resp = JSONResponse({"ok": True})
     resp.delete_cookie(auth.SESSION_COOKIE, path="/")
     return resp
+
+
+class ResendReq(BaseModel):
+    email: str
+
+
+@app.post("/api/resend-verification")
+def api_resend_verification(req: ResendReq):
+    """重寄驗證信。不論帳號是否存在都回 ok，避免洩漏帳號是否註冊。"""
+    user = auth.get_user(req.email)
+    if user and user.get("provider") == "password" and not auth.is_verified(user):
+        _send_verify_email(user["email"])
+    return {"ok": True}
+
+
+@app.get("/verify", response_class=HTMLResponse)
+def verify_email(token: str = ""):
+    email = auth.read_verify_token(token)
+    if not email:
+        return RedirectResponse("/login?verify_error=1", status_code=302)
+    auth.mark_verified(email)
+    return RedirectResponse("/login?verified=1", status_code=302)
 
 
 @app.get("/api/me")

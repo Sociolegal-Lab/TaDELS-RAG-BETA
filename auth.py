@@ -136,6 +136,7 @@ def register_user(email: str, password: str, name: str = "", avatar_seed: str = 
         "pw_salt": salt.hex(),
         "pw_hash": _hash_password(password, salt),
         "avatar_seed": (avatar_seed or "").strip() or default_avatar_seed(email),
+        "email_verified": False,  # 需點驗證信連結才會變 True
         "created": int(time.time()),
     }
     _save_users(users)
@@ -171,10 +172,25 @@ def upsert_google_user(email: str, name: str = "") -> dict:
             "name": name or email.split("@")[0],
             "provider": "google",
             "avatar_seed": default_avatar_seed(email),
+            "email_verified": True,  # Google 已驗證過該信箱
             "created": int(time.time()),
         }
         _save_users(users)
     return users[email]
+
+
+def is_verified(user: dict | None) -> bool:
+    return bool(user and user.get("email_verified"))
+
+
+def mark_verified(email: str) -> bool:
+    users = _load_users()
+    e = _norm_email(email)
+    if e in users:
+        users[e]["email_verified"] = True
+        _save_users(users)
+        return True
+    return False
 
 
 # ── Session cookie 簽章 ───────────────────────────────────────
@@ -225,6 +241,33 @@ def read_session_token(token: str | None) -> dict | None:
 def current_user(request) -> dict | None:
     """從 request 的 cookie 取得目前登入的使用者（或 None）。"""
     return read_session_token(request.cookies.get(SESSION_COOKIE))
+
+
+# ── Email 驗證 token（簽章、24 小時有效）─────────────────────────
+VERIFY_MAX_AGE = 60 * 60 * 24  # 24 小時
+
+
+def make_verify_token(email: str) -> str:
+    payload = json.dumps({"email": _norm_email(email), "purpose": "verify", "iat": int(time.time())})
+    return _sign(payload)
+
+
+def read_verify_token(token: str | None) -> str | None:
+    """驗證 token 正確且未過期時，回傳對應 email；否則 None。"""
+    if not token:
+        return None
+    payload = _unsign(token)
+    if not payload:
+        return None
+    try:
+        data = json.loads(payload)
+    except json.JSONDecodeError:
+        return None
+    if data.get("purpose") != "verify":
+        return None
+    if int(time.time()) - data.get("iat", 0) > VERIFY_MAX_AGE:
+        return None
+    return data.get("email")
 
 
 # ── Google OAuth helpers ──────────────────────────────────────
