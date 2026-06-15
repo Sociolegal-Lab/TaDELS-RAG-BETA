@@ -108,6 +108,23 @@ function toggleTheme(){
     transition: color .2s;
   }
   .header nav a:hover, .header nav a.active { color: var(--accent); }
+  /* 融入 nav 的登入入口 */
+  .nav-login {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 13px; border-radius: 8px;
+    background: var(--accent); color: #fff !important;
+    font-size: 0.8125rem; font-weight: 600;
+    box-shadow: 0 4px 12px rgba(108,140,255,.3);
+    transition: filter .15s, transform .12s;
+  }
+  .nav-login:hover { filter: brightness(1.08); transform: translateY(-1px); color: #fff !important; }
+  .nav-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 1px solid var(--border); background: #fff; overflow: hidden;
+    display: inline-flex; transition: border-color .2s, transform .12s;
+  }
+  .nav-avatar:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .nav-avatar img { width: 100%; height: 100%; display: block; }
 
   /* ── Content ── */
   .content {
@@ -934,6 +951,7 @@ function toggleTheme(){
     <a href="/entities">Entities</a>
     <a href="/qa">QA pairs</a>
     <a href="/results">Results</a>
+    <span id="introAuth"><a class="nav-login" href="/login">登入</a></span>
     <button class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="切換主題">
       <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
@@ -1383,6 +1401,20 @@ async function load() {
 }
 
 load();
+
+// 已登入則把「登入」入口換成頭貼（點擊進聊天）
+(async function introAuth() {
+  try {
+    const r = await fetch('/api/me');
+    const d = await r.json();
+    if (d.authenticated) {
+      const seed = d.avatar_seed || d.email;
+      const url = `https://api.dicebear.com/10.x/glyphs/svg?seed=${encodeURIComponent(seed)}`;
+      document.getElementById('introAuth').innerHTML =
+        `<a class="nav-avatar" href="/chat" title="${d.name || d.email}｜進入聊天"><img src="${url}" alt="頭貼"></a>`;
+    }
+  } catch (e) {}
+})();
 </script>
 </body>
 </html>

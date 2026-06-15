@@ -9,12 +9,16 @@ RAG Web Server
 
 import json
 import sys
+import time
+import threading
 from contextlib import asynccontextmanager
 from pathlib import Path
 
+import secrets
+
 import uvicorn
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse, RedirectResponse, JSONResponse
 from fastapi import Request
 from pydantic import BaseModel
 
@@ -42,6 +46,8 @@ from entities import entity_matching_score, _load_eval_types, normalize_text, sc
 from hallucination import hallucination_penalty
 from ndcg import ndcg_at_k
 
+import auth  # 認證模組（在 rag_pipeline 載入 .env 之後 import，才能讀到環境變數）
+
 # ── Global state ──────────────────────────────────────────────
 
 store: DocumentStore = None
@@ -52,6 +58,56 @@ COVID_DIR = BASE_DIR / "dataset" / "covid_19_discourse"
 SPLIT_DIR = COVID_DIR / "dataset_split_v4"
 ENTITIES_PATH = COVID_DIR / "dataset_entities_v4.json"
 SCHEMA_PATH = COVID_DIR / "entity_schema.json"
+
+# ── 對話紀錄（依使用者同意之條款保存，供品質分析與模型優化）──────
+CHAT_LOG_PATH = BASE_DIR / "logs" / "chat_logs.jsonl"
+_chat_log_lock = threading.Lock()
+
+
+def _log_chat(email: str, cid: str, question: str, result: dict, options: dict | None = None) -> None:
+    """把一次問答附加寫入 chat_logs.jsonl（每行一筆 JSON）。失敗不影響回應。
+
+    以 email 雜湊（uid）關聯而非明文 email；存完整 result 以便日後還原對話。
+    """
+    try:
+        CHAT_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        payload = {k: v for k, v in result.items() if k != "type"}
+        entry = {
+            "ts": int(time.time()),
+            "uid": auth.user_uid(email),
+            "cid": cid or "",
+            "question": question,
+            "result": payload,
+            "options": options or {},
+        }
+        line = json.dumps(entry, ensure_ascii=False)
+        with _chat_log_lock:
+            with open(CHAT_LOG_PATH, "a", encoding="utf-8") as f:
+                f.write(line + "\n")
+    except Exception as e:
+        print(f"  [chat-log] failed: {e}")
+
+
+def _read_user_logs(email: str) -> list[dict]:
+    """讀出屬於該使用者（依 uid 比對）的所有對話紀錄行，依時間排序。"""
+    uid = auth.user_uid(email)
+    rows = []
+    if not CHAT_LOG_PATH.exists():
+        return rows
+    with _chat_log_lock:
+        with open(CHAT_LOG_PATH, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    obj = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if obj.get("uid") == uid:
+                    rows.append(obj)
+    rows.sort(key=lambda r: r.get("ts", 0))
+    return rows
 
 
 # ── Lifespan ──────────────────────────────────────────────────
@@ -105,8 +161,245 @@ def intro_page():
 
 
 @app.get("/chat", response_class=HTMLResponse)
-def chat_page():
+def chat_page(request: Request):
+    # 未登入 → 導向登入頁
+    if not auth.current_user(request):
+        return RedirectResponse("/login", status_code=302)
     return (WEB_DIR / "chat.html").read_text(encoding="utf-8")
+
+
+# ── 認證頁面與 API ────────────────────────────────────────────
+
+@app.get("/login", response_class=HTMLResponse)
+def login_page(request: Request):
+    # 已登入就直接進聊天
+    if auth.current_user(request):
+        return RedirectResponse("/chat", status_code=302)
+    html = (WEB_DIR / "login.html").read_text(encoding="utf-8")
+    # 沒設定 Google 憑證時，前端隱藏 Google 按鈕
+    flag = "true" if auth.google_enabled() else "false"
+    return html.replace("__GOOGLE_ENABLED__", flag)
+
+
+class RegisterReq(BaseModel):
+    email: str
+    password: str
+    name: str = ""
+    agree: bool = False
+    avatar_seed: str = ""
+
+
+class LoginReq(BaseModel):
+    email: str
+    password: str
+    agree: bool = False
+
+
+def _set_session(resp, email: str) -> None:
+    resp.set_cookie(
+        auth.SESSION_COOKIE,
+        auth.make_session_token(email),
+        max_age=auth.SESSION_MAX_AGE,
+        httponly=True,
+        samesite="lax",
+        path="/",
+    )
+
+
+@app.post("/api/register")
+def api_register(req: RegisterReq):
+    if not req.agree:
+        raise HTTPException(400, "請先閱讀並勾選同意使用條款")
+    try:
+        user = auth.register_user(req.email, req.password, req.name, req.avatar_seed)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    auth.record_consent(user["email"])
+    resp = JSONResponse({"ok": True, "email": user["email"], "name": user["name"]})
+    _set_session(resp, user["email"])
+    return resp
+
+
+@app.post("/api/login")
+def api_login(req: LoginReq):
+    if not req.agree:
+        raise HTTPException(400, "請先閱讀並勾選同意使用條款")
+    user = auth.verify_password(req.email, req.password)
+    if not user:
+        raise HTTPException(401, "Email 或密碼錯誤")
+    auth.record_consent(user["email"])
+    resp = JSONResponse({"ok": True, "email": user["email"], "name": user["name"]})
+    _set_session(resp, user["email"])
+    return resp
+
+
+@app.post("/api/logout")
+def api_logout():
+    resp = JSONResponse({"ok": True})
+    resp.delete_cookie(auth.SESSION_COOKIE, path="/")
+    return resp
+
+
+@app.get("/api/me")
+def api_me(request: Request):
+    user = auth.current_user(request)
+    if not user:
+        return {"authenticated": False}
+    return {"authenticated": True, "email": user["email"],
+            "name": user.get("name", ""), "provider": user.get("provider", ""),
+            "avatar_seed": user.get("avatar_seed") or auth.default_avatar_seed(user["email"])}
+
+
+# ── API: 個人設定（顯示名稱 / 頭貼）────────────────────────────
+
+class ProfileReq(BaseModel):
+    name: str
+
+
+class AvatarReq(BaseModel):
+    seed: str = ""  # 空字串＝重置為依 email 自動生成
+
+
+@app.post("/api/profile")
+def api_profile(req: ProfileReq, request: Request):
+    user = auth.current_user(request)
+    if not user:
+        raise HTTPException(401, "請先登入")
+    try:
+        user = auth.update_name(user["email"], req.name)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return {"ok": True, "name": user["name"]}
+
+
+@app.post("/api/avatar")
+def api_avatar(req: AvatarReq, request: Request):
+    """設定頭貼 seed；未帶 seed 視為「重骰」，由後端產生隨機 seed。"""
+    user = auth.current_user(request)
+    if not user:
+        raise HTTPException(401, "請先登入")
+    seed = req.seed.strip() or secrets.token_hex(8)
+    final = auth.set_avatar_seed(user["email"], seed)
+    return {"ok": True, "avatar_seed": final}
+
+
+# ── API: 聊天記錄（依使用者 uid 關聯，可列出 / 還原 / 刪除）──────
+
+@app.get("/api/history")
+def api_history(request: Request):
+    """回傳該使用者的對話清單（依 conversation_id 分組），最新在前。"""
+    user = auth.current_user(request)
+    if not user:
+        raise HTTPException(401, "請先登入")
+    convs: dict[str, dict] = {}
+    for i, row in enumerate(_read_user_logs(user["email"])):
+        cid = row.get("cid") or f"_legacy_{row.get('ts', i)}"
+        c = convs.get(cid)
+        if not c:
+            convs[cid] = {
+                "cid": cid,
+                "title": row.get("question", "")[:60] or "(無標題)",
+                "created": row.get("ts", 0),
+                "updated": row.get("ts", 0),
+                "count": 1,
+            }
+        else:
+            c["count"] += 1
+            c["updated"] = max(c["updated"], row.get("ts", 0))
+    items = sorted(convs.values(), key=lambda c: c["updated"], reverse=True)
+    return {"conversations": items}
+
+
+@app.get("/api/history/{cid}")
+def api_history_detail(cid: str, request: Request):
+    """回傳單一對話的所有輪次（含完整 result），供前端還原。"""
+    user = auth.current_user(request)
+    if not user:
+        raise HTTPException(401, "請先登入")
+    turns = [
+        {"ts": row.get("ts", 0), "question": row.get("question", ""),
+         "result": row.get("result", {})}
+        for row in _read_user_logs(user["email"])
+        if (row.get("cid") or "") == cid
+    ]
+    if not turns:
+        raise HTTPException(404, "找不到該對話")
+    return {"cid": cid, "turns": turns}
+
+
+@app.delete("/api/history/{cid}")
+def api_history_delete(cid: str, request: Request):
+    """刪除該使用者某段對話（依條款，使用者可要求刪除自己的紀錄）。"""
+    user = auth.current_user(request)
+    if not user:
+        raise HTTPException(401, "請先登入")
+    uid = auth.user_uid(user["email"])
+    removed = 0
+    with _chat_log_lock:
+        if not CHAT_LOG_PATH.exists():
+            return {"ok": True, "removed": 0}
+        kept = []
+        with open(CHAT_LOG_PATH, encoding="utf-8") as f:
+            for line in f:
+                s = line.strip()
+                if not s:
+                    continue
+                try:
+                    obj = json.loads(s)
+                except json.JSONDecodeError:
+                    kept.append(line.rstrip("\n"))
+                    continue
+                if obj.get("uid") == uid and (obj.get("cid") or "") == cid:
+                    removed += 1
+                else:
+                    kept.append(line.rstrip("\n"))
+        with open(CHAT_LOG_PATH, "w", encoding="utf-8") as f:
+            if kept:
+                f.write("\n".join(kept) + "\n")
+    return {"ok": True, "removed": removed}
+
+
+# ── Google OAuth ──────────────────────────────────────────────
+
+@app.get("/auth/google/login")
+def google_login(agree: str = ""):
+    if not auth.google_enabled():
+        raise HTTPException(503, "尚未設定 Google 登入（缺少 GOOGLE_CLIENT_ID / SECRET）")
+    # 必須先勾選同意使用條款（前端會把 agree=1 帶上）
+    if agree != "1":
+        return RedirectResponse("/login?error=agree", status_code=302)
+    state = secrets.token_urlsafe(24)
+    resp = RedirectResponse(auth.google_auth_url(state), status_code=302)
+    # 用簽章 cookie 暫存 state（防 CSRF）與同意紀錄，回呼時驗證
+    resp.set_cookie("oauth_state", auth._sign(state),
+                    max_age=600, httponly=True, samesite="lax", path="/")
+    resp.set_cookie("oauth_agree", auth._sign("1"),
+                    max_age=600, httponly=True, samesite="lax", path="/")
+    return resp
+
+
+@app.get("/auth/google/callback")
+def google_callback(request: Request, code: str = "", state: str = ""):
+    if not auth.google_enabled():
+        raise HTTPException(503, "尚未設定 Google 登入")
+    # 驗證 state（防 CSRF）
+    saved_state = auth._unsign(request.cookies.get("oauth_state", "") or "")
+    if not code or not saved_state or saved_state != state:
+        return RedirectResponse("/login?error=state", status_code=302)
+    try:
+        profile = auth.google_exchange_code(code)
+    except Exception as e:
+        print(f"  [Google OAuth] 失敗: {e}")
+        return RedirectResponse("/login?error=google", status_code=302)
+    user = auth.upsert_google_user(profile["email"], profile.get("name", ""))
+    # 記錄使用條款同意（來自 login 前的勾選）
+    if auth._unsign(request.cookies.get("oauth_agree", "") or "") == "1":
+        auth.record_consent(user["email"])
+    resp = RedirectResponse("/chat", status_code=302)
+    resp.delete_cookie("oauth_state", path="/")
+    resp.delete_cookie("oauth_agree", path="/")
+    _set_session(resp, user["email"])
+    return resp
 
 
 @app.get("/results", response_class=HTMLResponse)
@@ -134,11 +427,22 @@ class AskReq(BaseModel):
     use_metadata: bool = True
     use_entities: bool = True
     filter_titles: list[str] | None = None
+    conversation_id: str = ""
 
 
 @app.post("/api/ask")
-def api_ask(req: AskReq):
+def api_ask(req: AskReq, request: Request):
     """Streaming RAG: sends step-by-step progress via newline-delimited JSON."""
+    _user = auth.current_user(request)
+    if not _user:
+        raise HTTPException(401, "請先登入後再使用聊天功能")
+    user_email = _user.get("email", "")
+    opts = {
+        "use_rewrite": req.use_rewrite, "use_hyde": req.use_hyde,
+        "use_rerank": req.use_rerank, "use_dense": req.use_dense,
+        "use_bm25": req.use_bm25, "use_metadata": req.use_metadata,
+        "use_entities": req.use_entities, "filter_titles": req.filter_titles,
+    }
     def _generate():
         def step(name, detail=""):
             return json.dumps({"type": "step", "step": name, "detail": detail}, ensure_ascii=False) + "\n"
@@ -211,7 +515,9 @@ def api_ask(req: AskReq):
                 candidates = [c for c in candidates if c["title"] in allowed]
                 print(f"  [Filter] {len(candidates)}/{before} candidates kept ({len(allowed)} titles allowed)")
                 if not candidates:
-                    yield json.dumps({"type": "result", "answer": "篩選範圍內無相關文件。請調整資料來源篩選後重試。", "reference": [], "refs": [], "entities": {}, "debug": {"query_type": query_type, "rewritten": rewritten, "sub_queries": sub_queries, "hyde": hyde_passage[:200] if hyde_passage else None}}, ensure_ascii=False) + "\n"
+                    empty_result = {"type": "result", "answer": "篩選範圍內無相關文件。請調整資料來源篩選後重試。", "reference": [], "refs": [], "entities": {}, "debug": {"query_type": query_type, "rewritten": rewritten, "sub_queries": sub_queries, "hyde": hyde_passage[:200] if hyde_passage else None}}
+                    yield json.dumps(empty_result, ensure_ascii=False) + "\n"
+                    _log_chat(user_email, req.conversation_id, req.question, empty_result, opts)
                     return
 
             # Step 5: Rerank or structured answer
@@ -261,6 +567,7 @@ def api_ask(req: AskReq):
                 },
             }
             yield json.dumps(result, ensure_ascii=False) + "\n"
+            _log_chat(user_email, req.conversation_id, req.question, result, opts)
 
         except Exception as e:
             yield json.dumps({"type": "error", "detail": str(e)}, ensure_ascii=False) + "\n"

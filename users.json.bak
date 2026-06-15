@@ -1,0 +1,11 @@
+{
+  "claire891018@gmail.com": {
+    "email": "claire891018@gmail.com",
+    "name": "測試",
+    "provider": "password",
+    "pw_salt": "929b644f232fc2bc9908b802c713845c",
+    "pw_hash": "2eafc172e9f709d90635165564f2679860b9d72bfdad4ced33d9dc5a62f3de54",
+    "created": 1781239888,
+    "tos_agreed_at": 1781486296
+  }
+}

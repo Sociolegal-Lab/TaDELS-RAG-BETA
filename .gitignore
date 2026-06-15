@@ -1,5 +1,10 @@
 # Secrets
 .env
+.session_secret
+users.json
+
+# 對話紀錄（含使用者輸入，不進版控）
+logs/
 
 # Python
 __pycache__/

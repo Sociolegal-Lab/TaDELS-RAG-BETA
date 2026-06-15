@@ -916,6 +916,95 @@ function toggleTheme(){
     opacity: 0;
   }
 
+  /* ── User menu (avatar dropdown) ── */
+  .user-menu { position: relative; margin-left: 6px; }
+  .avatar-btn {
+    width: 30px; height: 30px; padding: 0; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--surface2);
+    cursor: pointer; overflow: hidden; display: inline-flex;
+    align-items: center; justify-content: center;
+    transition: border-color .2s, box-shadow .2s, transform .12s;
+  }
+  .avatar-btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .avatar-btn.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(108,140,255,.18); }
+  .avatar-btn img { width: 100%; height: 100%; display: block; background: #fff; }
+
+  .user-dropdown {
+    position: absolute; top: calc(100% + 10px); right: 0;
+    width: 248px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 14px 40px rgba(0,0,0,.45);
+    padding: 6px; z-index: 200;
+    opacity: 0; visibility: hidden; transform: translateY(-6px);
+    transition: opacity .18s, transform .18s, visibility 0s linear .18s;
+  }
+  .user-dropdown.show { opacity: 1; visibility: visible; transform: none; transition: opacity .18s, transform .18s, visibility 0s; }
+  .user-dropdown-head { display: flex; align-items: center; gap: 10px; padding: 10px 10px 12px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
+  .user-dropdown-head img { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: #fff; flex-shrink: 0; }
+  .user-dropdown-id { min-width: 0; }
+  .user-dropdown-name { font-size: 0.8125rem; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .user-dropdown-email { font-size: 0.6875rem; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .user-dropdown-item {
+    width: 100%; display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border: none; background: transparent;
+    color: var(--text); font: 0.8125rem inherit; text-align: left;
+    border-radius: 8px; cursor: pointer; transition: background .15s, color .15s;
+  }
+  .user-dropdown-item:hover { background: var(--surface2); }
+  .user-dropdown-item.danger:hover { color: var(--red, #f87171); }
+  .user-dropdown-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: .85; }
+  .user-dropdown-sep { height: 1px; background: var(--border); margin: 6px 4px; }
+
+  /* ── Generic modal (settings / history) ── */
+  .um-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,.55);
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center;
+    padding: 24px; z-index: 9999; opacity: 0; transition: opacity .25s;
+  }
+  .um-backdrop.show { display: flex; opacity: 1; }
+  .um-modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; width: 100%; max-width: 440px; max-height: 84vh;
+    display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    transform: translateY(12px) scale(.97); transition: transform .3s cubic-bezier(.2,.8,.3,1.1);
+  }
+  .um-backdrop.show .um-modal { transform: none; }
+  .um-modal.wide { max-width: 540px; }
+  .um-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .um-head h2 { margin: 0; font-size: 0.9375rem; font-weight: 600; }
+  .um-close { border: none; background: transparent; color: var(--text2); font-size: 22px; line-height: 1; cursor: pointer; padding: 0 4px; }
+  .um-close:hover { color: var(--text); }
+  .um-body { padding: 20px; overflow-y: auto; }
+  .um-foot { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+
+  .um-avatar-row { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+  .um-avatar-row img { width: 64px; height: 64px; border-radius: 16px; border: 1px solid var(--border); background: #fff; }
+  .um-label { display: block; font-size: 0.75rem; color: var(--text2); margin: 0 0 6px; }
+  .um-input { width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 9px; color: var(--text); font: 0.875rem inherit; }
+  .um-input:focus { outline: none; border-color: var(--accent); }
+  .um-btn { padding: 9px 16px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font: 600 0.8125rem inherit; cursor: pointer; transition: background .15s, filter .15s; }
+  .um-btn:hover { background: var(--border); }
+  .um-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .um-btn.primary:hover { filter: brightness(1.08); background: var(--accent); }
+  .um-attr { font-size: 0.625rem; color: var(--text2); opacity: .8; line-height: 1.6; margin-top: 14px; }
+  .um-attr a { color: var(--text2); }
+  .um-msg { font-size: 0.75rem; margin-top: 10px; min-height: 1em; }
+  .um-msg.err { color: var(--red, #f87171); }
+  .um-msg.ok { color: var(--green); }
+
+  /* History list */
+  .hist-empty { color: var(--text2); font-size: 0.8125rem; text-align: center; padding: 28px 0; }
+  .hist-item { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s, background .15s; }
+  .hist-item:hover { border-color: var(--accent); background: var(--surface2); }
+  .hist-item-main { flex: 1; min-width: 0; }
+  .hist-item-title { font-size: 0.8125rem; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hist-item-meta { font-size: 0.6875rem; color: var(--text2); margin-top: 3px; }
+  .hist-del { border: none; background: transparent; color: var(--text2); cursor: pointer; padding: 4px 6px; border-radius: 6px; font-size: 14px; flex-shrink: 0; }
+  .hist-del:hover { color: var(--red, #f87171); background: var(--bg); }
+  .hist-new { width: 100%; margin-bottom: 14px; padding: 10px; border-radius: 9px; border: 1px dashed var(--border); background: transparent; color: var(--accent); font: 600 0.8125rem inherit; cursor: pointer; transition: background .15s, border-color .15s; }
+  .hist-new:hover { background: var(--surface2); border-color: var(--accent); }
+
   /* ── Tour Overlay & Spotlight ── */
   .tour-overlay {
     position: fixed;
@@ -1092,19 +1181,88 @@ function toggleTheme(){
 <body>
 
 <div class="header">
-  <h1>TaDELS RAG Chat <span class="beta-badge">Beta</span></h1>
+  <h1>TaDELS RAG Chat <span class="beta-badge">Beta</span>
+    <button class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="切換主題">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+    </button>
+  </h1>
   <nav>
-    <button type="button" class="help-btn" onclick="document.getElementById('obBackdrop').classList.add('show')" title="查看新手教學" aria-label="查看新手教學">?</button>
+    <button type="button" class="help-btn" onclick="restartTour()" title="重新觀看操作導覽" aria-label="重新觀看操作導覽">?</button>
     <a href="/intro">Intro</a>
     <a href="/chat" class="active">Chat</a>
     <a href="/entities">Entities</a>
     <a href="/qa">QA pairs</a>
     <a href="/results">Results</a>
-    <button class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="切換主題">
-      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-    </button>
+    <div class="user-menu" id="userMenu">
+      <button class="avatar-btn" id="avatarBtn" type="button" onclick="toggleUserMenu(event)" aria-label="使用者選單" style="display:none">
+        <img id="avatarImg" alt="頭貼">
+      </button>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-head">
+          <img id="ddAvatar" alt="">
+          <div class="user-dropdown-id">
+            <div class="user-dropdown-name" id="ddName"></div>
+            <div class="user-dropdown-email" id="ddEmail"></div>
+          </div>
+        </div>
+        <button class="user-dropdown-item" onclick="newChat()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          新對話
+        </button>
+        <button class="user-dropdown-item" onclick="openHistory()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l3 3"/></svg>
+          聊天記錄
+        </button>
+        <button class="user-dropdown-item" onclick="openSettings()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          設定
+        </button>
+        <div class="user-dropdown-sep"></div>
+        <button class="user-dropdown-item danger" onclick="logout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+          登出
+        </button>
+      </div>
+    </div>
   </nav>
+</div>
+
+<!-- 設定 Modal -->
+<div class="um-backdrop" id="settingsBackdrop" onclick="if(event.target===this) closeSettings()">
+  <div class="um-modal">
+    <div class="um-head"><h2>設定</h2><button class="um-close" onclick="closeSettings()" aria-label="關閉">&times;</button></div>
+    <div class="um-body">
+      <div class="um-avatar-row">
+        <img id="setAvatar" alt="頭貼預覽">
+        <div>
+          <div class="um-label" style="margin-bottom:8px">頭貼</div>
+          <button class="um-btn" type="button" onclick="rerollAvatar()">換一個頭貼</button>
+        </div>
+      </div>
+      <label class="um-label" for="setName">顯示名稱</label>
+      <input class="um-input" id="setName" type="text" maxlength="40" placeholder="你的名字">
+      <div class="um-msg" id="setMsg"></div>
+      <div class="um-attr">
+        頭貼由 <a href="https://www.dicebear.com/styles/glyphs/" target="_blank" rel="noopener">DiceBear · Glyphs</a> 生成。
+        Glyphs 改作自 Matt Houser 之「Abstract Avatars for All Creative Profile Use」，採 <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> 授權。
+      </div>
+    </div>
+    <div class="um-foot">
+      <button class="um-btn" type="button" onclick="closeSettings()">取消</button>
+      <button class="um-btn primary" type="button" onclick="saveSettings()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 聊天記錄 Modal -->
+<div class="um-backdrop" id="historyBackdrop" onclick="if(event.target===this) closeHistory()">
+  <div class="um-modal wide">
+    <div class="um-head"><h2>聊天記錄</h2><button class="um-close" onclick="closeHistory()" aria-label="關閉">&times;</button></div>
+    <div class="um-body" id="historyBody">
+      <div class="hist-empty">載入中…</div>
+    </div>
+  </div>
 </div>
 
 <div class="filter-bar" id="filterBar">
@@ -1449,6 +1607,11 @@ const sendBtn = document.getElementById('sendBtn');
 const welcome = document.getElementById('welcome');
 let isLoading = false;
 
+// 對話分組 id：第一次送出時建立，用於聊天記錄分組與還原
+let currentCid = null;
+function newCid() { return (crypto.randomUUID ? crypto.randomUUID() : 'c-' + Date.now() + '-' + Math.random().toString(36).slice(2)); }
+function ensureCid() { if (!currentCid) currentCid = newCid(); return currentCid; }
+
 input.addEventListener('input', () => {
   input.style.height = 'auto';
   input.style.height = Math.min(input.scrollHeight, 120) + 'px';
@@ -1491,6 +1654,7 @@ async function send() {
         use_rerank: document.getElementById('opt-rerank').checked,
         use_entities: document.getElementById('opt-entities').checked,
         filter_titles: getSelectedTitles(),
+        conversation_id: ensureCid(),
       }),
     });
     if (!resp.ok) throw new Error(await resp.text());
@@ -1627,7 +1791,7 @@ function addTyping() {
   return div;
 }
 
-function addBotMsg(data) {
+function addBotMsg(data, opts = {}) {
   const div = document.createElement('div');
   div.className = 'msg msg-bot';
 
@@ -1694,7 +1858,7 @@ function addBotMsg(data) {
   chatArea.scrollTop = chatArea.scrollHeight;
 
   // Auto-trigger output tour after first response (only if not yet seen)
-  setTimeout(maybeStartOutputTour, 1200);
+  if (!opts.restore) setTimeout(maybeStartOutputTour, 1200);
 }
 
 // ── Side Panel ──
@@ -1971,12 +2135,16 @@ function renderTourStep() {
       top  = rect.top - tipH - 14;
       left = Math.max(12, Math.min(window.innerWidth - tipW - 12, rect.left));
     } else if (step.arrow === 'left') {
-      top  = Math.max(12, rect.top);
+      top  = rect.top;
       left = rect.right + 14;
     } else {
-      top  = Math.max(12, rect.top);
+      top  = rect.top;
       left = rect.left - tipW - 14;
     }
+    // Final clamp: keep the whole tooltip (incl. the Next button) inside the viewport
+    const margin = 12;
+    left = Math.max(margin, Math.min(window.innerWidth  - tipW - margin, left));
+    top  = Math.max(margin, Math.min(window.innerHeight - tipH - margin, top));
     tip.style.top  = top  + 'px';
     tip.style.left = left + 'px';
 
@@ -2030,6 +2198,192 @@ window.restartOutputTour = () => {
   if (document.querySelector('.msg-bot[data-latest] .refs-container')) startOutputTour();
   else console.warn('[restartOutputTour] 還沒有 response，先送出一題再執行');
 };
+
+// ── 使用者 / 頭貼選單 / 設定 / 聊天記錄 ──
+let me = null;  // { email, name, avatar_seed, provider }
+
+function avatarUrl(seed) {
+  return `https://api.dicebear.com/10.x/glyphs/svg?seed=${encodeURIComponent(seed || '')}`;
+}
+
+async function logout() {
+  try { await fetch('/api/logout', { method: 'POST' }); } catch (e) {}
+  location.href = '/login';
+}
+
+// 頭貼下拉選單
+function toggleUserMenu(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('userDropdown');
+  const btn = document.getElementById('avatarBtn');
+  const show = !dd.classList.contains('show');
+  dd.classList.toggle('show', show);
+  btn.classList.toggle('active', show);
+}
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('userMenu');
+  if (menu && !menu.contains(e.target)) {
+    document.getElementById('userDropdown').classList.remove('show');
+    document.getElementById('avatarBtn').classList.remove('active');
+  }
+});
+
+function closeUserMenu() {
+  document.getElementById('userDropdown').classList.remove('show');
+  document.getElementById('avatarBtn').classList.remove('active');
+}
+
+// ── 設定 ──
+let pendingSeed = null;  // 設定視窗中暫存、尚未儲存的頭貼 seed
+function openSettings() {
+  if (!me) return;
+  closeUserMenu();
+  pendingSeed = me.avatar_seed;
+  document.getElementById('setAvatar').src = avatarUrl(pendingSeed);
+  document.getElementById('setName').value = me.name || '';
+  setSetMsg('');
+  document.getElementById('settingsBackdrop').classList.add('show');
+}
+function closeSettings() { document.getElementById('settingsBackdrop').classList.remove('show'); }
+function setSetMsg(text, type) {
+  const el = document.getElementById('setMsg');
+  el.textContent = text || '';
+  el.className = 'um-msg' + (type ? ' ' + type : '');
+}
+function rerollAvatar() {
+  // 前端先產生隨機 seed 預覽；按「儲存」才落地
+  pendingSeed = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random()).replace(/-/g, '').slice(0, 16);
+  document.getElementById('setAvatar').src = avatarUrl(pendingSeed);
+}
+async function saveSettings() {
+  const name = document.getElementById('setName').value.trim();
+  try {
+    if (name && name !== me.name) {
+      const r = await fetch('/api/profile', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.detail || '儲存失敗');
+      me.name = d.name;
+    }
+    if (pendingSeed && pendingSeed !== me.avatar_seed) {
+      const r = await fetch('/api/avatar', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ seed: pendingSeed }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.detail || '儲存失敗');
+      me.avatar_seed = d.avatar_seed;
+    }
+    applyMe();
+    setSetMsg('已儲存', 'ok');
+    setTimeout(closeSettings, 600);
+  } catch (e) {
+    setSetMsg(e.message, 'err');
+  }
+}
+
+// ── 聊天記錄 ──
+function fmtTime(ts) {
+  if (!ts) return '';
+  const d = new Date(ts * 1000);
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}/${p(d.getMonth() + 1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+async function openHistory() {
+  closeUserMenu();
+  document.getElementById('historyBackdrop').classList.add('show');
+  const body = document.getElementById('historyBody');
+  body.innerHTML = '<div class="hist-empty">載入中…</div>';
+  try {
+    const r = await fetch('/api/history');
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || '載入失敗');
+    renderHistory(d.conversations || []);
+  } catch (e) {
+    body.innerHTML = `<div class="hist-empty">載入失敗：${esc(e.message)}</div>`;
+  }
+}
+function closeHistory() { document.getElementById('historyBackdrop').classList.remove('show'); }
+function renderHistory(items) {
+  const body = document.getElementById('historyBody');
+  let html = `<button class="hist-new" onclick="newChat(); closeHistory()">＋ 開始新對話</button>`;
+  if (!items.length) {
+    html += '<div class="hist-empty">尚無聊天記錄</div>';
+  } else {
+    html += items.map(c => `
+      <div class="hist-item" onclick="restoreConversation('${c.cid}')">
+        <div class="hist-item-main">
+          <div class="hist-item-title">${esc(c.title)}</div>
+          <div class="hist-item-meta">${fmtTime(c.updated)} · ${c.count} 則</div>
+        </div>
+        <button class="hist-del" title="刪除此對話" onclick="event.stopPropagation(); deleteConversation('${c.cid}', this)">&times;</button>
+      </div>`).join('');
+  }
+  body.innerHTML = html;
+}
+async function restoreConversation(cid) {
+  try {
+    const r = await fetch('/api/history/' + encodeURIComponent(cid));
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || '載入失敗');
+    if (welcome && welcome.parentNode) welcome.remove();
+    chatArea.innerHTML = '';
+    currentCid = cid;
+    for (const turn of d.turns) {
+      addMsg('user', turn.question);
+      addBotMsg(turn.result || {}, { restore: true });
+    }
+    closeHistory();
+    chatArea.scrollTop = chatArea.scrollHeight;
+  } catch (e) {
+    alert('還原對話失敗：' + e.message);
+  }
+}
+async function deleteConversation(cid, btn) {
+  if (!confirm('確定要刪除這段對話紀錄嗎？此動作無法復原。')) return;
+  try {
+    const r = await fetch('/api/history/' + encodeURIComponent(cid), { method: 'DELETE' });
+    if (!r.ok) throw new Error((await r.json()).detail || '刪除失敗');
+    const item = btn.closest('.hist-item');
+    if (item) item.remove();
+    if (cid === currentCid) newChat();
+  } catch (e) {
+    alert('刪除失敗：' + e.message);
+  }
+}
+
+// ── 新對話 ──
+function newChat() {
+  currentCid = null;
+  chatArea.innerHTML = '';
+  location.reload();  // 重新載入以回到 welcome 畫面
+}
+
+// ── 套用使用者資料到 UI ──
+function applyMe() {
+  if (!me) return;
+  const seed = me.avatar_seed || me.email;
+  document.getElementById('avatarImg').src = avatarUrl(seed);
+  document.getElementById('ddAvatar').src = avatarUrl(seed);
+  document.getElementById('ddName').textContent = me.name || me.email;
+  document.getElementById('ddEmail').textContent = me.email;
+  document.getElementById('avatarBtn').style.display = '';
+}
+
+(async function loadMe() {
+  try {
+    const r = await fetch('/api/me');
+    const d = await r.json();
+    if (d.authenticated) {
+      me = d;
+      applyMe();
+    } else {
+      location.href = '/login';
+    }
+  } catch (e) {}
+})();
 </script>
 </body>
 </html>

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<title>登入 · TaDELS RAG</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<script>
+  // 套用儲存的主題
+  const t = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  // 後端注入：是否啟用 Google 登入
+  window.GOOGLE_ENABLED = __GOOGLE_ENABLED__;
+</script>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #242836;
+    --border: #2e3345;
+    --text: #e1e4ed;
+    --text2: #8b90a0;
+    --accent: #6c8cff;
+    --accent-rgb: 108,140,255;
+    --green: #4ade80;
+    --red: #f87171;
+    --user-bg: #1e3a5f;
+    --glass: rgba(26,29,39,.66);
+    --glass-border: rgba(255,255,255,.10);
+    --veil: radial-gradient(120% 90% at 50% 0%, rgba(108,140,255,.18) 0%, rgba(15,17,23,.55) 45%, rgba(15,17,23,.92) 100%);
+  }
+  [data-theme="light"] {
+    color-scheme: light;
+    --bg: #fcfbf7;
+    --surface: #ffffff;
+    --surface2: #f1efe9;
+    --border: #e0ddd3;
+    --text: #1f1c17;
+    --text2: #6b6356;
+    --accent: #4a63d8;
+    --accent-rgb: 74,99,216;
+    --green: #3da55b;
+    --red: #d84a4a;
+    --user-bg: #e3ebfa;
+    --glass: rgba(255,255,255,.72);
+    --glass-border: rgba(31,28,23,.10);
+    --veil: radial-gradient(120% 90% at 50% 0%, rgba(74,99,216,.12) 0%, rgba(252,251,247,.45) 45%, rgba(252,251,247,.85) 100%);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── 背景：模糊的聊天介面（純裝飾） ── */
+  .bg-scene {
+    position: fixed;
+    inset: -4%;
+    z-index: 0;
+    pointer-events: none;
+    user-select: none;
+    overflow: hidden;
+    filter: blur(16px) brightness(.55) saturate(1.1);
+    transform: scale(1.06);
+    animation: sceneDrift 26s ease-in-out infinite alternate;
+  }
+  [data-theme="light"] .bg-scene { filter: blur(16px) brightness(1.02) saturate(1.04); }
+  @keyframes sceneDrift {
+    from { transform: scale(1.06) translate3d(0, 0, 0); }
+    to   { transform: scale(1.12) translate3d(0, -2%, 0); }
+  }
+  @media (prefers-reduced-motion: reduce) { .bg-scene { animation: none; } }
+
+  /* 背景上方的暗化/光暈遮罩，確保卡片對比 */
+  .bg-veil {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: var(--veil);
+  }
+
+  /* 假聊天版面 */
+  .mock {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .mock-header {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .mock-badge {
+    font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px;
+    background: rgba(var(--accent-rgb),.15); color: var(--accent);
+    border: 1px solid rgba(var(--accent-rgb),.3);
+  }
+  .mock-body { flex: 1; padding: 28px 16%; display: flex; flex-direction: column; gap: 18px; }
+  .mock-row { display: flex; }
+  .mock-row.right { justify-content: flex-end; }
+  .mock-bubble { padding: 13px 17px; border-radius: 14px; font-size: 14px; line-height: 1.7; max-width: 72%; }
+  .mock-bubble.user { background: var(--user-bg); border-bottom-right-radius: 4px; }
+  .mock-bubble.bot { background: var(--surface); border: 1px solid var(--border); width: 100%; max-width: 100%; }
+  .mock-line { height: 11px; border-radius: 5px; background: var(--border); margin: 9px 0; }
+  .mock-line.w90 { width: 90%; } .mock-line.w70 { width: 70%; } .mock-line.w80 { width: 80%; } .mock-line.w50 { width: 50%; }
+  .mock-refcard {
+    margin-top: 12px; padding: 11px 14px; border-radius: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .mock-pill { height: 10px; width: 40%; border-radius: 5px; background: var(--border); }
+  .mock-input {
+    margin: 0 16% 26px; padding: 12px 16px; border-radius: 16px;
+    background: var(--surface); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .mock-input .ph { height: 12px; width: 50%; border-radius: 6px; background: var(--border); }
+  .mock-input .send { width: 36px; height: 30px; border-radius: 9px; background: var(--accent); opacity: .9; }
+
+  /* ── 登入卡片（玻璃） ── */
+  .card {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 390px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    padding: 34px 30px;
+    box-shadow:
+      0 24px 70px rgba(0,0,0,.45),
+      inset 0 1px 0 rgba(255,255,255,.08);
+    -webkit-backdrop-filter: blur(28px) saturate(1.4);
+    backdrop-filter: blur(28px) saturate(1.4);
+    animation: cardIn .6s cubic-bezier(.2,.8,.25,1) both;
+  }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(18px) scale(.97); }
+    to   { opacity: 1; transform: none; }
+  }
+  /* 卡片頂端高光描邊 */
+  .card::before {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(var(--accent-rgb),.45), transparent 40%, transparent 60%, rgba(255,255,255,.10));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .brand { text-align: center; margin-bottom: 24px; animation: riseIn .6s cubic-bezier(.2,.8,.25,1) .08s both; }
+  .brand h1 { font-size: 21px; margin: 0 0 4px; letter-spacing: .5px; }
+  .brand .beta {
+    font-size: 10px; font-weight: 700; color: var(--accent);
+    background: rgba(var(--accent-rgb),.15); border: 1px solid rgba(var(--accent-rgb),.3);
+    padding: 2px 7px; border-radius: 6px; vertical-align: middle; margin-left: 2px;
+  }
+  .brand p { margin: 8px 0 0; font-size: 13px; color: var(--text2); }
+  @keyframes riseIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  .tabs {
+    display: flex; gap: 4px;
+    background: rgba(var(--accent-rgb),.06);
+    border: 1px solid var(--glass-border);
+    border-radius: 11px; padding: 4px; margin-bottom: 22px;
+    animation: riseIn .6s cubic-bezier(.2,.8,.25,1) .14s both;
+  }
+  .tabs button {
+    flex: 1; border: none; background: transparent; color: var(--text2);
+    padding: 9px; border-radius: 8px; font: 600 13px inherit; cursor: pointer;
+    transition: background .2s, color .2s, box-shadow .2s;
+  }
+  .tabs button.active { background: var(--surface); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+
+  form { animation: riseIn .6s cubic-bezier(.2,.8,.25,1) .2s both; }
+  label { display: block; font-size: 12px; color: var(--text2); margin: 0 0 6px; }
+  input {
+    width: 100%; padding: 12px 14px; margin-bottom: 16px;
+    background: rgba(var(--accent-rgb),.04);
+    border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font: 14px inherit;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+  }
+  input::placeholder { color: var(--text2); }
+  input:focus {
+    outline: none; border-color: var(--accent);
+    background: rgba(var(--accent-rgb),.07);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb),.16);
+  }
+
+  .btn {
+    width: 100%; padding: 13px; border: none; border-radius: 10px;
+    background: var(--accent); color: #fff; font: 600 14px inherit; cursor: pointer;
+    transition: filter .15s, transform .12s, box-shadow .2s, opacity .15s;
+    box-shadow: 0 6px 18px rgba(var(--accent-rgb),.35);
+  }
+  .btn:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 10px 24px rgba(var(--accent-rgb),.45); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: .5; cursor: default; box-shadow: none; transform: none; filter: none; }
+
+  .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--text2); font-size: 12px; }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+  .google-btn {
+    width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px;
+    background: rgba(var(--accent-rgb),.04); color: var(--text); font: 600 14px inherit; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: border-color .2s, background .2s, transform .12s;
+  }
+  .google-btn:hover { border-color: var(--accent); background: rgba(var(--accent-rgb),.09); transform: translateY(-1px); }
+  .google-btn:disabled { opacity: .5; cursor: default; transform: none; }
+  .google-btn svg { width: 18px; height: 18px; }
+
+  .msg { font-size: 13px; margin: 0 0 16px; padding: 10px 13px; border-radius: 9px; display: none; }
+  .msg.err { display: block; color: var(--red); background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.25); }
+  .msg.ok  { display: block; color: var(--green); background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.25); }
+
+  /* 同意條款 */
+  .consent {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 12.5px; color: var(--text2); line-height: 1.5; margin: 4px 0 18px;
+  }
+  .consent input { width: auto; margin: 2px 0 0; flex: none; accent-color: var(--accent); cursor: pointer; }
+  .consent-text { cursor: pointer; }
+  .consent-link { color: var(--accent); text-decoration: underline; }
+  .consent-text:hover .consent-link { filter: brightness(1.15); }
+  /* 未勾同意時的提示 */
+  .consent-err {
+    display: none;
+    color: var(--red); font-size: 12px; line-height: 1.5;
+    margin: -8px 0 14px; padding-left: 24px;
+  }
+  .consent-err.show { display: block; animation: shake .3s; }
+  .consent.flash input { outline: 2px solid var(--red); outline-offset: 2px; border-radius: 3px; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+  /* 註冊時的頭貼預覽 */
+  .reg-avatar { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .reg-avatar img { width: 56px; height: 56px; border-radius: 14px; border: 1px solid var(--border); background: #fff; flex-shrink: 0; }
+  .reg-avatar .reroll {
+    padding: 7px 12px; border: 1px solid var(--border); border-radius: 9px;
+    background: rgba(var(--accent-rgb),.04); color: var(--text);
+    font: 600 12.5px inherit; cursor: pointer; transition: border-color .2s, background .2s;
+  }
+  .reg-avatar .reroll:hover { border-color: var(--accent); background: rgba(var(--accent-rgb),.09); }
+  .reg-avatar .cap { font-size: 11px; color: var(--text2); margin-top: 5px; line-height: 1.5; }
+  .reg-avatar .cap a { color: var(--text2); }
+
+  /* 主題切換鈕（右上角） */
+  .theme-toggle {
+    position: fixed; top: 18px; right: 18px; z-index: 3;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    cursor: pointer; padding: 8px; color: var(--text2);
+    display: inline-flex; align-items: center; border-radius: 10px;
+    transition: color .2s, border-color .2s;
+  }
+  .theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; }
+  .theme-toggle .icon-sun { display: none; }
+  [data-theme="light"] .theme-toggle .icon-sun { display: block; }
+  [data-theme="light"] .theme-toggle .icon-moon { display: none; }
+
+  /* 條款 Modal */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.55);
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center;
+    padding: 24px; z-index: 100;
+    opacity: 0; transition: opacity .25s;
+  }
+  .modal-backdrop.show { display: flex; opacity: 1; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; max-width: 560px; width: 100%; max-height: 82vh;
+    display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    transform: translateY(12px) scale(.97); transition: transform .3s cubic-bezier(.2,.8,.3,1.1);
+  }
+  .modal-backdrop.show .modal { transform: none; }
+  .modal-head {
+    padding: 18px 22px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal-head h2 { margin: 0; font-size: 16px; }
+  .modal-close {
+    border: none; background: transparent; color: var(--text2);
+    font-size: 22px; line-height: 1; cursor: pointer; padding: 0 4px;
+  }
+  .modal-close:hover { color: var(--text); }
+  .modal-body { padding: 18px 22px; overflow-y: auto; }
+  .modal-body h3 { font-size: 14px; margin: 18px 0 6px; color: var(--text); }
+  .modal-body h3:first-child { margin-top: 0; }
+  .modal-body p { font-size: 13px; line-height: 1.7; color: var(--text2); margin: 0; }
+  .modal-foot {
+    padding: 14px 22px; border-top: 1px solid var(--border);
+    display: flex; gap: 10px; justify-content: flex-end;
+  }
+  .modal-foot .btn { width: auto; padding: 9px 18px; box-shadow: none; }
+  .modal-foot .btn.ghost { background: var(--surface2); color: var(--text); }
+
+  @media (max-width: 640px) {
+    .mock-body, .mock-input { padding-left: 6%; padding-right: 6%; }
+    .mock-input { margin-left: 6%; margin-right: 6%; }
+  }
+</style>
+</head>
+<body>
+  <!-- 背景：模糊聊天介面（裝飾，無實際資料） -->
+  <div class="bg-scene" aria-hidden="true">
+    <div class="mock">
+      <div class="mock-header">TaDELS RAG Chat <span class="mock-badge">Beta</span></div>
+      <div class="mock-body">
+        <div class="mock-row right"><div class="mock-bubble user">關於 COVID-19 的社群討論趨勢如何？</div></div>
+        <div class="mock-row"><div class="mock-bubble bot">
+          <div class="mock-line w90"></div>
+          <div class="mock-line w80"></div>
+          <div class="mock-line w70"></div>
+          <div class="mock-refcard"><div class="mock-pill"></div><div class="mock-pill" style="width:18%"></div></div>
+          <div class="mock-refcard"><div class="mock-pill" style="width:55%"></div><div class="mock-pill" style="width:14%"></div></div>
+        </div></div>
+        <div class="mock-row right"><div class="mock-bubble user">能再幫我整理重點嗎？</div></div>
+        <div class="mock-row"><div class="mock-bubble bot">
+          <div class="mock-line w80"></div>
+          <div class="mock-line w50"></div>
+        </div></div>
+      </div>
+      <div class="mock-input"><div class="ph"></div><div class="send"></div></div>
+    </div>
+  </div>
+  <div class="bg-veil" aria-hidden="true"></div>
+
+  <!-- 主題切換 -->
+  <button class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="切換主題">
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+  </button>
+
+  <div class="card">
+    <div class="brand">
+      <h1>TaDELS RAG <span class="beta">Beta</span></h1>
+      <p>請先登入以使用聊天功能</p>
+    </div>
+
+    <div class="tabs">
+      <button id="tabLogin" class="active" onclick="switchTab('login')">登入</button>
+      <button id="tabRegister" onclick="switchTab('register')">註冊</button>
+    </div>
+
+    <div class="msg" id="msg"></div>
+
+    <form id="authForm" onsubmit="return submitForm(event)">
+      <div id="nameField" style="display:none">
+        <div class="reg-avatar">
+          <img id="regAvatar" alt="頭貼預覽">
+          <div>
+            <button type="button" class="reroll" onclick="rerollRegAvatar()">換一個頭貼</button>
+            <div class="cap">頭貼由 <a href="https://www.dicebear.com/styles/glyphs/" target="_blank" rel="noopener">DiceBear · Glyphs</a> 生成（CC BY 4.0）</div>
+          </div>
+        </div>
+        <label for="name">顯示名稱（選填）</label>
+        <input id="name" type="text" autocomplete="name" placeholder="你的名字">
+      </div>
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+      <label for="password">密碼</label>
+      <input id="password" type="password" autocomplete="current-password" placeholder="至少 6 個字元" required>
+      <div class="consent" id="consentBlock" style="display:none">
+        <input id="agree" type="checkbox" onchange="updateGate()">
+        <span class="consent-text" onclick="openTerms()" title="點此閱讀條款">
+          我已閱讀並同意 <span class="consent-link">《使用條款與隱私政策》</span>
+        </span>
+      </div>
+      <div class="consent-err" id="consentErr">請先勾選確認同意使用條款，才能繼續。</div>
+      <button class="btn" id="submitBtn" type="submit">登入</button>
+    </form>
+
+    <div id="googleBlock">
+      <div class="divider">或</div>
+      <button class="google-btn" id="googleBtn" type="button" onclick="googleLogin()">
+        <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        使用 Google 帳號登入
+      </button>
+    </div>
+  </div>
+
+  <!-- 使用條款 Modal -->
+  <div class="modal-backdrop" id="termsModal" onclick="if(event.target===this) closeTerms()">
+    <div class="modal">
+      <div class="modal-head">
+        <h2>TaDELS RAG 使用條款與隱私政策</h2>
+        <button class="modal-close" onclick="closeTerms()" aria-label="關閉">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h3>一、使用提醒</h3>
+        <p>TaDELS RAG 系統以人工智慧（檢索增強生成，RAG）技術產生回應，其結果取決於系統所收錄之文件、檢索與生成模型，以及訓練資料本身可能存在的偏誤，無法保證內容之完整、正確或最新。本系統之回應僅供研究與參考，不構成任何法律意見或專業建議；使用者應自行審酌、查證，並於必要時諮詢合格之專業人員。請勿於提問或輸入內容中提供姓名、身分證字號、聯絡方式等個人身分資訊，或任何機密、敏感資料。</p>
+
+        <h3>二、免責聲明</h3>
+        <p>本系統依「現況」與「現有功能」提供服務，開發團隊對於系統內容之正確性、即時性、完整性、可用性或服務之不中斷，均不作任何明示或默示之保證。對於使用者因使用或無法使用本系統，所生之任何直接、間接、附帶或衍生之損失或損害，開發團隊不負賠償責任。使用本系統之一切風險，由使用者自行承擔。</p>
+
+        <h3>三、對話紀錄之蒐集與運用</h3>
+        <p>為持續優化檢索與回應品質，本系統<b>會記錄並保存您與系統之對話內容</b>，包含您的提問、系統回應、檢索到的文件編號、所選用之系統選項與操作時間，並以您帳號之去識別化代號（而非明文電子郵件）與該等紀錄建立關聯後保存。前述對話資料可能被用於系統除錯、品質監控、研究分析，以及檢索與生成模型之評估與優化。本系統不會將您的對話內容公開，亦不會提供予與本研究無關之第三方作為識別個人之用途。為保護您的隱私，<b>請勿於提問中輸入姓名、身分證字號、聯絡方式等個人身分資訊，或任何機密、敏感資料</b>；您送出之內容即視為同意依本條款保存與運用。您可隨時於「設定 → 聊天記錄」自行刪除，或來信要求查詢或刪除與您帳號關聯之對話紀錄。</p>
+
+        <h3>四、帳號與登入資訊</h3>
+        <p>以 Email 或 Google 帳號登入時，本系統僅取得用於建立帳號之電子郵件與顯示名稱；密碼以單向雜湊方式保存，本系統無法還原您的明文密碼。登入狀態以加密簽章之 Cookie 維持，您可隨時登出以結束該狀態。</p>
+
+        <h3>五、知情同意</h3>
+        <p>當您勾選同意並開始使用本系統，即表示您已閱讀、理解並同意本條款及隱私政策之全部內容，包含第三條所述之對話紀錄蒐集與運用。若您不同意其中任何部分，請勿勾選同意並停止使用本系統。本團隊保留隨時修訂本條款之權利，修訂後之條款於系統公告時生效。</p>
+      </div>
+      <div class="modal-foot">
+        <button class="btn ghost" type="button" onclick="closeTerms()">關閉</button>
+        <button class="btn" type="button" onclick="agreeFromModal()">我同意</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  let mode = 'login';
+  let regSeed = null;  // null = 跟著 email 走；非 null = 使用者手動換過
+
+  function avatarUrl(seed) {
+    return `https://api.dicebear.com/10.x/glyphs/svg?seed=${encodeURIComponent(seed || 'guest')}`;
+  }
+  function updateRegAvatar() {
+    const seed = regSeed || document.getElementById('email').value.trim().toLowerCase() || 'guest';
+    document.getElementById('regAvatar').src = avatarUrl(seed);
+  }
+  function rerollRegAvatar() {
+    regSeed = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random()).replace(/-/g, '').slice(0, 16);
+    updateRegAvatar();
+  }
+
+  function toggleTheme() {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+  }
+
+  // Google 未設定就隱藏整塊
+  if (!window.GOOGLE_ENABLED) {
+    document.getElementById('googleBlock').style.display = 'none';
+  }
+
+  // URL 帶 ?error= 時顯示提示
+  const params = new URLSearchParams(location.search);
+  const err = params.get('error');
+  if (err === 'agree') {
+    showMsg('請先勾選同意使用條款後再登入。', 'err');
+  } else if (err) {
+    showMsg('Google 登入失敗，請再試一次。', 'err');
+  }
+
+  // 勾選同意後，把提示與紅框收掉
+  function updateGate() {
+    if (document.getElementById('agree').checked) hideConsentErr();
+  }
+
+  // 未勾同意時：顯示紅字提示 + 輸入框紅框 + 抖動，回傳 false
+  function consentOk() {
+    if (document.getElementById('agree').checked) { hideConsentErr(); return true; }
+    const errEl = document.getElementById('consentErr');
+    errEl.classList.remove('show');  // 重新觸發動畫
+    void errEl.offsetWidth;
+    errEl.classList.add('show');
+    document.querySelector('.consent').classList.add('flash');
+    return false;
+  }
+  function hideConsentErr() {
+    document.getElementById('consentErr').classList.remove('show');
+    document.querySelector('.consent').classList.remove('flash');
+  }
+
+  // Google 登入：註冊情境（顯示同意區）才需先勾選
+  function googleLogin() {
+    if (mode === 'register' && !consentOk()) return;
+    location.href = '/auth/google/login?agree=1';
+  }
+
+  // 條款 Modal
+  function openTerms()  { document.getElementById('termsModal').classList.add('show'); }
+  function closeTerms() { document.getElementById('termsModal').classList.remove('show'); }
+  function agreeFromModal() {
+    document.getElementById('agree').checked = true;
+    updateGate();
+    closeTerms();
+  }
+
+  function switchTab(m) {
+    mode = m;
+    const isReg = m === 'register';
+    document.getElementById('tabLogin').classList.toggle('active', !isReg);
+    document.getElementById('tabRegister').classList.toggle('active', isReg);
+    document.getElementById('nameField').style.display = isReg ? 'block' : 'none';
+    // 同意條款只在「註冊」時要求；登入者已於註冊時確認過
+    document.getElementById('consentBlock').style.display = isReg ? 'flex' : 'none';
+    hideConsentErr();
+    document.getElementById('submitBtn').textContent = isReg ? '建立帳號' : '登入';
+    document.getElementById('password').setAttribute(
+      'autocomplete', isReg ? 'new-password' : 'current-password');
+    if (isReg) updateRegAvatar();
+    hideMsg();
+  }
+
+  // 註冊時，頭貼預設跟著 email 變動（除非已手動換過）
+  document.getElementById('email').addEventListener('input', () => {
+    if (mode === 'register' && !regSeed) updateRegAvatar();
+  });
+
+  function showMsg(text, type) {
+    const el = document.getElementById('msg');
+    el.textContent = text;
+    el.className = 'msg ' + type;
+  }
+  function hideMsg() { document.getElementById('msg').className = 'msg'; }
+
+  async function submitForm(e) {
+    e.preventDefault();
+    hideMsg();
+    // 註冊才檢查同意；登入者於註冊時已確認過
+    if (mode === 'register' && !consentOk()) return false;
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    const body = {
+      email: document.getElementById('email').value.trim(),
+      password: document.getElementById('password').value,
+      agree: mode === 'register' ? document.getElementById('agree').checked : true,
+    };
+    const url = mode === 'register' ? '/api/register' : '/api/login';
+    if (mode === 'register') {
+      body.name = document.getElementById('name').value.trim();
+      body.avatar_seed = regSeed || '';  // 空＝後端依 email 自動生成
+    }
+    try {
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.detail || '發生錯誤');
+      location.href = '/chat';
+    } catch (err) {
+      showMsg(err.message, 'err');
+      btn.disabled = false;
+    }
+    return false;
+  }
+</script>
+</body>
+</html>
